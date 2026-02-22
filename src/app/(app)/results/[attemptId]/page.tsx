@@ -9,15 +9,21 @@ import {
     CheckCircle,
     XCircle,
     Target,
+    Zap,
+    Sparkles,
+    Gauge,
+    AlertTriangle,
+    History,
 } from "lucide-react";
+import AIInsightCard from "../ai-insight-card";
 
 export const dynamic = "force-dynamic";
 
-const subjectColors: Record<string, { bg: string; text: string; bar: string }> = {
-    Biology: { bg: "bg-green-50", text: "text-green-700", bar: "bg-green-500" },
-    Chemistry: { bg: "bg-purple-50", text: "text-purple-700", bar: "bg-purple-500" },
-    Physics: { bg: "bg-blue-50", text: "text-blue-700", bar: "bg-blue-500" },
-    English: { bg: "bg-orange-50", text: "text-orange-700", bar: "bg-orange-500" },
+const subjectColors: Record<string, { bg: string; text: string; bar: string; glow: string }> = {
+    Biology: { bg: "bg-emerald-50", text: "text-emerald-700", bar: "bg-emerald-500", glow: "shadow-emerald-500/20" },
+    Chemistry: { bg: "bg-purple-50", text: "text-purple-700", bar: "bg-purple-500", glow: "shadow-purple-500/20" },
+    Physics: { bg: "bg-blue-50", text: "text-blue-700", bar: "bg-blue-500", glow: "shadow-blue-500/20" },
+    English: { bg: "bg-amber-50", text: "text-amber-700", bar: "bg-amber-500", glow: "shadow-amber-500/20" },
 };
 
 export default async function ResultsPage({
@@ -35,13 +41,11 @@ export default async function ResultsPage({
         .eq("id", attemptId)
         .single();
 
-    if (!attempt) {
-        notFound();
-    }
+    if (!attempt) notFound();
 
     const paper = attempt.papers as { id: string; title: string; year: number; total_questions: number };
 
-    // Fetch answers with questions and options
+    // Fetch answers with detailed metadata
     const { data: answers } = await supabase
         .from("attempt_answers")
         .select("*, questions(*, options(*))")
@@ -49,11 +53,14 @@ export default async function ResultsPage({
 
     const answersList = answers || [];
 
-    // Calculate stats
+    // Stats Calculation
     const totalQuestions = paper.total_questions;
     const correctCount = attempt.score;
-    const incorrectCount = totalQuestions - correctCount;
     const percentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+
+    // Time Analysis
+    const totalSeconds = attempt.time_taken;
+    const avgTimePerQuestion = totalQuestions > 0 ? totalSeconds / totalQuestions : 0;
 
     const formatTime = (seconds: number) => {
         const hrs = Math.floor(seconds / 3600);
@@ -63,200 +70,220 @@ export default async function ResultsPage({
         return `${mins}m ${secs}s`;
     };
 
-    // Subject breakdown
-    const subjectStats: Record<string, { correct: number; total: number }> = {};
+    // Subject & Time Breakdown
+    const subjectStats: Record<string, { correct: number; total: number; time: number }> = {};
     answersList.forEach((a) => {
         const question = a.questions as { subject: string };
         if (!question) return;
         const subject = question.subject;
         if (!subjectStats[subject]) {
-            subjectStats[subject] = { correct: 0, total: 0 };
+            subjectStats[subject] = { correct: 0, total: 0, time: 0 };
         }
         subjectStats[subject].total++;
+        subjectStats[subject].time += (a.time_spent || 0);
         if (a.is_correct) subjectStats[subject].correct++;
     });
 
-    // Grade
     const getGrade = (pct: number) => {
-        if (pct >= 90) return { label: "Excellent!", color: "text-green-600", emoji: "🏆" };
-        if (pct >= 75) return { label: "Great Job!", color: "text-blue-600", emoji: "🎉" };
-        if (pct >= 60) return { label: "Good Effort", color: "text-primary-600", emoji: "💪" };
-        if (pct >= 40) return { label: "Keep Trying", color: "text-amber-600", emoji: "📚" };
-        return { label: "Needs Practice", color: "text-red-600", emoji: "🔄" };
+        if (pct >= 90) return { label: "Elite Dominance", status: "MASTER", emoji: "🏆", color: "from-primary-600 to-blue-800" };
+        if (pct >= 75) return { label: "High Proficiency", status: "PROFICIENT", emoji: "🔥", color: "from-emerald-600 to-teal-800" };
+        if (pct >= 60) return { label: "Solid Foundation", status: "AVERAGE", emoji: "💪", color: "from-amber-600 to-orange-800" };
+        return { label: "Draft Stage", status: "RETRY", emoji: "📚", color: "from-red-600 to-rose-800" };
     };
 
     const grade = getGrade(percentage);
 
     return (
-        <div className="animate-fade-in max-w-4xl mx-auto space-y-8">
-            {/* Score Header */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 via-primary-700 to-blue-800 p-6 sm:p-8 text-white shadow-lg">
-                <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
-                <div className="absolute bottom-0 left-0 w-56 h-56 bg-primary-400/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
-                <div className="relative text-center">
-                    <p className="text-5xl mb-2">{grade.emoji}</p>
-                    <h1 className="text-3xl font-bold mb-1">{grade.label}</h1>
-                    <p className="text-primary-200 mb-6">{paper.title}</p>
+        <div className="animate-fade-in max-w-5xl mx-auto space-y-12 pb-24 px-4">
 
-                    <div className="inline-flex items-baseline gap-1 bg-white/15 backdrop-blur-sm rounded-2xl px-8 py-4 border border-white/20">
-                        <span className="text-5xl font-extrabold">{correctCount}</span>
-                        <span className="text-2xl text-primary-200 font-medium">/ {totalQuestions}</span>
+            {/* Elite Score Hero */}
+            <div className={`relative overflow-hidden rounded-[3rem] bg-gradient-to-br ${grade.color} p-10 sm:p-16 text-white shadow-2xl transition-all duration-700`}>
+                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4" />
+                <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/4" />
+
+                <div className="relative flex flex-col items-center text-center">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-black uppercase tracking-[0.3em] mb-8">
+                        <Sparkles className="w-3.5 h-3.5 text-primary-200" />
+                        Session Ingestion Compiled
                     </div>
 
-                    <div className="flex items-center justify-center gap-6 mt-6 text-sm">
-                        <span className="flex items-center gap-1.5">
-                            <Target className="w-4 h-4" />
-                            {percentage}% accuracy
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                            <Clock className="w-4 h-4" />
-                            {formatTime(attempt.time_taken)}
-                        </span>
+                    <h1 className="text-5xl sm:text-7xl font-black italic tracking-tighter mb-4 flex items-center gap-4">
+                        {grade.label} <span className="text-3xl not-italic opacity-40">{grade.emoji}</span>
+                    </h1>
+
+                    <p className="text-white/60 font-black uppercase tracking-widest text-xs mb-12">
+                        Archive: {paper.title} • Grade: {grade.status}
+                    </p>
+
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-white/20 blur-3xl rounded-full scale-150 group-hover:bg-white/30 transition-all duration-700" />
+                        <div className="relative flex items-baseline gap-2 bg-white text-gray-900 rounded-[2.5rem] px-12 py-8 shadow-2xl shadow-black/20 border-4 border-white/20">
+                            <span className="text-7xl font-black italic">{correctCount}</span>
+                            <span className="text-3xl text-gray-400 font-bold">/ {totalQuestions}</span>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mt-16 w-full max-w-3xl">
+                        <div className="text-center space-y-1">
+                            <p className="text-2xl font-black italic">{percentage}%</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Accuracy</p>
+                        </div>
+                        <div className="text-center space-y-1">
+                            <p className="text-2xl font-black italic">{formatTime(totalSeconds)}</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Total Meta-Time</p>
+                        </div>
+                        <div className="text-center space-y-1">
+                            <p className="text-2xl font-black italic">{Math.round(avgTimePerQuestion)}s</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Avg/Question</p>
+                        </div>
+                        <div className="text-center space-y-1">
+                            <p className="text-2xl font-black italic">{correctCount}</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Commits</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-card text-center">
-                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                        <CheckCircle className="w-5 h-5 text-green-600" />
-                    </div>
-                    <p className="text-2xl font-bold text-green-700">{correctCount}</p>
-                    <p className="text-xs text-gray-500">Correct</p>
-                </div>
-                <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-card text-center">
-                    <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                        <XCircle className="w-5 h-5 text-red-600" />
-                    </div>
-                    <p className="text-2xl font-bold text-red-700">{incorrectCount}</p>
-                    <p className="text-xs text-gray-500">Incorrect</p>
-                </div>
-                <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-card text-center">
-                    <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                        <Trophy className="w-5 h-5 text-primary-600" />
-                    </div>
-                    <p className="text-2xl font-bold text-primary-700">{percentage}%</p>
-                    <p className="text-xs text-gray-500">Score</p>
-                </div>
-            </div>
-
-            {/* Subject Breakdown */}
-            <div className="bg-white rounded-xl border border-gray-100 shadow-card p-6">
-                <h2 className="font-semibold text-gray-900 mb-5">Subject Performance</h2>
-                <div className="space-y-4">
-                    {Object.entries(subjectStats).map(([subject, stats]) => {
-                        const pct = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
-                        const colors = subjectColors[subject] || { bg: "bg-gray-50", text: "text-gray-700", bar: "bg-gray-500" };
-                        return (
-                            <div key={subject}>
-                                <div className="flex items-center justify-between text-sm mb-2">
-                                    <span className={`font-medium ${colors.text}`}>{subject}</span>
-                                    <span className="text-gray-500">
-                                        {stats.correct}/{stats.total} ({pct}%)
-                                    </span>
+            {/* Subject Tactical Breakdown */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div className="lg:col-span-12">
+                    <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl shadow-gray-200/20">
+                        <div className="flex items-center justify-between mb-10">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-primary-900 text-white flex items-center justify-center font-black">
+                                    <Gauge className="w-6 h-6" />
                                 </div>
-                                <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                                    <div
-                                        className={`h-full ${colors.bar} rounded-full transition-all duration-700`}
-                                        style={{ width: `${pct}%` }}
-                                    />
+                                <div>
+                                    <h2 className="text-2xl font-black tracking-tight text-gray-900">Tactical Performance</h2>
+                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Cross-Subject Diagnostic</p>
                                 </div>
                             </div>
-                        );
-                    })}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            {Object.entries(subjectStats).map(([subject, stats]) => {
+                                const pct = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+                                const avgSubjectTime = stats.total > 0 ? stats.time / stats.total : 0;
+                                const colors = subjectColors[subject] || subjectColors.Physics;
+
+                                return (
+                                    <div key={subject} className="space-y-6">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-3 h-3 rounded-full ${colors.bar} ${colors.glow}`} />
+                                                <span className="text-lg font-black italic text-gray-900">{subject}</span>
+                                            </div>
+                                            <div className="flex items-center gap-4">
+                                                <div className="text-right">
+                                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Density</p>
+                                                    <p className="font-black text-gray-900">{Math.round(avgSubjectTime)}s/q</p>
+                                                </div>
+                                                <div className="h-6 w-px bg-gray-100" />
+                                                <span className="text-2xl font-black text-gray-900 italic">{pct}%</span>
+                                            </div>
+                                        </div>
+                                        <div className="h-4 bg-gray-100 rounded-full overflow-hidden p-1 shadow-inner">
+                                            <div
+                                                className={`h-full ${colors.bar} rounded-full transition-all duration-1000 ${colors.glow}`}
+                                                style={{ width: `${pct}%` }}
+                                            />
+                                        </div>
+                                        <p className="text-[10px] font-bold text-gray-400 leading-relaxed italic">
+                                            {pct > 80 ? "Dominant performance. Strategy: Maintain current retention." : "Efficiency gap detected. Strategy: Target high-value misconceptions."}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {/* Question Review */}
-            <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Question Review</h2>
-                <div className="space-y-4">
+            {/* Smart Review Trace */}
+            <div className="space-y-8">
+                <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center">
+                        <History className="w-5 h-5 text-primary-400" />
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-black tracking-tight text-gray-900">Analysis Trace</h2>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Question-by-Question Diagnostic</p>
+                    </div>
+                </div>
+
+                <div className="grid gap-8">
                     {answersList.map((answer, idx) => {
-                        const question = answer.questions as {
-                            id: string;
-                            question_text: string;
-                            subject: string;
-                            options: { id: string; option_text: string; is_correct: boolean }[];
-                        };
+                        const question = answer.questions as any;
                         if (!question) return null;
+
+                        const isMistake = !answer.is_correct;
+                        const timeStatus = answer.time_spent > (avgTimePerQuestion * 1.5) ? "Slow" : answer.time_spent < (avgTimePerQuestion * 0.5) ? "Fast" : "Optimal";
 
                         return (
                             <div
                                 key={answer.id}
-                                className={`bg-white rounded-xl border shadow-card overflow-hidden ${answer.is_correct ? "border-green-200" : "border-red-200"
-                                    }`}
+                                className={`group bg-white rounded-[2.5rem] border transition-all duration-500 overflow-hidden ${isMistake ? "border-red-100 shadow-xl shadow-red-500/5 hover:border-red-200" : "border-gray-100 hover:border-emerald-200"}`}
                             >
-                                <div
-                                    className={`px-5 py-3 border-b flex items-center justify-between ${answer.is_correct
-                                        ? "bg-green-50 border-green-100"
-                                        : "bg-red-50 border-red-100"
-                                        }`}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <span
-                                            className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${answer.is_correct
-                                                ? "bg-green-200 text-green-800"
-                                                : "bg-red-200 text-red-800"
-                                                }`}
-                                        >
+                                {/* Compact Card Header */}
+                                <div className={`px-10 py-6 flex items-center justify-between border-b ${isMistake ? "bg-red-50/30 border-red-50" : "bg-emerald-50/30 border-emerald-50"}`}>
+                                    <div className="flex items-center gap-6">
+                                        <span className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black italic ${isMistake ? "bg-red-500 text-white" : "bg-emerald-500 text-white"}`}>
                                             {idx + 1}
                                         </span>
-                                        {answer.is_correct ? (
-                                            <CheckCircle className="w-4 h-4 text-green-600" />
-                                        ) : (
-                                            <XCircle className="w-4 h-4 text-red-600" />
-                                        )}
-                                        <span
-                                            className={`text-xs font-medium ${answer.is_correct ? "text-green-700" : "text-red-700"
-                                                }`}
-                                        >
-                                            {answer.is_correct ? "Correct" : "Incorrect"}
-                                        </span>
+                                        <div className="flex flex-col">
+                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Execution Metric</span>
+                                            <div className="flex items-center gap-2">
+                                                <Clock className={`w-3.5 h-3.5 ${isMistake ? "text-red-400" : "text-emerald-400"}`} />
+                                                <span className="text-sm font-black italic text-gray-900">{answer.time_spent}s</span>
+                                                <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${timeStatus === "Slow" ? "bg-red-100 text-red-600" :
+                                                        timeStatus === "Fast" ? "bg-amber-100 text-amber-600" : "bg-emerald-100 text-emerald-600"
+                                                    }`}>
+                                                    {timeStatus}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <span className="text-xs text-gray-400">{question.subject}</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-300">{question.subject}</span>
                                 </div>
-                                <div className="p-5">
-                                    <p className="text-gray-900 font-medium mb-4">
+
+                                <div className="p-10">
+                                    <h3 className="text-xl sm:text-2xl font-bold leading-tight text-gray-900 mb-8 italic">
                                         {question.question_text}
-                                    </p>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                        {question.options?.map((option, optIdx) => {
+                                    </h3>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {question.options?.map((option: any, optIdx: number) => {
                                             const isSelected = answer.selected_option_id === option.id;
                                             const isCorrect = option.is_correct;
-                                            let style = "bg-gray-50 border-gray-100 text-gray-600";
-                                            if (isCorrect) {
-                                                style = "bg-green-50 border-green-200 text-green-800";
-                                            } else if (isSelected && !isCorrect) {
-                                                style = "bg-red-50 border-red-200 text-red-800";
-                                            }
 
                                             return (
                                                 <div
                                                     key={option.id}
-                                                    className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm border ${style}`}
+                                                    className={`flex items-center gap-6 px-6 py-4 rounded-2xl border-2 transition-all ${isCorrect ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-900" :
+                                                            isSelected && !isCorrect ? "bg-red-500/5 border-red-500/20 text-red-900" :
+                                                                "bg-gray-50 border-gray-100 text-gray-500 opacity-60"
+                                                        }`}
                                                 >
-                                                    <span
-                                                        className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold shrink-0 ${isCorrect
-                                                            ? "bg-green-200 text-green-800"
-                                                            : isSelected
-                                                                ? "bg-red-200 text-red-800"
-                                                                : "bg-gray-200 text-gray-500"
-                                                            }`}
-                                                    >
+                                                    <span className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black shrink-0 ${isCorrect ? "bg-emerald-500 text-white" :
+                                                            isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500"
+                                                        }`}>
                                                         {String.fromCharCode(65 + optIdx)}
                                                     </span>
-                                                    <span className="flex-1">{option.option_text}</span>
-                                                    {isCorrect && (
-                                                        <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
-                                                    )}
-                                                    {isSelected && !isCorrect && (
-                                                        <XCircle className="w-4 h-4 text-red-500 shrink-0" />
-                                                    )}
+                                                    <span className="flex-1 font-bold text-sm tracking-tight">{option.option_text}</span>
+                                                    {isCorrect && <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />}
+                                                    {isSelected && !isCorrect && <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />}
                                                 </div>
                                             );
                                         })}
                                     </div>
+
+                                    {/* AI Insight Injection */}
+                                    {isMistake && (
+                                        <AIInsightCard
+                                            answerId={answer.id}
+                                            initialInsight={answer.ai_analysis}
+                                        />
+                                    )}
                                 </div>
                             </div>
                         );
@@ -264,21 +291,21 @@ export default async function ResultsPage({
                 </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex items-center justify-center gap-4 pb-8">
+            {/* Bottom Tactical Actions */}
+            <div className="flex items-center justify-center gap-8 py-12">
                 <Link
                     href="/papers"
-                    className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
+                    className="flex items-center gap-3 px-10 py-5 bg-white border-2 border-gray-100 text-gray-900 font-black uppercase tracking-widest text-xs rounded-3xl hover:bg-gray-50 hover:border-gray-900 transition-all active:scale-95 shadow-xl shadow-gray-200/20"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    Back to Papers
+                    Archive
                 </Link>
                 <Link
                     href={`/quiz/${paper.id}`}
-                    className="flex items-center gap-2 px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-sm"
+                    className="flex items-center gap-3 px-10 py-5 bg-gray-900 text-white font-black uppercase tracking-widest text-xs rounded-3xl hover:bg-black transition-all active:scale-95 shadow-2xl shadow-black/30"
                 >
-                    <RotateCcw className="w-4 h-4" />
-                    Retake Quiz
+                    <RotateCcw className="w-4 h-4 italic" />
+                    Recalibrate Session
                 </Link>
             </div>
         </div>

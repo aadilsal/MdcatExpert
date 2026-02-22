@@ -147,12 +147,6 @@ export default function HomePage() {
               Start For Free
               <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link
-              href="#features"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-5 text-lg font-bold text-gray-900 bg-white/50 backdrop-blur-xl border-2 border-gray-100 rounded-[2rem] hover:bg-white hover:border-primary-200 transition-all active:scale-95"
-            >
-              Explore Features
-            </Link>
           </motion.div>
 
           {/* Trust Bar */}

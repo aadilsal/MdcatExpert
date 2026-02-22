@@ -7,7 +7,12 @@ import { revalidatePath } from "next/cache";
  * Securely submits a quiz.
  * Scoring happens in the database via RPC to prevent client-side tampering.
  */
-export async function submitQuizAction(paperId: string, elapsedSeconds: number, answers: Record<string, string>) {
+export async function submitQuizAction(
+    paperId: string,
+    elapsedSeconds: number,
+    answers: Record<string, string>,
+    timePerQuestion: Record<string, number>
+) {
     const supabase = await createClient();
 
     const {
@@ -19,14 +24,12 @@ export async function submitQuizAction(paperId: string, elapsedSeconds: number, 
     }
 
     // Call the PostgreSQL RPC function
-    // This ensures:
-    // 1. Scoring is done server-side based on the 'options' table.
-    // 2. Both 'attempts' and 'attempt_answers' are inserted in a single atomic transaction.
     const { data: attemptId, error } = await supabase.rpc("submit_quiz_secure", {
         p_user_id: user.id,
         p_paper_id: paperId,
         p_time_taken: elapsedSeconds,
-        p_answers: answers
+        p_answers: answers,
+        p_time_per_question: timePerQuestion
     });
 
     if (error) {
