@@ -45,7 +45,7 @@ During the setup, Vercel will ask for the environment variables. Provide the val
 4. Click **Deploy**.
 
 ## 🛠️ Post-Deployment
-- **Custom Domain**: Optionally configure a custom domain in the Vercel project settings.
+- **Custom Domain**: Follow the [Domain Setup Guide](file:///d:/Projects/mdcat-expert/DOMAIN_SETUP.md) to connect your Hostinger domain.
 - **Admin Access**: Manually set the `role` to `'admin'` for your primary user in the `users` table via the Supabase Dashboard to access admin features.
 - **Monitoring**: Check the Vercel logs and Supabase API logs for any runtime errors.
 
