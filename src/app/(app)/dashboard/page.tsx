@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
+import SubscriptionStatusBanner from "@/components/subscription-status-banner";
 import {
     Target,
     TrendingUp,
@@ -35,6 +36,14 @@ interface SubjectPerformance {
     accuracy_pct: number;
 }
 
+interface UserProfile {
+    id: string;
+    name: string;
+    email: string;
+    subscription_type: "free" | "premium";
+    premium_until: string | null;
+}
+
 export default async function StudentDashboardPage() {
     const supabase = await createClient();
 
@@ -42,16 +51,31 @@ export default async function StudentDashboardPage() {
         data: { user },
     } = await supabase.auth.getUser();
 
-    // Get user name
+    // Get user profile with subscription info
     let userName = "Student";
+    let subscriptionType: "free" | "premium" = "free";
+    let premiumUntil: string | null = null;
     if (user) {
         const { data: profile } = await supabase
             .from("users")
-            .select("name")
+            .select("name, subscription_type, premium_until")
             .eq("id", user.id)
             .single();
         if (profile?.name) userName = profile.name;
+        if (profile?.subscription_type) subscriptionType = profile.subscription_type;
+        if (profile?.premium_until) premiumUntil = profile.premium_until;
     }
+
+    // Check for pending payment requests
+    const { data: pendingPayments } = await supabase
+        .from("payment_requests")
+        .select("id, status")
+        .eq("user_id", user?.id || "")
+        .eq("status", "pending")
+        .limit(1);
+
+    const hasPendingPayment = pendingPayments && pendingPayments.length > 0;
+    const pendingPaymentId = hasPendingPayment ? pendingPayments[0].id : undefined;
 
     // Fetch all attempts for this user
     const { data: attemptsRaw } = await supabase
@@ -110,6 +134,14 @@ export default async function StudentDashboardPage() {
 
     return (
         <div className="animate-fade-in space-y-8">
+            {/* Subscription Status Banner */}
+            <SubscriptionStatusBanner
+                subscriptionType={subscriptionType}
+                premiumUntil={premiumUntil}
+                hasPendingPayment={hasPendingPayment}
+                paymentRequestId={pendingPaymentId}
+            />
+
             {/* Welcome Header */}
             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 via-primary-700 to-blue-800 p-6 sm:p-8 text-white shadow-lg">
                 <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />

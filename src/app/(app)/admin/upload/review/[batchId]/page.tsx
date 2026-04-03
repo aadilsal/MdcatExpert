@@ -16,6 +16,7 @@ import {
     Image as ImageIcon,
     AlertTriangle
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface StagingQuestion {
@@ -49,9 +50,14 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
     useEffect(() => {
         const fetchStaging = async () => {
             try {
-                const res = await fetch(`/api/py/staging/${batchId}`);
-                const data = await res.json();
-                setQuestions(data);
+                const supabase = createClient();
+                const { data, error } = await supabase
+                    .from("staging_questions")
+                    .select("*")
+                    .eq("batch_id", batchId);
+
+                if (error) throw error;
+                setQuestions(data || []);
             } catch (error) {
                 console.error("Failed to fetch staging questions:", error);
             } finally {
@@ -63,11 +69,13 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
 
     const handleStatusUpdate = async (id: string, status: "approved" | "rejected") => {
         try {
-            await fetch(`/api/py/staging/${id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status })
-            });
+            const supabase = createClient();
+            const { error } = await supabase
+                .from("staging_questions")
+                .update({ status })
+                .eq("id", id);
+
+            if (error) throw error;
             setQuestions(prev => prev.map(q => q.id === id ? { ...q, status } : q));
         } catch (error) {
             console.error("Failed to update status:", error);
@@ -82,11 +90,13 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
     const handleSaveEdit = async () => {
         if (!editingId) return;
         try {
-            await fetch(`/api/py/staging/${editingId}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(editForm)
-            });
+            const supabase = createClient();
+            const { error } = await supabase
+                .from("staging_questions")
+                .update(editForm)
+                .eq("id", editingId);
+
+            if (error) throw error;
             setQuestions(prev => prev.map(q => q.id === editingId ? { ...q, ...editForm } as StagingQuestion : q));
             setEditingId(null);
         } catch (error) {
@@ -94,13 +104,93 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
         }
     };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to remove this question?")) return;
+    const handleImageUpload = async (questionId: string, file: File) => {
         try {
-            await fetch(`/api/py/staging/${id}`, { method: "DELETE" });
-            setQuestions(prev => prev.filter(q => q.id !== id));
+            console.log("Starting image upload for question:", questionId);
+
+            const supabase = createClient();
+
+            // Check user authentication and role
+            const { data: { user }, error: authError } = await supabase.auth.getUser();
+            console.log("Current user:", user);
+            console.log("Auth error:", authError);
+
+            if (authError) throw new Error(`Authentication error: ${authError.message}`);
+            if (!user) throw new Error("User not authenticated");
+
+            // Check user role
+            const { data: userData, error: userError } = await supabase
+                .from("users")
+                .select("role")
+                .eq("id", user.id)
+                .single();
+
+            console.log("User data:", userData);
+            console.log("User error:", userError);
+
+            if (userError) throw new Error(`User data error: ${userError.message}`);
+            if (!userData) throw new Error("User data not found");
+            if (userData.role !== "admin") throw new Error(`User is not an admin. Role: ${userData.role}`);
+
+            console.log("User is authenticated as admin, proceeding with upload...");
+
+            // Upload image via API endpoint that uses service role
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("questionId", questionId);
+
+            const uploadResponse = await fetch("/api/upload-image", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!uploadResponse.ok) {
+                const errorData = await uploadResponse.json();
+                throw new Error(`Upload failed: ${errorData.error || uploadResponse.statusText}`);
+            }
+
+            const { publicUrl } = await uploadResponse.json();
+            console.log("Public URL:", publicUrl);
+
+            // Update the staging question with the image URL directly
+            console.log("Updating staging question with image_url");
+            console.log("Question ID:", questionId);
+
+            // First, let's check if the question exists
+            const { data: existingQuestion, error: fetchError } = await supabase
+                .from("staging_questions")
+                .select("id, batch_id")
+                .eq("id", questionId)
+                .single();
+
+            console.log("Existing question:", existingQuestion);
+            console.log("Fetch error:", fetchError);
+
+            if (fetchError) throw new Error(`Fetch question error: ${fetchError.message}`);
+            if (!existingQuestion) throw new Error("Question not found");
+
+            console.log("Question exists, proceeding with update...");
+
+            const { error: updateError, data: updateData } = await supabase
+                .from("staging_questions")
+                .update({ image_url: publicUrl })
+                .eq("id", questionId);
+
+            console.log("Update error:", updateError);
+            console.log("Update data:", updateData);
+
+            if (updateError) throw new Error(`Database update error: ${updateError.message}`);
+
+            // Update local state
+            setQuestions(prev => prev.map(q =>
+                q.id === questionId ? { ...q, image_url: publicUrl } : q
+            ));
+
+            console.log("Image upload completed successfully");
+
         } catch (error) {
-            console.error("Failed to delete question:", error);
+            console.error("Failed to upload image:", error);
+            alert(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     };
 
@@ -137,6 +227,23 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
             </div>
         );
     }
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure you want to remove this question?")) return;
+        try {
+            const supabase = createClient();
+            const { error } = await supabase
+                .from("staging_questions")
+                .delete()
+                .eq("id", id);
+
+            if (error) throw error;
+            setQuestions(prev => prev.filter(q => q.id !== id));
+        } catch (error) {
+            console.error("Failed to delete question:", error);
+            alert("Failed to delete question. Please try again.");
+        }
+    };
 
     return (
         <div className="space-y-12 pb-20 max-w-7xl mx-auto">
@@ -203,6 +310,22 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
                                     <XCircle className="w-5 h-5" />
                                 </button>
                                 <div className="w-px h-6 bg-gray-100 mx-2" />
+                                {/* Image Upload Button */}
+                                <label className="relative cursor-pointer">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) handleImageUpload(q.id, file);
+                                        }}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    />
+                                    <div className={`p-2 rounded-xl border transition-all ${q.image_url ? "border-emerald-300 bg-emerald-50 text-emerald-600" : "border-gray-100 text-gray-400 hover:bg-primary-50 hover:text-primary-500 hover:border-primary-300"}`}>
+                                        <ImageIcon className="w-5 h-5" />
+                                    </div>
+                                </label>
+                                <div className="w-px h-6 bg-gray-100 mx-2" />
                                 {editingId === q.id ? (
                                     <button onClick={handleSaveEdit} className="p-2 rounded-xl bg-primary-600 text-white shadow-lg shadow-primary-600/20">
                                         <Save className="w-5 h-5" />
@@ -217,6 +340,25 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
                                 </button>
                             </div>
                         </div>
+
+                        {/* Display uploaded image if exists */}
+                        {q.image_url && (
+                            <div className="mb-6">
+                                <p className="text-sm text-gray-500 mb-2">Image URL: {q.image_url}</p>
+                                <img
+                                    src={q.image_url}
+                                    alt="Question illustration"
+                                    className="max-w-full h-auto max-h-64 rounded-xl border border-gray-200 shadow-lg"
+                                    onError={(e) => {
+                                        console.error("Image failed to load:", q.image_url);
+                                        e.currentTarget.style.display = 'none';
+                                    }}
+                                    onLoad={() => {
+                                        console.log("Image loaded successfully:", q.image_url);
+                                    }}
+                                />
+                            </div>
+                        )}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {(["a", "b", "c", "d"] as const).map(opt => (

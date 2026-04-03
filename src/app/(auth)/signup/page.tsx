@@ -1,24 +1,27 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { UserPlus, Eye, EyeOff, Loader2, AlertCircle, Mail, Lock, User } from "lucide-react";
+import { UserPlus, Eye, EyeOff, Loader2, AlertCircle, Mail, Lock, User, Sparkles } from "lucide-react";
 import { signupAction } from "../actions";
 
 export default function SignupPage() {
     const [state, action, isPending] = useActionState(signupAction, null);
     const [showPassword, setShowPassword] = useState(false);
+    const searchParams = useSearchParams();
+    const goElite = searchParams.get("goElite") === "true";
 
     return (
         <div className="w-full max-w-md animate-fade-in">
             <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8 sm:p-10">
                 <div className="text-center mb-10">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-50 text-primary-600 mb-4 ring-1 ring-primary-100">
-                        <UserPlus className="w-8 h-8" />
+                        {goElite ? <Sparkles className="w-8 h-8" /> : <UserPlus className="w-8 h-8" />}
                     </div>
                     <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Create Account</h1>
                     <p className="mt-2.5 text-gray-500 font-medium tracking-tight">
-                        Join thousands of MDCAT aspirants
+                        {goElite ? "Join Elite and unlock AI-powered learning" : "Join thousands of MDCAT aspirants"}
                     </p>
                 </div>
 
@@ -29,7 +32,19 @@ export default function SignupPage() {
                     </div>
                 )}
 
+                {goElite && (
+                    <div className="mb-8 p-4 rounded-xl bg-primary-50 border border-primary-200 flex items-start gap-3 text-primary-700">
+                        <Sparkles className="w-5 h-5 shrink-0 mt-0.5" />
+                        <div className="text-sm">
+                            <p className="font-semibold">Going Elite!</p>
+                            <p className="text-xs mt-1 opacity-90">Create your account first, then upload your payment screenshot.</p>
+                        </div>
+                    </div>
+                )}
+
                 <form action={action} className="space-y-5">
+                    <input type="hidden" name="goElite" value={goElite ? "true" : "false"} />
+
                     <div>
                         <label
                             htmlFor="name"
@@ -135,8 +150,8 @@ export default function SignupPage() {
                             <Loader2 className="w-5 h-5 animate-spin" />
                         ) : (
                             <>
-                                <span>Create Account</span>
-                                <UserPlus className="w-5 h-5" />
+                                <span>{goElite ? "Continue to Payment" : "Create Account"}</span>
+                                {goElite ? <Sparkles className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
                             </>
                         )}
                     </button>

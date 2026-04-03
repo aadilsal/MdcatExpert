@@ -339,7 +339,7 @@ export default function HomePage() {
                   ))}
                 </ul>
               </div>
-              <Link href="/upgrade" className="w-full py-4 text-center font-black uppercase tracking-widest text-[10px] text-white bg-primary-600 rounded-2xl hover:bg-primary-500 shadow-xl shadow-primary-600/30 transition-all">Go Elite</Link>
+              <Link href="/signup?goElite=true" className="w-full py-4 text-center font-black uppercase tracking-widest text-[10px] text-white bg-primary-600 rounded-2xl hover:bg-primary-500 shadow-xl shadow-primary-600/30 transition-all">Go Elite</Link>
             </div>
           </div>
         </div>

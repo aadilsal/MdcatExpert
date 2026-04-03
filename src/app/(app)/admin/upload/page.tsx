@@ -4,7 +4,6 @@ import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    Upload,
     FileSpreadsheet,
     CheckCircle,
     AlertCircle,
@@ -80,6 +79,12 @@ export default function AdminUploadPage() {
     const handleUpload = async () => {
         if (!file || !title.trim() || !year.trim()) return;
 
+        const yearNumber = Number(year.trim());
+        if (!Number.isInteger(yearNumber) || yearNumber <= 0) {
+            setResult({ success: false, error: "Please enter a valid year (e.g., 2024)." });
+            return;
+        }
+
         setUploading(true);
         setResult(null);
 
@@ -87,7 +92,7 @@ export default function AdminUploadPage() {
             const formData = new FormData();
             formData.append("file", file);
             formData.append("title", title.trim());
-            formData.append("year", year.trim());
+            formData.append("year", yearNumber.toString());
 
             const endpoint = uploadMode === 'pdf' ? "/api/py/upload-pdf" : "/api/py/upload";
             const res = await fetch(endpoint, {
@@ -114,7 +119,12 @@ export default function AdminUploadPage() {
                 setYear("");
                 if (fileInputRef.current) fileInputRef.current.value = "";
             } else {
-                setResult({ success: false, error: data.error });
+                const message =
+                    data?.error ||
+                    data?.detail ||
+                    (res.status === 413 ? "Upload too large (body size limit exceeded)." : `${res.status} ${res.statusText}`) ||
+                    "Upload failed."
+                setResult({ success: false, error: message });
             }
         } catch {
             setResult({

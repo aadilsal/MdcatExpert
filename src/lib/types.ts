@@ -5,6 +5,8 @@ export interface User {
     name: string;
     email: string;
     role: UserRole;
+    subscription_type?: "free" | "premium";
+    premium_until?: string | null;
     created_at: string;
 }
 

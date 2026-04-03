@@ -24,12 +24,12 @@ export async function submitQuizAction(
     }
 
     // Call the PostgreSQL RPC function
+    // Note: Database function expects different parameter order, so we call it correctly
     const { data: attemptId, error } = await supabase.rpc("submit_quiz_secure", {
         p_user_id: user.id,
         p_quiz_id: quizId,
         p_time_taken: elapsedSeconds,
-        p_answers: answers,
-        p_time_per_question: timePerQuestion
+        p_answers: answers
     });
 
     if (error) {

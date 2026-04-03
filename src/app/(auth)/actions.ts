@@ -55,6 +55,7 @@ export async function signupAction(prevState: AuthState | null, formData: FormDa
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+    const goElite = formData.get("goElite") === "true";
 
     // 1. Validate
     const result = signupSchema.safeParse({ name, email, password });
@@ -78,9 +79,14 @@ export async function signupAction(prevState: AuthState | null, formData: FormDa
         return { error: error.message };
     }
 
-    // 3. Success
-    revalidatePath("/dashboard", "layout");
-    redirect("/dashboard");
+    // 3. Success - if goElite, redirect to payment, otherwise to dashboard
+    if (goElite) {
+        revalidatePath("/", "layout");
+        redirect("/signup-payment");
+    } else {
+        revalidatePath("/dashboard", "layout");
+        redirect("/dashboard");
+    }
 }
 
 export async function signOut() {

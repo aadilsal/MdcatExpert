@@ -80,7 +80,8 @@ export default async function ResultsPage({
             subjectStats[subject] = { correct: 0, total: 0, time: 0 };
         }
         subjectStats[subject].total++;
-        subjectStats[subject].time += (a.time_spent || 0);
+        // Use average time per question since individual time_spent is not stored
+        subjectStats[subject].time += avgTimePerQuestion;
         if (a.is_correct) subjectStats[subject].correct++;
     });
 

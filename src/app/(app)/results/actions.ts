@@ -10,15 +10,19 @@ import { revalidatePath } from "next/cache";
 export async function generateAnswerInsight(answerId: string) {
     const supabase = await createClient();
 
-    // 1. Fetch the answer with question and options
+    // 1. Fetch the answer with question data
     const { data: answer, error: fetchError } = await supabase
-        .from("attempt_answers")
+        .from("user_answers")
         .select(`
             *,
             questions (
                 question_text,
                 subject,
-                options (*)
+                option_a,
+                option_b,
+                option_c,
+                option_d,
+                correct_option
             )
         `)
         .eq("id", answerId)
@@ -39,8 +43,20 @@ export async function generateAnswerInsight(answerId: string) {
     }
 
     const question = answer.questions;
-    const selectedOption = question.options.find((o: any) => o.id === answer.selected_option_id)?.option_text || "Unknown";
-    const correctOption = question.options.find((o: any) => o.is_correct)?.option_text || "Unknown";
+    if (!question) {
+        throw new Error("Question data not found");
+    }
+
+    // Map selected option to text
+    const optionMap: Record<string, string> = {
+        'A': question.option_a,
+        'B': question.option_b,
+        'C': question.option_c,
+        'D': question.option_d
+    };
+
+    const selectedOption = optionMap[answer.selected_option] || "Unknown";
+    const correctOption = optionMap[question.correct_option] || "Unknown";
 
     // 4. Call Gemini
     const insight = await analyzeMistake({
@@ -52,7 +68,7 @@ export async function generateAnswerInsight(answerId: string) {
 
     // 5. Store the result
     const { error: updateError } = await supabase
-        .from("attempt_answers")
+        .from("user_answers")
         .update({ ai_analysis: insight })
         .eq("id", answerId);
 

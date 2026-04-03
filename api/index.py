@@ -1,13 +1,17 @@
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import os
 import io
+import logging
 from .services.xlsx_parser import parse_mdcat_xlsx
 from .services.pdf_ingestion import process_pdf_to_questions
 from .services.mistake_analyzer import analyze_mistakes
 from .services.weakness_radar import calculate_weakness_radar
 from .supabase_client import get_supabase
 from typing import Dict, Any, List
+
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
 
@@ -19,6 +23,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.exception_handler(ValueError)
+async def value_error_handler(request: Request, exc: ValueError):
+    logging.error("ValueError on %s: %s", request.url.path, exc)
+    return JSONResponse(status_code=400, content={"detail": str(exc)})
+
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    logging.exception("Unhandled exception on %s", request.url.path)
+    return JSONResponse(status_code=500, content={"detail": "Internal Server Error", "error": str(exc)})
 
 @app.get("/api/py/health")
 def health_check():
@@ -34,25 +48,52 @@ async def upload_dataset(
     title: str = Form(...),
     year: int = Form(...)
 ):
+    logging.info("upload_dataset invoked title=%s year=%s filename=%s", title, year, file.filename)
+
+    if year <= 0:
+        raise ValueError("Year must be a positive integer")
+
     # Read file content
-    content = await file.read()
-    
+    try:
+        content = await file.read()
+        logging.info("upload_dataset file read: %s bytes", len(content))
+    except Exception as read_exc:
+        logging.exception("Failed to read uploaded file")
+        raise HTTPException(status_code=400, detail=f"Failed to read file: {read_exc}")
+
     # Parse questions
     questions, skipped, error = parse_mdcat_xlsx(content)
-    
+    logging.info("upload_dataset parsed %s questions, skipped=%s, error=%s", len(questions), skipped[:10], error)
+
     if error:
         raise HTTPException(status_code=400, detail=error)
-    
+
     if not questions:
         raise HTTPException(status_code=400, detail="No valid questions found in file")
 
     # Store in staging_questions
     supabase = get_supabase()
-    
-    result = supabase.table("staging_questions").insert(questions).execute()
-    
-    if result and hasattr(result, "error") and result.error:  # type: ignore
-         raise HTTPException(status_code=500, detail=f"Database error: {result.error}")  # type: ignore
+    logging.info("upload_dataset: inserting %s questions into staging_questions", len(questions))
+
+    try:
+        result = supabase.table("staging_questions").insert(questions).execute()
+        logging.info("upload_dataset: supabase insert result type=%s", type(result))
+    except Exception as exc:
+        logging.exception("Supabase insert failed")
+        raise HTTPException(status_code=500, detail=f"Database write failed: {str(exc)}")
+
+    db_error = None
+    try:
+        if hasattr(result, "error") and getattr(result, "error", None):  # type: ignore
+            db_error = getattr(result, "error", None)  # type: ignore
+        elif isinstance(result, dict) and result.get("error"):
+            db_error = result.get("error")
+    except Exception:
+        db_error = None
+
+    if db_error:
+        logging.error("Supabase insert error: %s", db_error)
+        raise HTTPException(status_code=500, detail=f"Database error: {db_error}")
 
     return {
         "success": True,
@@ -68,9 +109,20 @@ async def upload_pdf(
     title: str = Form(...),
     year: int = Form(...)
 ):
-    pdf_content = await file.read()
+    logging.info("upload_pdf invoked title=%s year=%s filename=%s", title, year, file.filename)
+
+    if year <= 0:
+        raise ValueError("Year must be a positive integer")
+
+    try:
+        pdf_content = await file.read()
+        logging.info("upload_pdf file read: %s bytes", len(pdf_content))
+    except Exception as read_exc:
+        logging.exception("Failed to read uploaded PDF file")
+        raise HTTPException(status_code=400, detail=f"Failed to read PDF file: {read_exc}")
 
     questions, skipped, error = process_pdf_to_questions(pdf_content, year)
+    logging.info("upload_pdf processed %s questions, skipped=%s, error=%s", len(questions), skipped[:10], error)
 
     if error:
         raise HTTPException(status_code=400, detail=error)
@@ -79,11 +131,27 @@ async def upload_pdf(
         raise HTTPException(status_code=400, detail="No valid questions found in PDF")
 
     supabase = get_supabase()
+    logging.info("upload_pdf: inserting %s questions into staging_questions", len(questions))
 
-    result = supabase.table("staging_questions").insert(questions).execute()
+    try:
+        result = supabase.table("staging_questions").insert(questions).execute()
+        logging.info("upload_pdf: supabase insert result type=%s", type(result))
+    except Exception as exc:
+        logging.exception("Supabase insert failed")
+        raise HTTPException(status_code=500, detail=f"Database write failed: {str(exc)}")
 
-    if result and hasattr(result, "error") and result.error:  # type: ignore
-        raise HTTPException(status_code=500, detail=f"Database error: {result.error}")  # type: ignore
+    db_error = None
+    try:
+        if hasattr(result, "error") and getattr(result, "error", None):  # type: ignore
+            db_error = getattr(result, "error", None)  # type: ignore
+        elif isinstance(result, dict) and result.get("error"):
+            db_error = result.get("error")
+    except Exception:
+        db_error = None
+
+    if db_error:
+        logging.error("Supabase insert error: %s", db_error)
+        raise HTTPException(status_code=500, detail=f"Database error: {db_error}")
 
     return {
         "success": True,
