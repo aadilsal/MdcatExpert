@@ -44,3 +44,7 @@ AI features available only when user has premium/elite membership:
 
 - Free users can view static analytics but should not receive AI insights (based on user role checks in pages and query paths).
 - This mapping is based on the current branch `enhancement/new_features` state as of April 3, 2026.
+
+## Update log
+
+- 2026-04-03: Added AI feature matrix and roadmap alignment in README.
