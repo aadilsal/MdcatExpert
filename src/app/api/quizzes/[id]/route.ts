@@ -28,12 +28,12 @@ export async function DELETE(
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
-        // Delete paper (cascades to questions, options)
-        const { error } = await supabase.from("papers").delete().eq("id", id);
+        // Delete quiz (cascades to quiz_questions)
+        const { error } = await supabase.from("quizzes").delete().eq("id", id);
 
         if (error) {
             return NextResponse.json(
-                { error: `Failed to delete paper: ${error.message}` },
+                { error: `Failed to delete quiz: ${error.message}` },
                 { status: 500 }
             );
         }

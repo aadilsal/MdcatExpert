@@ -9,7 +9,7 @@ interface Attempt {
     score: number;
     time_taken: number;
     created_at: string;
-    papers: {
+    quizzes: {
         title: string;
         year: number;
         total_questions: number;
@@ -38,10 +38,10 @@ export default async function AnalyticsPage() {
         );
     }
 
-    // Fetch attempts with paper info
+    // Fetch attempts with quiz info
     const { data: attemptsRaw } = await supabase
         .from("attempts")
-        .select("*, papers(title, year, total_questions)")
+        .select("*, quizzes(title, year, total_questions)")
         .eq("user_id", user.id)
         .order("created_at", { ascending: true });
 
@@ -71,13 +71,13 @@ export default async function AnalyticsPage() {
         ? Math.round(attempts.reduce((s, a) => s + a.time_taken, 0) / totalAttempts)
         : 0;
     const bestScore = totalAttempts > 0
-        ? Math.round(Math.max(...attempts.map((a) => (a.score / a.papers.total_questions) * 100)))
+        ? Math.round(Math.max(...attempts.map((a) => (a.score / a.quizzes.total_questions) * 100)))
         : 0;
 
     // Transform trend data for Recharts
     const scoreTrend = attempts.map((a) => ({
-        label: a.papers.title,
-        pct: Math.round((a.score / a.papers.total_questions) * 100),
+        label: a.quizzes.title,
+        pct: Math.round((a.score / a.quizzes.total_questions) * 100),
         date: new Date(a.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
         timeTaken: a.time_taken,
     }));
@@ -94,6 +94,15 @@ export default async function AnalyticsPage() {
 
     const weakestSubject = subjectData.length > 0 ? subjectData[subjectData.length - 1] : null;
     const strongestSubject = subjectData.length > 0 ? subjectData[0] : null;
+
+    // Fetch AI insights from FastAPI
+    // Note: In production, use a secure internal URL or Vercel rewrite
+    const apiUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+    const [mistakesRes, radarRes] = await Promise.all([
+        fetch(`${apiUrl}/api/py/analytics/mistakes/${user.id}`).then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch(`${apiUrl}/api/py/analytics/radar/${user.id}`).then(r => r.ok ? r.json() : null).catch(() => null)
+    ]);
 
     return (
         <div className="animate-fade-in space-y-8">
@@ -127,6 +136,8 @@ export default async function AnalyticsPage() {
                 subjectData={subjectData}
                 weakestSubject={weakestSubject}
                 strongestSubject={strongestSubject}
+                aiMistakes={mistakesRes}
+                aiRadar={radarRes}
             />
         </div>
     );

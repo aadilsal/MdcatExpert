@@ -6,8 +6,8 @@ export default function HelpPage() {
             category: "Getting Started",
             icon: BookOpen,
             questions: [
-                { q: "Is MdcatXpert really free?", a: "Yes, MdcatXpert is 100% free for all MDCAT aspirants. We provide access to all past papers and analytics without any subscription fees." },
-                { q: "How do I take a quiz?", a: "Simply log in to your account, navigate to the 'Papers' tab, and select any year's paper to start your timed quiz." }
+                { q: "Is MdcatXpert really free?", a: "Yes, MdcatXpert is 100% free for all MDCAT aspirants. We provide access to all quiz archives and analytics without any subscription fees." },
+                { q: "How do I take a quiz?", a: "Simply log in to your account, navigate to the 'Quizzes' tab, and select any year's quiz to start your timed session." }
             ]
         },
         {
@@ -15,14 +15,14 @@ export default function HelpPage() {
             icon: BarChart3,
             questions: [
                 { q: "How is my score calculated?", a: "Your score is calculated based on the official MDCAT marking scheme. We also provide subject-wise accuracy breakdowns to help you improve." },
-                { q: "Can I reset my progress?", a: "Currently, we keep all your attempt history so you can track your growth over time. You can always retake a paper to see your improvement." }
+                { q: "Can I reset my progress?", a: "Currently, we keep all your attempt history so you can track your growth over time. You can always retake a quiz to see your improvement." }
             ]
         },
         {
             category: "Technical Support",
             icon: Target,
             questions: [
-                { q: "What should I do if a question has an error?", a: "We strive for 100% accuracy. If you spot an error, please contact us via the Contact Us page or email support@mdcatxpert.com with the paper year and question number." },
+                { q: "What should I do if a question has an error?", a: "We strive for 100% accuracy. If you spot an error, please contact us via the Contact Us page or email support@mdcatxpert.com with the quiz year and question number." },
                 { q: "Does the app work offline?", a: "Currently, MdcatXpert requires an active internet connection to securely save your attempts and calculate real-time analytics." }
             ]
         }

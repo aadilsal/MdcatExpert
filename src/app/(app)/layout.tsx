@@ -21,13 +21,13 @@ import UserDropdown from "./user-dropdown";
 
 const studentNav = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/papers", label: "Papers", icon: FileText },
+    { href: "/quizzes", label: "Quizzes", icon: FileText },
     { href: "/analytics", label: "Analytics", icon: BarChart3 },
 ];
 
 const adminNav = [
-    { href: "/admin/papers", label: "Manage Papers", icon: FileText },
-    { href: "/admin/upload", label: "Upload Paper", icon: Upload },
+    { href: "/admin/quizzes", label: "Manage Quizzes", icon: FileText },
+    { href: "/admin/upload", label: "Upload Quiz", icon: Upload },
     { href: "/admin/students", label: "Students", icon: Users },
 ];
 

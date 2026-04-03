@@ -9,19 +9,20 @@ import {
     Sparkles,
     Search,
     TrendingUp,
+    Lock,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-export default async function PapersPage() {
+export default async function QuizzesPage() {
     const supabase = await createClient();
 
     const {
         data: { user },
     } = await supabase.auth.getUser();
 
-    const { data: papers } = await supabase
-        .from("papers")
+    const { data: quizzes } = await supabase
+        .from("quizzes")
         .select("*")
         .order("year", { ascending: false });
 
@@ -30,18 +31,21 @@ export default async function PapersPage() {
     if (user) {
         const { data: attempts } = await supabase
             .from("attempts")
-            .select("paper_id")
+            .select("quiz_id")
             .eq("user_id", user.id);
 
         if (attempts) {
             attempts.forEach((a) => {
-                attemptCounts[a.paper_id] = (attemptCounts[a.paper_id] || 0) + 1;
+                attemptCounts[a.quiz_id] = (attemptCounts[a.quiz_id] || 0) + 1;
             });
         }
     }
 
-    const papersList = papers || [];
-    const totalPapers = papersList.length;
+    const { data: userData } = user ? await supabase.from("users").select("subscription_type").eq("id", user.id).single() : { data: null };
+    const isPremiumUser = userData?.subscription_type === "premium";
+
+    const quizzesList = quizzes || [];
+    const totalQuizzes = quizzesList.length;
     const attemptedUnique = Object.keys(attemptCounts).length;
 
     return (
@@ -63,15 +67,15 @@ export default async function PapersPage() {
                             <span className="text-primary-500 italic">Library.</span>
                         </h1>
                         <p className="text-gray-400 font-medium max-w-md leading-relaxed">
-                            Master Pakistan&apos;s toughest papers with real-time feedback and subject-wise precision.
+                            Master Pakistan&apos;s toughest exams with real-time feedback and subject-wise precision.
                         </p>
                     </div>
 
                     {/* Quick Stats Grid */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="bg-white/5 backdrop-blur-xl border border-white/5 p-6 rounded-3xl">
-                            <p className="text-3xl font-black text-white">{totalPapers}</p>
-                            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-1">Available Papers</p>
+                            <p className="text-3xl font-black text-white">{totalQuizzes}</p>
+                            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-1">Available Quizzes</p>
                         </div>
                         <div className="bg-primary-600 p-6 rounded-3xl shadow-xl shadow-primary-600/20">
                             <p className="text-3xl font-black text-white">{attemptedUnique}</p>
@@ -85,8 +89,8 @@ export default async function PapersPage() {
             <div className="space-y-8">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-8">
                     <div>
-                        <h2 className="text-2xl font-black text-gray-900 tracking-tight">Browse Papers</h2>
-                        <p className="text-sm text-gray-400 font-bold uppercase tracking-widest mt-1">Found {totalPapers} Verified Exams</p>
+                        <h2 className="text-2xl font-black text-gray-900 tracking-tight">Browse Quizzes</h2>
+                        <p className="text-sm text-gray-400 font-bold uppercase tracking-widest mt-1">Found {totalQuizzes} Verified Exams</p>
                     </div>
 
                     <div className="relative group max-w-sm w-full">
@@ -99,41 +103,46 @@ export default async function PapersPage() {
                     </div>
                 </div>
 
-                {papersList.length === 0 ? (
+                {quizzesList.length === 0 ? (
                     <div className="bg-gray-50/50 rounded-[2.5rem] border-2 border-dashed border-gray-100 p-20 text-center">
                         <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-gray-200/50">
                             <BookOpen className="w-10 h-10 text-gray-300" />
                         </div>
                         <h3 className="text-xl font-black text-gray-900 mb-2">The shelves are empty.</h3>
-                        <p className="text-gray-400 font-medium max-w-sm mx-auto">No papers have been uploaded yet. Please check back later or contact an administrator.</p>
+                        <p className="text-gray-400 font-medium max-w-sm mx-auto">No quizzes have been uploaded yet. Please check back later or contact an administrator.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {papersList.map((paper) => {
-                            const userAttempts = attemptCounts[paper.id] || 0;
+                        {quizzesList.map((quiz) => {
+                            const userAttempts = attemptCounts[quiz.id] || 0;
                             const isAttempted = userAttempts > 0;
+                            const isLocked = quiz.is_premium && !isPremiumUser;
 
                             return (
                                 <Link
-                                    key={paper.id}
-                                    href={`/quiz/${paper.id}`}
-                                    className="group relative bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm hover:shadow-2xl hover:shadow-primary-600/10 hover:border-primary-200 transition-all duration-500 flex flex-col"
+                                    key={quiz.id}
+                                    href={isLocked ? "/upgrade" : `/quiz/${quiz.id}`}
+                                    className={`group relative bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col ${isLocked ? "grayscale-[0.5] opacity-90" : "hover:shadow-primary-600/10 hover:border-primary-200"}`}
                                 >
                                     {/* Glassmorphic Gradient Overlay on Hover */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-primary-600/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 rounded-[2rem] transition-opacity pointer-events-none" />
+                                    {!isLocked && <div className="absolute inset-0 bg-gradient-to-br from-primary-600/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 rounded-[2rem] transition-opacity pointer-events-none" />}
 
                                     <div className="relative flex items-start justify-between mb-8">
-                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${isAttempted
-                                                ? "bg-emerald-50 text-emerald-600 shadow-lg shadow-emerald-500/10"
-                                                : "bg-gray-50 text-gray-500 group-hover:bg-primary-50 group-hover:text-primary-600"
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${isLocked ? "bg-amber-50 text-amber-600 shadow-lg shadow-amber-500/10" : isAttempted
+                                            ? "bg-emerald-50 text-emerald-600 shadow-lg shadow-emerald-500/10"
+                                            : "bg-gray-50 text-gray-500 group-hover:bg-primary-50 group-hover:text-primary-600"
                                             }`}>
-                                            {isAttempted ? <CheckCircle className="w-7 h-7" /> : <BookOpen className="w-7 h-7" />}
+                                            {isLocked ? <Lock className="w-7 h-7" /> : isAttempted ? <CheckCircle className="w-7 h-7" /> : <BookOpen className="w-7 h-7" />}
                                         </div>
                                         <div className="flex flex-col items-end gap-2">
                                             <span className="px-3 py-1 bg-gray-900 text-white rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg shadow-black/10">
-                                                {paper.year}
+                                                {quiz.year}
                                             </span>
-                                            {isAttempted && (
+                                            {isLocked ? (
+                                                <span className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-100 text-amber-700 rounded-md text-[9px] font-black uppercase tracking-widest">
+                                                    PREMIUM
+                                                </span>
+                                            ) : isAttempted && (
                                                 <span className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-md text-[9px] font-black uppercase tracking-widest">
                                                     MASTERED
                                                 </span>
@@ -143,16 +152,16 @@ export default async function PapersPage() {
 
                                     <div className="relative space-y-2 mb-8">
                                         <h3 className="font-black text-gray-900 text-2xl tracking-tight leading-tight group-hover:text-primary-600 transition-colors">
-                                            {paper.title}
+                                            {quiz.title}
                                         </h3>
                                         <div className="flex items-center gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
-                                            <span className="flex items-center gap-1.5">
+                                            <span className="flex items-center gap-1.5 text-primary-500">
                                                 <Hash className="w-3.5 h-3.5" />
-                                                {paper.total_questions} Qs
+                                                {quiz.subject}
                                             </span>
                                             <span className="flex items-center gap-1.5">
-                                                <Clock className="w-3.5 h-3.5" />
-                                                {Math.ceil(paper.total_questions * 0.9)}m
+                                                <Hash className="w-3.5 h-3.5" />
+                                                {quiz.total_questions} Qs
                                             </span>
                                         </div>
                                     </div>
@@ -166,7 +175,7 @@ export default async function PapersPage() {
                                         </div>
 
                                         <div className="inline-flex items-center gap-2 text-sm font-black text-primary-600 group-hover:translate-x-1 transition-transform">
-                                            {isAttempted ? "Retake Exam" : "Start Prep"}
+                                            {isLocked ? "Unlock Access" : isAttempted ? "Retake Exam" : "Start Prep"}
                                             <ArrowRight className="w-4 h-4" />
                                         </div>
                                     </div>

@@ -14,6 +14,11 @@ import {
     Cell,
     PieChart,
     Pie,
+    Radar,
+    RadarChart,
+    PolarGrid,
+    PolarAngleAxis,
+    PolarRadiusAxis,
 } from "recharts";
 import {
     Target,
@@ -23,6 +28,7 @@ import {
     TrendingUp,
     BarChart3,
     AlertTriangle,
+    Shield,
 } from "lucide-react";
 
 interface AnalyticsClientProps {
@@ -48,6 +54,14 @@ interface AnalyticsClientProps {
     }[];
     weakestSubject: { subject: string; pct: number } | null;
     strongestSubject: { subject: string; pct: number } | null;
+    aiMistakes?: {
+        total_mistakes: number;
+        by_subject: Record<string, number>;
+        insights: string[];
+    };
+    aiRadar?: {
+        radar_data: { subject: string; score: number; fullMark: number }[];
+    };
 }
 
 const subjectColors: Record<string, string> = {
@@ -63,6 +77,8 @@ export default function AnalyticsClient({
     subjectData,
     weakestSubject,
     strongestSubject,
+    aiMistakes,
+    aiRadar,
 }: AnalyticsClientProps) {
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
@@ -327,6 +343,46 @@ export default function AnalyticsClient({
                         )}
                     </div>
                 </div>
+
+                {/* AI Weakness Radar */}
+                <div className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden lg:col-span-2">
+                    <div className="px-6 py-4 border-b border-gray-100">
+                        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+                            <Target className="w-5 h-5 text-primary-600" />
+                            Elite Weakness Radar
+                        </h2>
+                    </div>
+                    <div className="p-6 h-[400px]">
+                        {aiRadar?.radar_data && aiRadar.radar_data.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={aiRadar.radar_data}>
+                                    <PolarGrid stroke="#e5e7eb" />
+                                    <PolarAngleAxis dataKey="subject" tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 600 }} />
+                                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: "#9ca3af", fontSize: 10 }} />
+                                    <Radar
+                                        name="Skill Level"
+                                        dataKey="score"
+                                        stroke="#2563eb"
+                                        fill="#3b82f6"
+                                        fillOpacity={0.5}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{
+                                            borderRadius: "12px",
+                                            border: "none",
+                                            boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+                                        }}
+                                    />
+                                </RadarChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="h-full flex flex-col items-center justify-center text-gray-400">
+                                <Shield className="w-12 h-12 mb-4 opacity-10" />
+                                <p className="font-bold italic uppercase tracking-widest text-xs">Awaiting data stream for radar generation</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* Insights Card */}
@@ -356,7 +412,7 @@ export default function AnalyticsClient({
                             <div>
                                 <p className="text-sm font-bold text-gray-900 mb-1">Focus Item: {weakestSubject.subject}</p>
                                 <p className="text-xs text-gray-600 leading-relaxed">
-                                    Currently at {weakestSubject.pct}% accuracy in {weakestSubject.subject}. Devote 30 mins daily to reviewing past papers in this subject.
+                                    Currently at {weakestSubject.pct}% accuracy in {weakestSubject.subject}. Devote 30 mins daily to reviewing quiz archives in this subject.
                                 </p>
                             </div>
                         </div>
@@ -366,11 +422,11 @@ export default function AnalyticsClient({
                                 <TrendingUp className="w-5 h-5 text-blue-600" />
                             </div>
                             <div>
-                                <p className="text-sm font-bold text-gray-900 mb-1">Trend Analysis</p>
+                                <p className="text-sm font-bold text-gray-900 mb-1">Elite Advice</p>
                                 <p className="text-xs text-gray-600 leading-relaxed">
-                                    {scoreTrend.length > 1 && scoreTrend[scoreTrend.length - 1].pct > scoreTrend[scoreTrend.length - 2].pct
+                                    {aiMistakes?.insights?.[0] || (scoreTrend.length > 1 && scoreTrend[scoreTrend.length - 1].pct > scoreTrend[scoreTrend.length - 2].pct
                                         ? "Your accuracy is improving! Keep up the momentum for the final exam."
-                                        : "Consistency is key. Try to take 1 quiz every day to keep your brain sharp."}
+                                        : "Consistency is key. Try to take 1 quiz every day to keep your brain sharp.")}
                                 </p>
                             </div>
                         </div>

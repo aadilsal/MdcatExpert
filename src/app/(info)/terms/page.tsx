@@ -12,7 +12,7 @@ export default function TermsPage() {
 
                 <h2 className="text-2xl font-black text-gray-900 pt-8 border-t border-gray-100 uppercase tracking-wider text-sm">2. Use of the Platform</h2>
                 <p>
-                    MdcatXpert is designed to provide educational materials, specifically MDCAT past papers and mock tests, for personal, non-commercial use. You agree not to:
+                    MdcatXpert is designed to provide educational materials, specifically MDCAT quiz archives and mock tests, for personal, non-commercial use. You agree not to:
                 </p>
                 <ul className="list-disc pl-6 space-y-2">
                     <li>Copy, redistribute, or resell any content from the Platform.</li>
@@ -22,7 +22,7 @@ export default function TermsPage() {
 
                 <h2 className="text-2xl font-black text-gray-900 pt-8 border-t border-gray-100 uppercase tracking-wider text-sm">3. Accuracy of Materials</h2>
                 <p>
-                    While we strive for 100% accuracy in our past papers and solutions, the materials on MdcatXpert are provided for educational purposes only. We do not guarantee that all information is free from errors or reflects the precise latest syllabus changes of official examination bodies.
+                    While we strive for 100% accuracy in our quiz archives and solutions, the materials on MdcatXpert are provided for educational purposes only. We do not guarantee that all information is free from errors or reflects the precise latest syllabus changes of official examination bodies.
                 </p>
 
                 <h2 className="text-2xl font-black text-gray-900 pt-8 border-t border-gray-100 uppercase tracking-wider text-sm">4. Limitation of Liability</h2>

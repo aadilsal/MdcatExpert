@@ -12,16 +12,16 @@ import {
     TrendingUp,
     Users,
 } from "lucide-react";
-import { DeletePaperButton } from "./delete-button";
+import { DeleteQuizButton } from "./delete-button";
 
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminPapersPage() {
+export default async function AdminQuizzesPage() {
     const supabase = await createClient();
 
-    const { data: papers, error } = await supabase
-        .from("papers")
+    const { data: quizzes, error } = await supabase
+        .from("quizzes")
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -39,7 +39,7 @@ export default async function AdminPapersPage() {
         .from("attempts")
         .select("*", { count: "exact", head: true });
 
-    const papersList = papers || [];
+    const quizzesList = quizzes || [];
 
     return (
         <div className="animate-fade-in space-y-8">
@@ -51,7 +51,7 @@ export default async function AdminPapersPage() {
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-bold">Admin Dashboard</h1>
                         <p className="mt-2 text-gray-300 max-w-lg">
-                            Manage papers, track student performance, and keep your MDCAT
+                            Manage quizzes, track student performance, and keep your MDCAT
                             content up to date.
                         </p>
                     </div>
@@ -60,7 +60,7 @@ export default async function AdminPapersPage() {
                         className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-sm text-sm shrink-0"
                     >
                         <Upload className="w-4 h-4" />
-                        Upload Paper
+                        Upload Quiz
                     </Link>
                 </div>
             </div>
@@ -69,8 +69,8 @@ export default async function AdminPapersPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
                     {
-                        label: "Total Papers",
-                        value: papersList.length.toString(),
+                        label: "Total Quizzes",
+                        value: quizzesList.length.toString(),
                         icon: FileText,
                         bgLight: "bg-blue-50",
                         textColor: "text-blue-700",
@@ -120,44 +120,44 @@ export default async function AdminPapersPage() {
                 ))}
             </div>
 
-            {/* Papers List */}
+            {/* Quizzes List */}
             <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                    Uploaded Papers
+                    Uploaded Quizzes
                 </h2>
 
                 {error && (
                     <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm mb-4">
-                        Failed to load papers: {error.message}
+                        Failed to load quizzes: {error.message}
                     </div>
                 )}
 
-                {papersList.length === 0 ? (
+                {quizzesList.length === 0 ? (
                     <div className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden">
                         <div className="p-14 text-center">
                             <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                 <FileText className="w-8 h-8 text-gray-300" />
                             </div>
                             <h3 className="font-semibold text-gray-900 mb-1">
-                                No papers uploaded yet
+                                No quizzes uploaded yet
                             </h3>
                             <p className="text-sm text-gray-500 mb-5">
-                                Upload your first MDCAT paper to get started.
+                                Upload your first MDCAT quiz to get started.
                             </p>
                             <Link
                                 href="/admin/upload"
                                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm text-sm"
                             >
                                 <Upload className="w-4 h-4" />
-                                Upload Paper
+                                Upload Quiz
                             </Link>
                         </div>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {papersList.map((paper) => (
+                        {quizzesList.map((quiz) => (
                             <div
-                                key={paper.id}
+                                key={quiz.id}
                                 className="bg-white rounded-xl border border-gray-100 p-5 shadow-card hover:shadow-card-hover transition-all duration-300 group"
                             >
                                 <div className="flex items-start justify-between mb-4">
@@ -165,39 +165,39 @@ export default async function AdminPapersPage() {
                                         <FileText className="w-6 h-6 text-primary-600" />
                                     </div>
                                     <span className="px-2.5 py-1 bg-primary-50 text-primary-700 rounded-lg text-xs font-semibold">
-                                        {paper.year}
+                                        {quiz.year}
                                     </span>
                                 </div>
 
                                 <h3 className="font-semibold text-gray-900 mb-3 text-lg">
-                                    {paper.title}
+                                    {quiz.title}
                                 </h3>
 
                                 <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-5">
+                                    <span className="flex items-center gap-1.5 font-bold text-primary-600">
+                                        <Hash className="w-3.5 h-3.5" />
+                                        {quiz.subject}
+                                    </span>
                                     <span className="flex items-center gap-1.5">
                                         <Hash className="w-3.5 h-3.5" />
-                                        {paper.total_questions} questions
+                                        {quiz.total_questions} questions
                                     </span>
-                                    <span className="flex items-center gap-1.5">
-                                        <Calendar className="w-3.5 h-3.5" />
-                                        {new Date(paper.created_at).toLocaleDateString()}
-                                    </span>
-                                    <span className="flex items-center gap-1.5">
-                                        <Clock className="w-3.5 h-3.5" />
-                                        ~{Math.ceil(paper.total_questions * 0.9)} min
-                                    </span>
+                                    {quiz.is_premium && (
+                                        <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-bold uppercase">
+                                            Premium
+                                        </span>
+                                    )}
                                 </div>
 
                                 <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
                                     <Link
-                                        href={`/admin/papers/${paper.id}`}
+                                        href={`/admin/quizzes/${quiz.id}`}
                                         className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors"
                                     >
                                         <Eye className="w-4 h-4" />
                                         Preview
                                     </Link>
-                                    {/* <DeletePaperButton paperId={paper.id} paperTitle={paper.title} /> */}
-                                    <DeletePaperButton paperId={paper.id} paperTitle={paper.title} />
+                                    <DeleteQuizButton quizId={quiz.id} quizTitle={quiz.title} />
                                 </div>
                             </div>
                         ))}

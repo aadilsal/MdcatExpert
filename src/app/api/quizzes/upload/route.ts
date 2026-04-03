@@ -140,17 +140,17 @@ export async function POST(request: Request) {
             })),
         }));
 
-        // Insert paper, questions, and options in a single atomic transaction
-        const { data: paperId, error: rpcError } = await supabase.rpc("upload_paper_batch", {
+        // Insert quiz, questions, and options in a single atomic transaction
+        const { data: quizId, error: rpcError } = await supabase.rpc("upload_quiz_batch", {
             p_title: title,
             p_year: year,
             p_total_questions: questions.length,
             p_questions: rpcQuestions,
         });
 
-        if (rpcError || !paperId) {
+        if (rpcError || !quizId) {
             return NextResponse.json(
-                { error: `Failed to upload paper: ${rpcError?.message}` },
+                { error: `Failed to upload quiz: ${rpcError?.message}` },
                 { status: 500 }
             );
         }
@@ -159,7 +159,7 @@ export async function POST(request: Request) {
 
         return NextResponse.json({
             success: true,
-            paper_id: paperId,
+            quiz_id: quizId,
             total_parsed: questions.length,
             total_inserted: insertedCount,
             skipped_rows: skippedRows,

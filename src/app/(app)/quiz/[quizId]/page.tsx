@@ -26,35 +26,16 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { submitQuizAction } from "../actions";
 
-interface Option {
-    id: string;
-    option_text: string;
-    is_correct: boolean;
-}
-
-interface Question {
-    id: string;
-    question_text: string;
-    subject: string;
-    image_url: string | null;
-    options: Option[];
-}
-
-interface Paper {
-    id: string;
-    title: string;
-    year: number;
-    total_questions: number;
-}
+import { Quiz, Question } from "@/lib/types";
 
 export default function QuizPage({
     params,
 }: {
-    params: Promise<{ paperId: string }>;
+    params: Promise<{ quizId: string }>;
 }) {
     const router = useRouter();
-    const [paperId, setPaperId] = useState<string | null>(null);
-    const [paper, setPaper] = useState<Paper | null>(null);
+    const [quizId, setQuizId] = useState<string | null>(null);
+    const [quiz, setQuiz] = useState<Quiz | null>(null);
     const [questions, setQuestions] = useState<Question[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -72,42 +53,71 @@ export default function QuizPage({
 
     // Resolve params
     useEffect(() => {
-        params.then((p) => setPaperId(p.paperId));
+        params.then((p) => setQuizId(p.quizId));
     }, [params]);
 
-    // Fetch paper and questions
+    // Fetch quiz and questions
     useEffect(() => {
-        if (!paperId) return;
+        if (!quizId) return;
         const fetchData = async () => {
             const supabase = createClient();
 
-            const { data: paperData } = await supabase
-                .from("papers")
+            const { data: quizData } = await supabase
+                .from("quizzes")
                 .select("*")
-                .eq("id", paperId)
+                .eq("id", quizId)
                 .single();
 
-            const { data: questionsData } = await supabase
-                .from("questions")
-                .select("*, options(*)")
-                .eq("paper_id", paperId)
-                .order("created_at", { ascending: true });
+            const { data: qQuestions } = await supabase
+                .from("quiz_questions")
+                .select("question_id, order")
+                .eq("quiz_id", quizId)
+                .order("order", { ascending: true });
 
-            if (paperData) setPaper(paperData);
-            if (questionsData) {
-                setQuestions(questionsData);
-                // Preload images if any
-                questionsData.forEach(q => {
-                    if (q.image_url) {
-                        const img = new Image();
-                        img.src = q.image_url;
+            if (quizData) {
+                setQuiz(quizData);
+
+                // Premium Access Check
+                if (quizData.is_premium) {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    const { data: userData } = await supabase
+                        .from("users")
+                        .select("subscription_type")
+                        .eq("id", user?.id)
+                        .single();
+
+                    if (!userData || userData.subscription_type !== "premium") {
+                        router.push("/upgrade?reason=premium_content");
+                        return;
                     }
-                });
+                }
+            }
+
+            if (qQuestions && qQuestions.length > 0) {
+                const qIds = qQuestions.map(qq => qq.question_id);
+                const { data: questionsData } = await supabase
+                    .from("questions")
+                    .select("*")
+                    .in("id", qIds);
+
+                if (questionsData) {
+                    // Sort by the original order from quiz_questions
+                    const sortedQuestions = qIds.map(id => questionsData.find(q => q.id === id)).filter(Boolean) as Question[];
+                    setQuestions(sortedQuestions);
+
+                    // Preload images
+                    sortedQuestions.forEach(q => {
+                        if (q.image_url) {
+                            const img = new Image();
+                            img.src = q.image_url;
+                        }
+                    });
+                }
             }
             setLoading(false);
         };
         fetchData();
-    }, [paperId]);
+    }, [quizId]);
 
     // Timer
     useEffect(() => {
@@ -147,10 +157,10 @@ export default function QuizPage({
     };
 
     const selectOption = useCallback(
-        (questionId: string, optionId: string) => {
+        (questionId: string, optionLabel: string) => {
             setSelectedAnswers((prev) => ({
                 ...prev,
-                [questionId]: optionId,
+                [questionId]: optionLabel,
             }));
         },
         []
@@ -166,7 +176,7 @@ export default function QuizPage({
     };
 
     const handleSubmit = async () => {
-        if (submitting || !paperId) return;
+        if (submitting || !quizId) return;
 
         // Final capture for current question
         const now = Date.now();
@@ -180,7 +190,7 @@ export default function QuizPage({
         setSubmitting(true);
         try {
             const { success, attemptId } = await submitQuizAction(
-                paperId,
+                quizId,
                 elapsedSeconds,
                 selectedAnswers,
                 finalTimes
@@ -210,15 +220,15 @@ export default function QuizPage({
         );
     }
 
-    if (!paper || questions.length === 0) {
+    if (!quiz || questions.length === 0) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
                 <div className="text-center p-12 bg-white rounded-[2.5rem] border border-gray-100 shadow-xl">
                     <AlertCircle className="w-16 h-16 text-primary-200 mx-auto mb-6" />
-                    <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Paper Empty or Missing</h2>
-                    <p className="text-gray-500 mb-8 font-medium">This paper doesn&apos;t seem to have any questions currently.</p>
+                    <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Quiz Empty or Missing</h2>
+                    <p className="text-gray-500 mb-8 font-medium">This quiz doesn&apos;t seem to have any questions currently.</p>
                     <button
-                        onClick={() => router.push("/papers")}
+                        onClick={() => router.push("/quizzes")}
                         className="px-8 py-4 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition-all shadow-xl shadow-primary-600/20 active:scale-95"
                     >
                         Return to Archives
@@ -248,7 +258,7 @@ export default function QuizPage({
                         <div className="h-6 w-px bg-gray-200 hidden sm:block" />
                         <div className="max-w-[120px] sm:max-w-none truncate">
                             <h1 className={`font-black tracking-tight text-[10px] sm:text-sm uppercase truncate ${zenMode ? "text-white" : "text-gray-900"}`}>
-                                {paper.title}
+                                {quiz.title}
                             </h1>
                             <p className={`text-[8px] sm:text-[10px] font-bold uppercase tracking-widest ${zenMode ? "text-white/40" : "text-gray-400"}`}>
                                 {answeredCount}/{questions.length} <span className="hidden sm:inline">Progress</span>
@@ -272,7 +282,7 @@ export default function QuizPage({
                                 <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5" />
                             </button>
                             <button
-                                onClick={() => router.push("/papers")}
+                                onClick={() => router.push("/quizzes")}
                                 className={`p-2 rounded-lg transition-all ${zenMode ? "bg-red-500/20 text-red-400" : "bg-gray-100 text-gray-400 hover:text-red-600"}`}
                                 title="Exit Session"
                             >
@@ -495,13 +505,14 @@ export default function QuizPage({
                                     )}
 
                                     <div className="grid gap-3 sm:gap-4">
-                                        {currentQuestion.options.map((option, optIdx) => {
-                                            const isSelected = selectedAnswers[currentQuestion.id] === option.id;
-                                            const label = String.fromCharCode(65 + optIdx);
+                                        {(["A", "B", "C", "D"] as const).map((label) => {
+                                            const isSelected = selectedAnswers[currentQuestion.id] === label;
+                                            const optionKey = `option_${label.toLowerCase()}` as keyof Question;
+                                            const optionText = currentQuestion[optionKey] as string;
                                             return (
                                                 <button
-                                                    key={option.id}
-                                                    onClick={() => selectOption(currentQuestion.id, option.id)}
+                                                    key={label}
+                                                    onClick={() => selectOption(currentQuestion.id, label)}
                                                     className={`group relative flex items-center gap-4 sm:gap-6 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border-2 transition-all text-left ${isSelected
                                                         ? "bg-primary-600 border-primary-600 shadow-xl shadow-primary-600/20"
                                                         : zenMode ? "bg-white/5 border-white/5 hover:bg-white/10" : "bg-white border-gray-100 hover:bg-gray-50 hover:border-primary-200"
@@ -512,7 +523,7 @@ export default function QuizPage({
                                                         {label}
                                                     </span>
                                                     <span className={`flex-1 font-bold text-sm sm:text-lg ${isSelected ? "text-white" : zenMode ? "text-white/70" : "text-gray-700"}`}>
-                                                        {option.option_text}
+                                                        {optionText}
                                                     </span>
                                                     {isSelected && <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white/40" />}
                                                 </button>

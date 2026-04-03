@@ -272,7 +272,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                                     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
                                         <div>
                                             <p className="font-semibold text-gray-900">Push Notifications</p>
-                                            <p className="text-xs text-gray-500">Alerts when new papers are uploaded.</p>
+                                            <p className="text-xs text-gray-500">Alerts when new quizzes are uploaded.</p>
                                         </div>
                                         <div className="w-12 h-6 bg-gray-300 rounded-full relative cursor-not-allowed">
                                             <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full" />

@@ -17,11 +17,11 @@ export const dynamic = "force-dynamic";
 
 interface Attempt {
     id: string;
-    paper_id: string;
+    quiz_id: string;
     score: number;
     time_taken: number;
     created_at: string;
-    papers: {
+    quizzes: {
         title: string;
         year: number;
         total_questions: number;
@@ -56,7 +56,7 @@ export default async function StudentDashboardPage() {
     // Fetch all attempts for this user
     const { data: attemptsRaw } = await supabase
         .from("attempts")
-        .select("*, papers(title, year, total_questions)")
+        .select("*, quizzes(title, year, total_questions)")
         .eq("user_id", user?.id || "")
         .order("created_at", { ascending: false });
 
@@ -76,7 +76,7 @@ export default async function StudentDashboardPage() {
         totalAttempts > 0
             ? Math.round(
                 attempts.reduce(
-                    (acc, a) => acc + (a.score / a.papers.total_questions) * 100,
+                    (acc, a) => acc + (a.score / a.quizzes.total_questions) * 100,
                     0
                 ) / totalAttempts
             )
@@ -85,7 +85,7 @@ export default async function StudentDashboardPage() {
         totalAttempts > 0
             ? Math.round(
                 Math.max(
-                    ...attempts.map((a) => (a.score / a.papers.total_questions) * 100)
+                    ...attempts.map((a) => (a.score / a.quizzes.total_questions) * 100)
                 )
             )
             : 0;
@@ -126,10 +126,10 @@ export default async function StudentDashboardPage() {
                         </p>
                     </div>
                     <Link
-                        href="/papers"
+                        href="/quizzes"
                         className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/15 backdrop-blur-sm text-white font-medium rounded-xl hover:bg-white/25 transition-all border border-white/20"
                     >
-                        Browse Papers
+                        Browse Quizzes
                         <ArrowRight className="w-4 h-4" />
                     </Link>
                 </div>
@@ -213,10 +213,10 @@ export default async function StudentDashboardPage() {
                                 No attempts yet
                             </h3>
                             <p className="text-sm text-gray-500 mb-5 max-w-xs mx-auto">
-                                Start practicing by taking your first MDCAT paper quiz.
+                                Start practicing by taking your first MDCAT quiz.
                             </p>
                             <Link
-                                href="/papers"
+                                href="/quizzes"
                                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm text-sm"
                             >
                                 Take a Quiz
@@ -227,7 +227,7 @@ export default async function StudentDashboardPage() {
                         <div className="divide-y divide-gray-50">
                             {attempts.slice(0, 5).map((attempt) => {
                                 const pct = Math.round(
-                                    (attempt.score / attempt.papers.total_questions) * 100
+                                    (attempt.score / attempt.quizzes.total_questions) * 100
                                 );
                                 return (
                                     <Link
@@ -254,7 +254,7 @@ export default async function StudentDashboardPage() {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="font-medium text-gray-900 truncate">
-                                                {attempt.papers.title}
+                                                {attempt.quizzes.title}
                                             </p>
                                             <div className="flex items-center gap-3 text-xs text-gray-400 mt-0.5">
                                                 <span className="flex items-center gap-1">
@@ -276,7 +276,7 @@ export default async function StudentDashboardPage() {
                                                         : "text-red-500"
                                                     }`}
                                             >
-                                                {attempt.score}/{attempt.papers.total_questions}
+                                                {attempt.score}/{attempt.quizzes.total_questions}
                                             </p>
                                             <p className="text-xs text-gray-400">{pct}%</p>
                                         </div>

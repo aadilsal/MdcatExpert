@@ -4,12 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, Loader2 } from "lucide-react";
 
-export function DeletePaperButton({
-    paperId,
-    paperTitle,
+export function DeleteQuizButton({
+    quizId,
+    quizTitle,
 }: {
-    paperId: string;
-    paperTitle: string;
+    quizId: string;
+    quizTitle: string;
 }) {
     const router = useRouter();
     const [deleting, setDeleting] = useState(false);
@@ -18,7 +18,7 @@ export function DeletePaperButton({
     const handleDelete = async () => {
         setDeleting(true);
         try {
-            const res = await fetch(`/api/papers/${paperId}`, { method: "DELETE" });
+            const res = await fetch(`/api/quizzes/${quizId}`, { method: "DELETE" });
             if (res.ok) {
                 router.refresh();
             }
@@ -57,7 +57,7 @@ export function DeletePaperButton({
     return (
         <button
             onClick={() => setShowConfirm(true)}
-            title={`Delete ${paperTitle}`}
+            title={`Delete ${quizTitle}`}
             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-red-500 text-sm font-medium hover:bg-red-50 transition-colors"
         >
             <Trash2 className="w-4 h-4" />

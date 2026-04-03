@@ -22,3 +22,32 @@ export async function updateUserRoleAction(userId: string, newRole: 'student' | 
     revalidatePath("/admin/students");
     return { success: true };
 }
+
+export async function updateUserSubscriptionAction(userId: string, subscriptionType: 'free' | 'premium') {
+    const supabase = await createClient();
+
+    const updates: { subscription_type: 'free' | 'premium'; premium_until?: string | null } = {
+        subscription_type: subscriptionType
+    };
+
+    if (subscriptionType === 'premium') {
+        const premiumUntil = new Date();
+        premiumUntil.setFullYear(premiumUntil.getFullYear() + 10);
+        updates.premium_until = premiumUntil.toISOString();
+    } else {
+        updates.premium_until = null;
+    }
+
+    const { error } = await supabase
+        .from('users')
+        .update(updates)
+        .eq('id', userId);
+
+    if (error) {
+        console.error("Failed to update user subscription:", error);
+        throw new Error(error.message || "Failed to update user subscription.");
+    }
+
+    revalidatePath("/admin/students");
+    return { success: true };
+}

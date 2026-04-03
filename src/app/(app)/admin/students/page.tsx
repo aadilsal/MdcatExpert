@@ -5,19 +5,37 @@ import StudentTable from "./StudentTable";
 export default async function AdminStudentsPage() {
     const supabase = await createClient();
 
-    // Fetch all users
-    const { data: users, error } = await supabase
+    // Fetch all users first (avoid relational select if policy/relationship not available)
+    const { data: users, error: usersError } = await supabase
         .from('users')
-        .select('*')
+        .select('id,name,email,role,subscription_type,premium_until,created_at')
         .order('created_at', { ascending: false });
 
-    if (error) {
-        console.error("Error fetching students:", error);
+    if (usersError) {
+        console.error("Error fetching users:", usersError, "detail:", usersError.message);
+        return (
+            <div className="text-center py-20 text-red-500 font-black">
+                Could not load users: {usersError.message || JSON.stringify(usersError)}
+            </div>
+        );
     }
 
-    // Stats calculations
-    const totalUsers = users?.length || 0;
-    const adminCount = users?.filter(u => u.role === "admin").length || 0;
+    const { data: paymentRequests, error: paymentError } = await supabase
+        .from('payment_requests')
+        .select('user_id,status,amount,transaction_id,created_at')
+        .order('created_at', { ascending: false });
+
+    if (paymentError) {
+        console.error("Error fetching payment requests:", paymentError, "detail:", paymentError.message);
+    }
+
+    const usersWithPayments = (users || []).map((user) => ({
+        ...user,
+        payment_requests: (paymentRequests || []).filter((req) => req.user_id === user.id)
+    }));
+
+    const totalUsers = usersWithPayments.length;
+    const adminCount = usersWithPayments.filter(u => u.role === "admin").length;
     const studentCount = totalUsers - adminCount;
 
     return (

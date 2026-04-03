@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
  * Scoring happens in the database via RPC to prevent client-side tampering.
  */
 export async function submitQuizAction(
-    paperId: string,
+    quizId: string,
     elapsedSeconds: number,
     answers: Record<string, string>,
     timePerQuestion: Record<string, number>
@@ -26,7 +26,7 @@ export async function submitQuizAction(
     // Call the PostgreSQL RPC function
     const { data: attemptId, error } = await supabase.rpc("submit_quiz_secure", {
         p_user_id: user.id,
-        p_paper_id: paperId,
+        p_quiz_id: quizId,
         p_time_taken: elapsedSeconds,
         p_answers: answers,
         p_time_per_question: timePerQuestion

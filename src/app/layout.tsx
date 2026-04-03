@@ -10,8 +10,8 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "MdcatXpert — Master Your MDCAT",
   description:
-    "Free MDCAT past papers, quizzes, and analytics to help you prepare smarter and score higher.",
-  keywords: ["MDCAT", "past papers", "quiz", "medical", "Pakistan", "preparation"],
+    "Free MDCAT quiz archives, practice tests, and analytics to help you prepare smarter and score higher.",
+  keywords: ["MDCAT", "quizzes", "practice tests", "medical", "Pakistan", "preparation"],
 };
 
 export default function RootLayout({

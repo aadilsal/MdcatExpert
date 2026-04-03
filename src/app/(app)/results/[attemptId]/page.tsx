@@ -37,24 +37,24 @@ export default async function ResultsPage({
     // Fetch attempt
     const { data: attempt } = await supabase
         .from("attempts")
-        .select("*, papers(*)")
+        .select("*, quizzes(*)")
         .eq("id", attemptId)
         .single();
 
     if (!attempt) notFound();
 
-    const paper = attempt.papers as { id: string; title: string; year: number; total_questions: number };
+    const quiz = attempt.quizzes as { id: string; title: string; year: number; total_questions: number };
 
     // Fetch answers with detailed metadata
     const { data: answers } = await supabase
-        .from("attempt_answers")
-        .select("*, questions(*, options(*))")
+        .from("user_answers")
+        .select("*, questions(*)")
         .eq("attempt_id", attemptId);
 
     const answersList = answers || [];
 
     // Stats Calculation
-    const totalQuestions = paper.total_questions;
+    const totalQuestions = quiz.total_questions;
     const correctCount = attempt.score;
     const percentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
 
@@ -112,7 +112,7 @@ export default async function ResultsPage({
                     </h1>
 
                     <p className="text-white/60 font-black uppercase tracking-widest text-xs mb-12">
-                        Archive: {paper.title} • Grade: {grade.status}
+                        Archive: {quiz.title} • Grade: {grade.status}
                     </p>
 
                     <div className="relative group">
@@ -236,7 +236,7 @@ export default async function ResultsPage({
                                                 <Clock className={`w-3.5 h-3.5 ${isMistake ? "text-red-400" : "text-emerald-400"}`} />
                                                 <span className="text-sm font-black italic text-gray-900">{answer.time_spent}s</span>
                                                 <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${timeStatus === "Slow" ? "bg-red-100 text-red-600" :
-                                                        timeStatus === "Fast" ? "bg-amber-100 text-amber-600" : "bg-emerald-100 text-emerald-600"
+                                                    timeStatus === "Fast" ? "bg-amber-100 text-amber-600" : "bg-emerald-100 text-emerald-600"
                                                     }`}>
                                                     {timeStatus}
                                                 </span>
@@ -252,24 +252,25 @@ export default async function ResultsPage({
                                     </h3>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {question.options?.map((option: any, optIdx: number) => {
-                                            const isSelected = answer.selected_option_id === option.id;
-                                            const isCorrect = option.is_correct;
+                                        {(["A", "B", "C", "D"] as const).map((label) => {
+                                            const isSelected = answer.selected_option === label;
+                                            const isCorrect = question.correct_option === label;
+                                            const optionText = question[`option_${label.toLowerCase()}`];
 
                                             return (
                                                 <div
-                                                    key={option.id}
+                                                    key={label}
                                                     className={`flex items-center gap-6 px-6 py-4 rounded-2xl border-2 transition-all ${isCorrect ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-900" :
-                                                            isSelected && !isCorrect ? "bg-red-500/5 border-red-500/20 text-red-900" :
-                                                                "bg-gray-50 border-gray-100 text-gray-500 opacity-60"
+                                                        isSelected && !isCorrect ? "bg-red-500/5 border-red-500/20 text-red-900" :
+                                                            "bg-gray-50 border-gray-100 text-gray-500 opacity-60"
                                                         }`}
                                                 >
                                                     <span className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black shrink-0 ${isCorrect ? "bg-emerald-500 text-white" :
-                                                            isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500"
+                                                        isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500"
                                                         }`}>
-                                                        {String.fromCharCode(65 + optIdx)}
+                                                        {label}
                                                     </span>
-                                                    <span className="flex-1 font-bold text-sm tracking-tight">{option.option_text}</span>
+                                                    <span className="flex-1 font-bold text-sm tracking-tight">{optionText}</span>
                                                     {isCorrect && <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />}
                                                     {isSelected && !isCorrect && <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />}
                                                 </div>
@@ -294,14 +295,14 @@ export default async function ResultsPage({
             {/* Bottom Tactical Actions */}
             <div className="flex items-center justify-center gap-8 py-12">
                 <Link
-                    href="/papers"
+                    href="/quizzes"
                     className="flex items-center gap-3 px-10 py-5 bg-white border-2 border-gray-100 text-gray-900 font-black uppercase tracking-widest text-xs rounded-3xl hover:bg-gray-50 hover:border-gray-900 transition-all active:scale-95 shadow-xl shadow-gray-200/20"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     Archive
                 </Link>
                 <Link
-                    href={`/quiz/${paper.id}`}
+                    href={`/quiz/${quiz.id}`}
                     className="flex items-center gap-3 px-10 py-5 bg-gray-900 text-white font-black uppercase tracking-widest text-xs rounded-3xl hover:bg-black transition-all active:scale-95 shadow-2xl shadow-black/30"
                 >
                     <RotateCcw className="w-4 h-4 italic" />

@@ -16,7 +16,7 @@ const subjectColors: Record<string, string> = {
     English: "bg-orange-100 text-orange-700",
 };
 
-export default async function AdminPaperDetailPage({
+export default async function AdminQuizDetailPage({
     params,
 }: {
     params: Promise<{ id: string }>;
@@ -24,23 +24,23 @@ export default async function AdminPaperDetailPage({
     const { id } = await params;
     const supabase = await createClient();
 
-    const { data: paper } = await supabase
-        .from("papers")
+    const { data: quiz } = await supabase
+        .from("quizzes")
         .select("*")
         .eq("id", id)
         .single();
 
-    if (!paper) {
+    if (!quiz) {
         notFound();
     }
 
-    const { data: questions } = await supabase
-        .from("questions")
-        .select("*, options(*)")
-        .eq("paper_id", id)
-        .order("created_at", { ascending: true });
+    const { data: quizQuestions } = await supabase
+        .from("quiz_questions")
+        .select("*, questions(*)")
+        .eq("quiz_id", id)
+        .order("order_index", { ascending: true });
 
-    const questionsList = questions || [];
+    const questionsList = quizQuestions?.map(qq => qq.questions) || [];
 
     // Subject counts
     const subjectCounts: Record<string, number> = {};
@@ -55,20 +55,20 @@ export default async function AdminPaperDetailPage({
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
                 <div className="relative">
                     <Link
-                        href="/admin/papers"
+                        href="/admin/quizzes"
                         className="inline-flex items-center gap-1.5 text-primary-200 hover:text-white text-sm font-medium mb-4 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Papers
+                        Back to Quizzes
                     </Link>
-                    <h1 className="text-2xl sm:text-3xl font-bold">{paper.title}</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold">{quiz.title}</h1>
                     <div className="flex items-center gap-4 mt-3 text-primary-100 text-sm">
-                        <span>Year: {paper.year}</span>
+                        <span>Year: {quiz.year}</span>
                         <span>•</span>
-                        <span>{paper.total_questions} questions</span>
+                        <span>{quiz.total_questions} questions</span>
                         <span>•</span>
                         <span>
-                            Uploaded {new Date(paper.created_at).toLocaleDateString()}
+                            Uploaded {new Date(quiz.created_at).toLocaleDateString()}
                         </span>
                     </div>
                 </div>
@@ -126,29 +126,33 @@ export default async function AdminPaperDetailPage({
                                     {question.question_text}
                                 </p>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    {(question.options as { id: string; option_text: string; is_correct: boolean }[])?.map(
-                                        (option, optIdx) => (
-                                            <div
-                                                key={option.id}
-                                                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm ${option.is_correct
+                                    {(["A", "B", "C", "D"] as const).map(
+                                        (label) => {
+                                            const isCorrect = question.correct_option === label;
+                                            const optionText = question[`option_${label.toLowerCase()}` as keyof typeof question];
+                                            return (
+                                                <div
+                                                    key={label}
+                                                    className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm ${isCorrect
                                                         ? "bg-green-50 border border-green-200 text-green-800"
                                                         : "bg-gray-50 border border-gray-100 text-gray-700"
-                                                    }`}
-                                            >
-                                                <span
-                                                    className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold shrink-0 ${option.is_correct
-                                                            ? "bg-green-200 text-green-800"
-                                                            : "bg-gray-200 text-gray-600"
                                                         }`}
                                                 >
-                                                    {String.fromCharCode(65 + optIdx)}
-                                                </span>
-                                                <span className="flex-1">{option.option_text}</span>
-                                                {option.is_correct && (
-                                                    <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
-                                                )}
-                                            </div>
-                                        )
+                                                    <span
+                                                        className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold shrink-0 ${isCorrect
+                                                            ? "bg-green-200 text-green-800"
+                                                            : "bg-gray-200 text-gray-600"
+                                                            }`}
+                                                    >
+                                                        {label}
+                                                    </span>
+                                                    <span className="flex-1 font-medium">{optionText}</span>
+                                                    {isCorrect && (
+                                                        <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
+                                                    )}
+                                                </div>
+                                            );
+                                        }
                                     )}
                                 </div>
                             </div>
