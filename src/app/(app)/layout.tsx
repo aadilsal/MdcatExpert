@@ -16,18 +16,17 @@ import {
     Shield,
     ChevronRight,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import UserDropdown from "./user-dropdown";
 
 const studentNav = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/papers", label: "Papers", icon: FileText },
+    { href: "/quizzes", label: "Quizzes", icon: FileText },
     { href: "/analytics", label: "Analytics", icon: BarChart3 },
 ];
 
 const adminNav = [
-    { href: "/admin/papers", label: "Manage Papers", icon: FileText },
-    { href: "/admin/upload", label: "Upload Paper", icon: Upload },
+    { href: "/admin/quizzes", label: "Manage Quizzes", icon: FileText },
+    { href: "/admin/upload", label: "Upload Quiz", icon: Upload },
     { href: "/admin/students", label: "Students", icon: Users },
 ];
 
@@ -42,22 +41,22 @@ export default function AppLayout({
 
     useEffect(() => {
         const fetchUserData = async () => {
-            const supabase = createClient();
-            const {
-                data: { user },
-            } = await supabase.auth.getUser();
-            if (user) {
-                const { data: profile } = await supabase
-                    .from("users")
-                    .select("name, role")
-                    .eq("id", user.id)
-                    .single();
-
+            try {
+                const response = await fetch("/api/auth/me");
+                if (!response.ok) {
+                    return;
+                }
+                const payload = await response.json();
+                if (!payload?.user) {
+                    return;
+                }
                 setUserData({
-                    name: profile?.name || "Student",
-                    email: user.email || "",
-                    role: profile?.role || "student"
+                    name: payload.user.name || "Student",
+                    email: payload.user.email || "",
+                    role: payload.user.role || "student",
                 });
+            } catch (error) {
+                console.error("Failed to load user profile", error);
             }
         };
         fetchUserData();

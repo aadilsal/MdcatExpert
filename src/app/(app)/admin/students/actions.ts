@@ -1,23 +1,37 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { fetchMutation, fetchQuery } from "convex/nextjs";
+import { api } from "../../../../../convex/_generated/api";
+import type { Id } from "../../../../../convex/_generated/dataModel";
 
 export async function updateUserRoleAction(userId: string, newRole: 'student' | 'admin') {
-    const supabase = await createClient();
+    const token = await convexAuthNextjsToken();
+    if (!token) throw new Error("Unauthorized");
+    const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
+    if (!me || me.role !== "admin") throw new Error("Forbidden");
 
-    // The RLS policy "Admins can update all users" uses is_admin()
-    // which checks public.users. So as long as the logged in user is an admin,
-    // they can update the role of other users.
-    const { error } = await supabase
-        .from('users')
-        .update({ role: newRole })
-        .eq('id', userId);
+    await fetchMutation(api.users.setUserRole, { userId: userId as Id<"users">, role: newRole }, { token });
 
-    if (error) {
-        console.error("Failed to update user role:", error);
-        throw new Error(error.message || "Failed to update user role.");
-    }
+    revalidatePath("/admin/students");
+    return { success: true };
+}
+
+export async function updateUserSubscriptionAction(userId: string, subscriptionType: 'free' | 'premium') {
+    const token = await convexAuthNextjsToken();
+    if (!token) throw new Error("Unauthorized");
+    const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
+    if (!me || me.role !== "admin") throw new Error("Forbidden");
+
+    const premiumUntil = subscriptionType === "premium"
+        ? new Date(new Date().setFullYear(new Date().getFullYear() + 10)).getTime()
+        : undefined;
+    await fetchMutation(
+        api.users.setSubscription,
+        { userId: userId as Id<"users">, subscriptionType, premiumUntil },
+        { token }
+    );
 
     revalidatePath("/admin/students");
     return { success: true };

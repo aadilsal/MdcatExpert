@@ -4,7 +4,6 @@ import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    Upload,
     FileSpreadsheet,
     CheckCircle,
     AlertCircle,
@@ -22,6 +21,7 @@ export default function AdminUploadPage() {
     const router = useRouter();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [file, setFile] = useState<File | null>(null);
+    const [uploadMode, setUploadMode] = useState<'xlsx' | 'pdf'>('xlsx');
     const [title, setTitle] = useState("");
     const [year, setYear] = useState("");
     const [uploading, setUploading] = useState(false);
@@ -50,18 +50,27 @@ export default function AdminUploadPage() {
         setDragActive(false);
 
         const droppedFile = e.dataTransfer.files?.[0];
-        if (
-            droppedFile &&
-            (droppedFile.name.endsWith(".xlsx") || droppedFile.name.endsWith(".xls"))
-        ) {
+        if (!droppedFile) return;
+
+        const allowed = uploadMode === 'pdf'
+            ? droppedFile.name.toLowerCase().endsWith('.pdf')
+            : droppedFile.name.toLowerCase().endsWith('.xlsx') || droppedFile.name.toLowerCase().endsWith('.xls');
+
+        if (allowed) {
             setFile(droppedFile);
             setResult(null);
         }
-    }, []);
+    }, [uploadMode]);
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
-        if (selectedFile) {
+        if (!selectedFile) return;
+
+        const allowed = uploadMode === 'pdf'
+            ? selectedFile.name.toLowerCase().endsWith('.pdf')
+            : selectedFile.name.toLowerCase().endsWith('.xlsx') || selectedFile.name.toLowerCase().endsWith('.xls');
+
+        if (allowed) {
             setFile(selectedFile);
             setResult(null);
         }
@@ -70,6 +79,12 @@ export default function AdminUploadPage() {
     const handleUpload = async () => {
         if (!file || !title.trim() || !year.trim()) return;
 
+        const yearNumber = Number(year.trim());
+        if (!Number.isInteger(yearNumber) || yearNumber <= 0) {
+            setResult({ success: false, error: "Please enter a valid year (e.g., 2024)." });
+            return;
+        }
+
         setUploading(true);
         setResult(null);
 
@@ -77,9 +92,10 @@ export default function AdminUploadPage() {
             const formData = new FormData();
             formData.append("file", file);
             formData.append("title", title.trim());
-            formData.append("year", year.trim());
+            formData.append("year", yearNumber.toString());
 
-            const res = await fetch("/api/papers/upload", {
+            const endpoint = uploadMode === 'pdf' ? "/api/py/upload-pdf" : "/api/py/upload";
+            const res = await fetch(endpoint, {
                 method: "POST",
                 body: formData,
             });
@@ -89,16 +105,26 @@ export default function AdminUploadPage() {
             if (res.ok && data.success) {
                 setResult({
                     success: true,
-                    total_inserted: data.total_inserted,
-                    skipped_count: data.skipped_count,
+                    total_inserted: data.total_parsed,
                     skipped_rows: data.skipped_rows,
                 });
+
+                // Redirect to review page after a short delay
+                setTimeout(() => {
+                    router.push(`/admin/upload/review/${data.batch_id}?title=${encodeURIComponent(title)}&year=${year}`);
+                }, 2000);
+
                 setFile(null);
                 setTitle("");
                 setYear("");
                 if (fileInputRef.current) fileInputRef.current.value = "";
             } else {
-                setResult({ success: false, error: data.error });
+                const message =
+                    data?.error ||
+                    data?.detail ||
+                    (res.status === 413 ? "Upload too large (body size limit exceeded)." : `${res.status} ${res.statusText}`) ||
+                    "Upload failed."
+                setResult({ success: false, error: message });
             }
         } catch {
             setResult({
@@ -138,11 +164,24 @@ export default function AdminUploadPage() {
                         </div>
                         <div className="bg-white/5 backdrop-blur-xl p-4 rounded-3xl border border-white/5">
                             <Layers className="w-6 h-6 text-emerald-400 mb-2" />
-                            <p className="text-xl font-bold italic line-clamp-1">XLSX</p>
+                            <p className="text-xl font-bold italic line-clamp-1">{uploadMode === 'pdf' ? 'PDF OCR' : 'XLSX Parser'}</p>
                             <p className="text-[9px] font-black text-white/30 uppercase tracking-widest">Target Engine</p>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Mode Switch */}
+            <div className="flex items-center justify-center gap-4">
+                {['xlsx', 'pdf'].map((mode) => (
+                    <button
+                        key={mode}
+                        onClick={() => { setUploadMode(mode as 'xlsx' | 'pdf'); setFile(null); setResult(null); }}
+                        className={`px-6 py-2 rounded-full font-black uppercase tracking-widest text-xs transition-all ${uploadMode === mode ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                    >
+                        {mode === 'xlsx' ? 'Upload XLSX' : 'Upload PDF'}
+                    </button>
+                ))}
             </div>
 
             {/* Results Feedback Overlay */}
@@ -153,8 +192,8 @@ export default function AdminUploadPage() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         className={`rounded-[2.5rem] border p-8 flex items-start gap-6 backdrop-blur-xl shadow-2xl ${result.success
-                                ? "bg-emerald-500/10 border-emerald-500/20"
-                                : "bg-red-500/10 border-red-500/20 text-red-100"
+                            ? "bg-emerald-500/10 border-emerald-500/20"
+                            : "bg-red-500/10 border-red-500/20 text-red-100"
                             }`}
                     >
                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${result.success ? "bg-emerald-500 text-white shadow-emerald-500/20" : "bg-red-500 text-white shadow-red-500/20"
@@ -174,7 +213,7 @@ export default function AdminUploadPage() {
                             </p>
                             {result.success && (
                                 <button
-                                    onClick={() => router.push("/admin/papers")}
+                                    onClick={() => router.push("/admin/quizzes")}
                                     className="inline-flex items-center gap-2 mt-2 text-emerald-700 font-black uppercase tracking-widest text-[10px] hover:text-emerald-900 transition-colors"
                                 >
                                     Proceed to Repository <ChevronRight className="w-3 h-3" />
@@ -206,7 +245,7 @@ export default function AdminUploadPage() {
                                     type="text"
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
-                                    placeholder="e.g. MDCAT 2024 ELITE"
+                                    placeholder="e.g. MDCAT 2024 ELITE QUIZ"
                                     className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-white focus:border-primary-500 transition-all font-bold text-gray-900 italic"
                                 />
                             </div>
@@ -237,15 +276,15 @@ export default function AdminUploadPage() {
                             onDrop={handleDrop}
                             onClick={() => fileInputRef.current?.click()}
                             className={`relative border-2 border-dashed rounded-[2rem] p-12 text-center transition-all duration-500 cursor-pointer group/drop ${dragActive
-                                    ? "border-primary-500 bg-primary-500/5 scale-[1.01]"
-                                    : file
-                                        ? "border-emerald-500 bg-emerald-50"
-                                        : "border-gray-100 bg-gray-50/50 hover:border-primary-300 hover:bg-white hover:scale-[1.01]"
+                                ? "border-primary-500 bg-primary-500/5 scale-[1.01]"
+                                : file
+                                    ? "border-emerald-500 bg-emerald-50"
+                                    : "border-gray-100 bg-gray-50/50 hover:border-primary-300 hover:bg-white hover:scale-[1.01]"
                                 }`}
                         >
                             <div className={`absolute inset-0 bg-primary-600/5 opacity-0 group-hover/drop:opacity-100 transition-opacity rounded-[2rem] pointer-events-none`} />
 
-                            <input ref={fileInputRef} type="file" accept=".xlsx,.xls" onChange={handleFileSelect} className="hidden" />
+                            <input ref={fileInputRef} type="file" accept={uploadMode === 'pdf' ? '.pdf' : '.xlsx,.xls'} onChange={handleFileSelect} className="hidden" />
 
                             {file ? (
                                 <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center gap-4 relative z-10 w-full max-w-sm mx-auto">
@@ -271,7 +310,7 @@ export default function AdminUploadPage() {
                                         <FileSpreadsheet className="w-10 h-10 text-primary-500" />
                                     </div>
                                     <h3 className="text-2xl font-black text-gray-900 tracking-tight italic">Drag & Drop Dataset.</h3>
-                                    <p className="text-gray-400 font-bold uppercase tracking-widest text-[9px]">Standard .XLSX Protocol Only</p>
+                                    <p className="text-gray-400 font-bold uppercase tracking-widest text-[9px]">{uploadMode === 'pdf' ? 'PDF (scanned/print) accepted' : 'Standard .XLSX Protocol Only'}</p>
                                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/20">
                                         Browse Modules
                                     </div>

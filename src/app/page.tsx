@@ -17,6 +17,7 @@ import {
   Sparkles,
   ShieldCheck,
   Smartphone,
+  AlertTriangle as AlertTriangleIcon,
 } from "lucide-react";
 import { useRef } from "react";
 
@@ -106,8 +107,8 @@ export default function HomePage() {
             transition={{ delay: 0.2 }}
             className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/50 backdrop-blur-md border border-primary-100 text-primary-700 text-xs font-black uppercase tracking-widest mb-10 shadow-sm"
           >
-            <Sparkles className="w-4 h-4 text-primary-500" />
-            The Ultimate Preparation Tool
+            <Sparkles className="w-4 h-4 text-amber-500" />
+            New: Elite AI Weakness Radar Launched
           </motion.div>
 
           <motion.h1
@@ -130,8 +131,8 @@ export default function HomePage() {
             transition={{ delay: 0.4 }}
             className="text-xl sm:text-2xl text-gray-500 leading-relaxed max-w-3xl mx-auto font-medium mb-12"
           >
-            Don&apos;t just practice. Master the pattern. Real past papers,
-            smart subject-wise analytics, and the edge you need for Pakistan&apos;s toughest medical entrance exam.
+            Don&apos;t just practice. Master the pattern with <span className="text-black font-black">Elite AI</span>. Real quiz archives,
+            smart subject-wise analytics, and the AI-driven edge you need for Pakistan&apos;s toughest medical entrance exam.
           </motion.p>
 
           <motion.div
@@ -194,8 +195,9 @@ export default function HomePage() {
 
               <ul className="space-y-6">
                 {[
-                  { title: "Smarter Analytics", desc: "No more guessing. See your accuracy by subject instantly.", icon: BarChart3 },
-                  { title: "Paper Archives", desc: "Access verified papers from the last 10 years.", icon: ShieldCheck },
+                  { title: "AI Weakness Radar", desc: "Visualize your subject mastery with our polar intelligence map.", icon: Target },
+                  { title: "Mistake Analyzer", desc: "Pinpoint exactly why you failed a question with AI-driven logic.", icon: AlertTriangleIcon },
+                  { title: "Quiz archives", desc: "Access verified quizzes from the last 10 years including Elite specials.", icon: ShieldCheck },
                   { title: "Exam Simulator", desc: "Real-time clock tracking your pressure performance.", icon: Clock },
                 ].map((item) => (
                   <motion.li
@@ -285,12 +287,70 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Pricing / Elite Plan Section */}
+      <section className="py-32 bg-gray-50 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 text-center mb-20">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-100 border border-primary-200 text-[10px] font-black uppercase tracking-[0.2em] text-primary-700 mb-6">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            Elite Membership
+          </div>
+          <h2 className="text-4xl sm:text-6xl font-black text-gray-900 tracking-tight italic mb-6">Choose Your <span className="text-primary-600">Legend.</span></h2>
+          <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Start for free or upgrade to high-performance AI tools.</p>
+        </div>
+
+        <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-10">
+          {/* Free Tier */}
+          <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl flex flex-col justify-between">
+            <div>
+              <h3 className="text-2xl font-black text-gray-900 italic mb-2">Standard.</h3>
+              <div className="text-5xl font-black text-gray-900 mb-8 italic">Free</div>
+              <ul className="space-y-4 mb-10">
+                {["Limited Quizzes", "Basic Analytics", "Community Support"].map(f => (
+                  <li key={f} className="flex items-center gap-3 text-gray-500 font-bold italic text-sm">
+                    <CheckCircle className="w-4 h-4 text-gray-300" /> {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <Link href="/signup" className="w-full py-4 text-center font-black uppercase tracking-widest text-[10px] text-gray-900 border-2 border-gray-900 rounded-2xl hover:bg-gray-900 hover:text-white transition-all">Get Started</Link>
+          </div>
+
+          {/* Elite Tier */}
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary-600 to-purple-600 rounded-[2.6rem] blur opacity-25" />
+            <div className="relative bg-black rounded-[2.5rem] p-10 text-white shadow-2xl flex flex-col justify-between h-full">
+              <div>
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-2xl font-black italic">Elite.</h3>
+                  <div className="px-3 py-1 bg-primary-600 text-[8px] font-black uppercase tracking-[0.2em] rounded-full">Recommended</div>
+                </div>
+                <div className="flex items-baseline gap-2 mb-8">
+                  <span className="text-5xl font-black italic text-primary-500">Rs. 2500</span>
+                  <span className="text-white/40 font-bold uppercase text-[9px] tracking-widest">/ Lifetime</span>
+                </div>
+                <ul className="space-y-4 mb-10">
+                  {["AI Weakness Radar", "Mistake Analyzer", "Elite Study Archive", "Manual activation Support"].map(f => (
+                    <li key={f} className="flex items-center gap-3 font-bold italic text-sm">
+                      <div className="w-5 h-5 rounded-full bg-primary-500/20 flex items-center justify-center">
+                        <CheckCircle className="w-3 h-3 text-primary-500" />
+                      </div>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <Link href="/signup?goElite=true" className="w-full py-4 text-center font-black uppercase tracking-widest text-[10px] text-white bg-primary-600 rounded-2xl hover:bg-primary-500 shadow-xl shadow-primary-600/30 transition-all">Go Elite</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Grid Highlights */}
       <section className="py-24 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { title: "Authentic Papers", desc: "No fake questions. Only real MDCAT materials.", icon: ShieldCheck, color: "blue" },
+              { title: "Authentic Quizzes", desc: "No fake questions. Only real MDCAT materials.", icon: ShieldCheck, color: "blue" },
               { title: "All Devices", desc: "Practice on your phone while commuting.", icon: Smartphone, color: "emerald" },
               { title: "Subject Focus", desc: "Drill down into Biology, Physics or Chemistry.", icon: Box, color: "purple" },
               { title: "Free Always", desc: "Premium features without the premium price.", icon: Star, color: "amber" },
@@ -346,7 +406,7 @@ export default function HomePage() {
               <span className="w-1 h-1 bg-gray-800 rounded-full" />
               <span className="flex items-center gap-1.5"><Sparkles className="w-4 h-4 text-primary-500" /> FREE</span>
               <span className="w-1 h-1 bg-gray-800 rounded-full" />
-              <span className="flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-primary-500" /> OFFICIAL PAPERS</span>
+              <span className="flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-primary-500" /> OFFICIAL QUIZZES</span>
             </div>
           </motion.div>
         </div>
@@ -374,7 +434,7 @@ export default function HomePage() {
                 { name: 'Home', href: '/' },
                 { name: 'Features', href: '#features' }, // Features are on this page
                 { name: 'Analytics', href: '/login' }, // Gated: ask to login first
-                { name: 'Papers', href: '/login' }     // Gated: ask to login first
+                { name: 'Quizzes', href: '/login' }     // Gated: ask to login first
               ].map(i => (
                 <li key={i.name}><Link href={i.href} className="text-gray-500 text-sm font-semibold hover:text-primary-600 transition-colors">{i.name}</Link></li>
               ))}

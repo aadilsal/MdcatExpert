@@ -5,60 +5,71 @@ export interface User {
     name: string;
     email: string;
     role: UserRole;
+    subscription_type?: "free" | "premium";
+    premium_until?: string | null;
     created_at: string;
 }
 
-export interface Paper {
+export interface Quiz {
     id: string;
     title: string;
     year: number;
+    subject: string;
+    is_premium: boolean;
     total_questions: number;
     created_at: string;
 }
 
 export interface Question {
     id: string;
-    paper_id: string;
     question_text: string;
-    subject: "Biology" | "Chemistry" | "Physics" | "English";
+    option_a: string;
+    option_b: string;
+    option_c: string;
+    option_d: string;
+    correct_option: "A" | "B" | "C" | "D";
+    subject: string;
+    explanation: string | null;
     image_url: string | null;
+    year: number;
     created_at: string;
 }
 
-export interface Option {
-    id: string;
-    question_id: string;
-    option_text: string;
-    is_correct: boolean;
-}
+// Option is now deprecated as it is flattened into Question, but kept for legacy if needed
+// export interface Option { ... }
 
 export interface Attempt {
     id: string;
     user_id: string;
-    paper_id: string;
+    quiz_id: string;
     score: number;
+    correct_answers: number;
+    wrong_answers: number;
     time_taken: number;
     created_at: string;
 }
 
-export interface AttemptAnswer {
+export interface UserAnswer {
     id: string;
     attempt_id: string;
     question_id: string;
-    selected_option_id: string;
+    selected_option: "A" | "B" | "C" | "D";
     is_correct: boolean;
+    created_at: string;
 }
 
 // Extended types for joins
-export interface QuestionWithOptions extends Question {
-    options: Option[];
+export interface QuizQuestion {
+    id: string;
+    quiz_id: string;
+    question_id: string;
+    order: number;
 }
 
-export interface AttemptWithPaper extends Attempt {
-    paper: Paper;
+export interface AttemptWithQuiz extends Attempt {
+    quiz: Quiz;
 }
 
-export interface AttemptAnswerWithDetails extends AttemptAnswer {
+export interface UserAnswerWithDetails extends UserAnswer {
     question: Question;
-    selected_option: Option;
 }

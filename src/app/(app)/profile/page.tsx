@@ -1,36 +1,24 @@
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import ProfileClient from "./profile-client";
 import { User } from "lucide-react";
 import { Suspense } from "react";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "../../../../convex/_generated/api";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
-    const supabase = await createClient();
+    const token = await convexAuthNextjsToken();
+    if (!token) redirect("/login");
 
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-        redirect("/login");
-    }
-
-    const { data: profile } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-    if (!profile) {
-        redirect("/dashboard");
-    }
+    const profile = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
+    if (!profile) redirect("/dashboard");
 
     return (
         <div className="animate-fade-in space-y-8">
             {/* Header */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 p-8 text-white shadow-lg">
+            <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-gray-800 to-gray-900 p-8 text-white shadow-lg">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
                 <div className="relative">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm text-sm font-medium mb-4">
@@ -45,7 +33,15 @@ export default async function ProfilePage() {
             </div>
 
             <Suspense fallback={<div className="h-96 animate-pulse bg-gray-50 rounded-2xl border border-gray-100" />}>
-                <ProfileClient user={profile} />
+                <ProfileClient
+                    user={{
+                        id: profile._id,
+                        email: profile.email ?? "",
+                        name: profile.name ?? "",
+                        phone: profile.phone ?? null,
+                        role: profile.role ?? "student",
+                    }}
+                />
             </Suspense>
         </div>
     );

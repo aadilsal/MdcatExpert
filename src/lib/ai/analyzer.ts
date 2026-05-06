@@ -76,9 +76,10 @@ export async function analyzeMistake(context: MistakeContext, retryCount = 0): P
         const text = chatCompletion.choices[0]?.message?.content || "{}";
 
         return JSON.parse(text) as AIInsight;
-    } catch (error: any) {
+    } catch (error: unknown) {
         // Handle 429 (Rate Limit) with exponential backoff
-        if ((error?.status === 429 || error?.message?.includes("429")) && retryCount < 3) {
+        const err = error as { status?: number; message?: string } | null;
+        if (((err?.status === 429) || (err?.message?.includes("429"))) && retryCount < 3) {
             const backoff = Math.pow(2, retryCount) * 2000;
             console.warn(`Groq rate limited. retrying in ${backoff}ms...`);
             await sleep(backoff);

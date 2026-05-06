@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -16,6 +15,10 @@ import {
     History,
 } from "lucide-react";
 import AIInsightCard from "../ai-insight-card";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "../../../../../convex/_generated/api";
+import type { Id } from "../../../../../convex/_generated/dataModel";
 
 export const dynamic = "force-dynamic";
 
@@ -32,34 +35,52 @@ export default async function ResultsPage({
     params: Promise<{ attemptId: string }>;
 }) {
     const { attemptId } = await params;
-    const supabase = await createClient();
+    const token = await convexAuthNextjsToken();
+    if (!token) notFound();
 
-    // Fetch attempt
-    const { data: attempt } = await supabase
-        .from("attempts")
-        .select("*, papers(*)")
-        .eq("id", attemptId)
-        .single();
-
+    const attempt = await fetchQuery(api.attempts.getAttemptById, { attemptId: attemptId as Id<"attempts"> }, { token });
     if (!attempt) notFound();
 
-    const paper = attempt.papers as { id: string; title: string; year: number; total_questions: number };
+    const quiz = await fetchQuery(api.quizzes.getQuizById, { quizId: attempt.quizId }, { token });
+    if (!quiz) notFound();
 
-    // Fetch answers with detailed metadata
-    const { data: answers } = await supabase
-        .from("attempt_answers")
-        .select("*, questions(*, options(*))")
-        .eq("attempt_id", attemptId);
+    const questions = await fetchQuery(api.quizzes.getQuizQuestions, { quizId: quiz._id }, { token });
+    const questionById = new Map<string, any>();
+    for (const q of questions ?? []) {
+        if (q?._id) questionById.set(String(q._id), q);
+    }
 
-    const answersList = answers || [];
+    const rawAnswers = await fetchQuery(api.attempts.getAttemptAnswers, { attemptId: attempt._id }, { token });
+    const answersList = (rawAnswers ?? []).map((ua) => {
+        const q = questionById.get(String(ua.questionId));
+        return {
+            id: ua._id,
+            is_correct: ua.isCorrect,
+            selected_option: ua.selectedOption,
+            time_spent: 0,
+            ai_analysis: ua.aiAnalysis ?? null,
+            questions: q
+                ? {
+                      question_text: q.questionText,
+                      subject: q.subject,
+                      option_a: q.optionA,
+                      option_b: q.optionB,
+                      option_c: q.optionC,
+                      option_d: q.optionD,
+                      correct_option: q.correctOption,
+                      explanation: q.explanation ?? null,
+                      image_url: q.imageUrl ?? null,
+                  }
+                : null,
+        };
+    });
 
-    // Stats Calculation
-    const totalQuestions = paper.total_questions;
-    const correctCount = attempt.score;
+    const totalQuestions = quiz.totalQuestions;
+    const correctCount = attempt.correctAnswers ?? attempt.score;
     const percentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
 
     // Time Analysis
-    const totalSeconds = attempt.time_taken;
+    const totalSeconds = attempt.timeTaken ?? 0;
     const avgTimePerQuestion = totalQuestions > 0 ? totalSeconds / totalQuestions : 0;
 
     const formatTime = (seconds: number) => {
@@ -80,7 +101,8 @@ export default async function ResultsPage({
             subjectStats[subject] = { correct: 0, total: 0, time: 0 };
         }
         subjectStats[subject].total++;
-        subjectStats[subject].time += (a.time_spent || 0);
+        // Use average time per question since individual time_spent is not stored
+        subjectStats[subject].time += avgTimePerQuestion;
         if (a.is_correct) subjectStats[subject].correct++;
     });
 
@@ -97,7 +119,7 @@ export default async function ResultsPage({
         <div className="animate-fade-in max-w-5xl mx-auto space-y-12 pb-24 px-4">
 
             {/* Elite Score Hero */}
-            <div className={`relative overflow-hidden rounded-[3rem] bg-gradient-to-br ${grade.color} p-10 sm:p-16 text-white shadow-2xl transition-all duration-700`}>
+            <div className={`relative overflow-hidden rounded-[3rem] bg-linear-to-br ${grade.color} p-10 sm:p-16 text-white shadow-2xl transition-all duration-700`}>
                 <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4" />
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/4" />
 
@@ -112,7 +134,7 @@ export default async function ResultsPage({
                     </h1>
 
                     <p className="text-white/60 font-black uppercase tracking-widest text-xs mb-12">
-                        Archive: {paper.title} • Grade: {grade.status}
+                        Archive: {quiz.title} • Grade: {grade.status}
                     </p>
 
                     <div className="relative group">
@@ -213,7 +235,16 @@ export default async function ResultsPage({
 
                 <div className="grid gap-8">
                     {answersList.map((answer, idx) => {
-                        const question = answer.questions as any;
+                        const question = answer.questions as unknown as {
+                            question_text?: string;
+                            option_a?: string;
+                            option_b?: string;
+                            option_c?: string;
+                            option_d?: string;
+                            correct_option?: string;
+                            explanation?: string | null;
+                            image_url?: string | null;
+                        } | null;
                         if (!question) return null;
 
                         const isMistake = !answer.is_correct;
@@ -236,7 +267,7 @@ export default async function ResultsPage({
                                                 <Clock className={`w-3.5 h-3.5 ${isMistake ? "text-red-400" : "text-emerald-400"}`} />
                                                 <span className="text-sm font-black italic text-gray-900">{answer.time_spent}s</span>
                                                 <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${timeStatus === "Slow" ? "bg-red-100 text-red-600" :
-                                                        timeStatus === "Fast" ? "bg-amber-100 text-amber-600" : "bg-emerald-100 text-emerald-600"
+                                                    timeStatus === "Fast" ? "bg-amber-100 text-amber-600" : "bg-emerald-100 text-emerald-600"
                                                     }`}>
                                                     {timeStatus}
                                                 </span>
@@ -252,24 +283,25 @@ export default async function ResultsPage({
                                     </h3>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {question.options?.map((option: any, optIdx: number) => {
-                                            const isSelected = answer.selected_option_id === option.id;
-                                            const isCorrect = option.is_correct;
+                                        {(["A", "B", "C", "D"] as const).map((label) => {
+                                            const isSelected = answer.selected_option === label;
+                                            const isCorrect = question.correct_option === label;
+                                            const optionText = question[`option_${label.toLowerCase()}`];
 
                                             return (
                                                 <div
-                                                    key={option.id}
+                                                    key={label}
                                                     className={`flex items-center gap-6 px-6 py-4 rounded-2xl border-2 transition-all ${isCorrect ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-900" :
-                                                            isSelected && !isCorrect ? "bg-red-500/5 border-red-500/20 text-red-900" :
-                                                                "bg-gray-50 border-gray-100 text-gray-500 opacity-60"
+                                                        isSelected && !isCorrect ? "bg-red-500/5 border-red-500/20 text-red-900" :
+                                                            "bg-gray-50 border-gray-100 text-gray-500 opacity-60"
                                                         }`}
                                                 >
                                                     <span className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black shrink-0 ${isCorrect ? "bg-emerald-500 text-white" :
-                                                            isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500"
+                                                        isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500"
                                                         }`}>
-                                                        {String.fromCharCode(65 + optIdx)}
+                                                        {label}
                                                     </span>
-                                                    <span className="flex-1 font-bold text-sm tracking-tight">{option.option_text}</span>
+                                                    <span className="flex-1 font-bold text-sm tracking-tight">{optionText}</span>
                                                     {isCorrect && <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />}
                                                     {isSelected && !isCorrect && <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />}
                                                 </div>
@@ -294,14 +326,14 @@ export default async function ResultsPage({
             {/* Bottom Tactical Actions */}
             <div className="flex items-center justify-center gap-8 py-12">
                 <Link
-                    href="/papers"
+                    href="/quizzes"
                     className="flex items-center gap-3 px-10 py-5 bg-white border-2 border-gray-100 text-gray-900 font-black uppercase tracking-widest text-xs rounded-3xl hover:bg-gray-50 hover:border-gray-900 transition-all active:scale-95 shadow-xl shadow-gray-200/20"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     Archive
                 </Link>
                 <Link
-                    href={`/quiz/${paper.id}`}
+                    href={`/quiz/${quiz.id}`}
                     className="flex items-center gap-3 px-10 py-5 bg-gray-900 text-white font-black uppercase tracking-widest text-xs rounded-3xl hover:bg-black transition-all active:scale-95 shadow-2xl shadow-black/30"
                 >
                     <RotateCcw className="w-4 h-4 italic" />

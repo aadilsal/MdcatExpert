@@ -1,13 +1,21 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LogIn, Eye, EyeOff, Loader2, AlertCircle, Mail, Lock } from "lucide-react";
-import { loginAction } from "../actions";
+import { useAuthActions } from "@convex-dev/auth/react";
 
 export default function LoginPage() {
-    const [state, action, isPending] = useActionState(loginAction, null);
+    const router = useRouter();
+    const { signIn } = useAuthActions();
     const [showPassword, setShowPassword] = useState(false);
+    const [isPending, setIsPending] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        setError(null);
+    }, []);
 
     return (
         <div className="w-full max-w-md animate-fade-in">
@@ -22,14 +30,32 @@ export default function LoginPage() {
                     </p>
                 </div>
 
-                {state?.error && (
+                {error && (
                     <div className="mb-8 p-4 rounded-xl bg-red-50 border border-red-100 flex items-start gap-3 text-red-700 animate-shake">
                         <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-                        <p className="text-sm font-medium leading-relaxed">{state.error}</p>
+                        <p className="text-sm font-medium leading-relaxed">{error}</p>
                     </div>
                 )}
 
-                <form action={action} className="space-y-6">
+                <form
+                    className="space-y-6"
+                    onSubmit={async (e) => {
+                        e.preventDefault();
+                        setIsPending(true);
+                        setError(null);
+                        try {
+                            const formData = new FormData(e.currentTarget);
+                            formData.set("flow", "signIn");
+                            await signIn("password", formData);
+                            router.push("/dashboard");
+                            router.refresh();
+                        } catch (err) {
+                            setError(err instanceof Error ? err.message : "Sign in failed.");
+                        } finally {
+                            setIsPending(false);
+                        }
+                    }}
+                >
                     <div>
                         <label
                             htmlFor="email"
@@ -47,15 +73,9 @@ export default function LoginPage() {
                                 type="email"
                                 required
                                 placeholder="you@example.com"
-                                className={`w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all duration-200 ${state?.fieldErrors?.email ? "border-red-300 ring-red-100" : ""
-                                    }`}
+                                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all duration-200"
                             />
                         </div>
-                        {state?.fieldErrors?.email && (
-                            <p className="mt-2 text-xs font-medium text-red-500 ml-1">
-                                {state.fieldErrors.email[0]}
-                            </p>
-                        )}
                     </div>
 
                     <div>
@@ -77,8 +97,7 @@ export default function LoginPage() {
                                 type={showPassword ? "text" : "password"}
                                 required
                                 placeholder="••••••••"
-                                className={`w-full pl-11 pr-12 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all duration-200 ${state?.fieldErrors?.password ? "border-red-300 ring-red-100" : ""
-                                    }`}
+                                className="w-full pl-11 pr-12 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all duration-200"
                             />
                             <button
                                 type="button"
@@ -92,11 +111,6 @@ export default function LoginPage() {
                                 )}
                             </button>
                         </div>
-                        {state?.fieldErrors?.password && (
-                            <p className="mt-2 text-xs font-medium text-red-500 ml-1">
-                                {state.fieldErrors.password[0]}
-                            </p>
-                        )}
                     </div>
 
                     <button

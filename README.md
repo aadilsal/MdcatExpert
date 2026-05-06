@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+;This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
@@ -19,6 +19,20 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## AI Features (Current Implementation)
+
+MdcatXpert now includes the following production AI features in the `enhancement/new_features` branch:
+
+- **AI Mistake Analyzer** (question-level explanation + misconceptions + recommendation)
+- **AI Weakness Radar** (subject-wise radar mapping from performance data)
+- **AI Mistakes Summary** (total mistakes, per-subject mistake breakouts, elite insight)
+- Premium/Eelite process in `src/app/(app)/upgrade/page.tsx` for payment + plan activation
+- API endpoints:
+  - `GET /api/py/analytics/mistakes/{user_id}`
+  - `GET /api/py/analytics/radar/{user_id}`
+
+For full feature mapping and edgeline plan, see `docs/AI_FEATURES_PLAN.md`.
 
 ## Learn More
 
