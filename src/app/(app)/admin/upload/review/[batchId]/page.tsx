@@ -9,15 +9,11 @@ import {
     Save,
     Trash2,
     Layers,
-    ChevronRight,
     Loader2,
-    Search,
-    Filter,
     Image as ImageIcon,
     AlertTriangle
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface StagingQuestion {
     id: string;
@@ -50,14 +46,10 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
     useEffect(() => {
         const fetchStaging = async () => {
             try {
-                const supabase = createClient();
-                const { data, error } = await supabase
-                    .from("staging_questions")
-                    .select("*")
-                    .eq("batch_id", batchId);
-
-                if (error) throw error;
-                setQuestions(data || []);
+                const res = await fetch(`/api/staging/${batchId}`, { cache: "no-store" });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json?.error || "Failed to load uploaded questions.");
+                setQuestions(json.questions || []);
             } catch (error) {
                 console.error("Failed to fetch staging questions:", error);
             } finally {
@@ -69,13 +61,12 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
 
     const handleStatusUpdate = async (id: string, status: "approved" | "rejected") => {
         try {
-            const supabase = createClient();
-            const { error } = await supabase
-                .from("staging_questions")
-                .update({ status })
-                .eq("id", id);
-
-            if (error) throw error;
+            const res = await fetch(`/api/staging/question/${id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status }),
+            });
+            if (!res.ok) throw new Error("Failed to update status.");
             setQuestions(prev => prev.map(q => q.id === id ? { ...q, status } : q));
         } catch (error) {
             console.error("Failed to update status:", error);
@@ -90,13 +81,12 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
     const handleSaveEdit = async () => {
         if (!editingId) return;
         try {
-            const supabase = createClient();
-            const { error } = await supabase
-                .from("staging_questions")
-                .update(editForm)
-                .eq("id", editingId);
-
-            if (error) throw error;
+            const res = await fetch(`/api/staging/question/${editingId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(editForm),
+            });
+            if (!res.ok) throw new Error("Failed to save changes.");
             setQuestions(prev => prev.map(q => q.id === editingId ? { ...q, ...editForm } as StagingQuestion : q));
             setEditingId(null);
         } catch (error) {
@@ -106,38 +96,9 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
 
     const handleImageUpload = async (questionId: string, file: File) => {
         try {
-            console.log("Starting image upload for question:", questionId);
-
-            const supabase = createClient();
-
-            // Check user authentication and role
-            const { data: { user }, error: authError } = await supabase.auth.getUser();
-            console.log("Current user:", user);
-            console.log("Auth error:", authError);
-
-            if (authError) throw new Error(`Authentication error: ${authError.message}`);
-            if (!user) throw new Error("User not authenticated");
-
-            // Check user role
-            const { data: userData, error: userError } = await supabase
-                .from("users")
-                .select("role")
-                .eq("id", user.id)
-                .single();
-
-            console.log("User data:", userData);
-            console.log("User error:", userError);
-
-            if (userError) throw new Error(`User data error: ${userError.message}`);
-            if (!userData) throw new Error("User data not found");
-            if (userData.role !== "admin") throw new Error(`User is not an admin. Role: ${userData.role}`);
-
-            console.log("User is authenticated as admin, proceeding with upload...");
-
-            // Upload image via API endpoint that uses service role
+            // Upload image via Convex Storage API
             const formData = new FormData();
             formData.append("file", file);
-            formData.append("questionId", questionId);
 
             const uploadResponse = await fetch("/api/upload-image", {
                 method: "POST",
@@ -150,43 +111,18 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
             }
 
             const { publicUrl } = await uploadResponse.json();
-            console.log("Public URL:", publicUrl);
 
-            // Update the staging question with the image URL directly
-            console.log("Updating staging question with image_url");
-            console.log("Question ID:", questionId);
-
-            // First, let's check if the question exists
-            const { data: existingQuestion, error: fetchError } = await supabase
-                .from("staging_questions")
-                .select("id, batch_id")
-                .eq("id", questionId)
-                .single();
-
-            console.log("Existing question:", existingQuestion);
-            console.log("Fetch error:", fetchError);
-
-            if (fetchError) throw new Error(`Fetch question error: ${fetchError.message}`);
-            if (!existingQuestion) throw new Error("Question not found");
-
-            console.log("Question exists, proceeding with update...");
-
-            const { error: updateError, data: updateData } = await supabase
-                .from("staging_questions")
-                .update({ image_url: publicUrl })
-                .eq("id", questionId);
-
-            console.log("Update error:", updateError);
-            console.log("Update data:", updateData);
-
-            if (updateError) throw new Error(`Database update error: ${updateError.message}`);
+            const patchRes = await fetch(`/api/staging/question/${questionId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ imageUrl: publicUrl }),
+            });
+            if (!patchRes.ok) throw new Error("Failed to attach image to the question.");
 
             // Update local state
             setQuestions(prev => prev.map(q =>
                 q.id === questionId ? { ...q, image_url: publicUrl } : q
             ));
-
-            console.log("Image upload completed successfully");
 
         } catch (error) {
             console.error("Failed to upload image:", error);
@@ -197,21 +133,18 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
     const handlePublish = async () => {
         setPublishing(true);
         try {
-            const formData = new FormData();
-            formData.append("title", title);
-            formData.append("year", year);
-            formData.append("subject", "General"); // Can be refined
-
-            const res = await fetch(`/api/py/publish/${batchId}`, {
+            const res = await fetch(`/api/staging/publish/${batchId}`, {
                 method: "POST",
-                body: formData
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    title,
+                    year: Number(year) || new Date().getFullYear(),
+                    subject: "General",
+                    isPremium: false,
+                }),
             });
-
-            if (res.ok) {
-                router.push("/admin/quizzes");
-            } else {
-                alert("Failed to publish batch. Ensure at least one question exists.");
-            }
+            if (!res.ok) throw new Error("Failed to publish batch. Ensure at least one question exists.");
+            router.push("/admin/quizzes");
         } catch (error) {
             console.error("Publishing error:", error);
         } finally {
@@ -231,13 +164,8 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure you want to remove this question?")) return;
         try {
-            const supabase = createClient();
-            const { error } = await supabase
-                .from("staging_questions")
-                .delete()
-                .eq("id", id);
-
-            if (error) throw error;
+            const res = await fetch(`/api/staging/question/${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Failed to delete.");
             setQuestions(prev => prev.filter(q => q.id !== id));
         } catch (error) {
             console.error("Failed to delete question:", error);
@@ -280,7 +208,7 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.05 }}
                         key={q.id}
-                        className={`bg-white rounded-[2rem] p-8 border ${editingId === q.id ? "border-primary-500 ring-4 ring-primary-500/5" : "border-gray-100"} shadow-xl shadow-gray-200/20 transition-all`}
+                        className={`bg-white rounded-4xl p-8 border ${editingId === q.id ? "border-primary-500 ring-4 ring-primary-500/5" : "border-gray-100"} shadow-xl shadow-gray-200/20 transition-all`}
                     >
                         <div className="flex items-start justify-between gap-6 mb-6">
                             <div className="flex-1">
@@ -345,6 +273,7 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
                         {q.image_url && (
                             <div className="mb-6">
                                 <p className="text-sm text-gray-500 mb-2">Image URL: {q.image_url}</p>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={q.image_url}
                                     alt="Question illustration"

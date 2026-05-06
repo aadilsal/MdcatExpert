@@ -267,7 +267,7 @@ export default function AnalyticsClient({
                                     />
                                     <Tooltip
                                         cursor={{ fill: "transparent" }}
-                                        formatter={(value: any) => [`${value}%`, "Accuracy"]}
+                                        formatter={(value: number | string) => [`${value}%`, "Accuracy"]}
                                         contentStyle={{
                                             borderRadius: "12px",
                                             border: "none",
@@ -317,7 +317,7 @@ export default function AnalyticsClient({
                                         tickFormatter={(val) => `${Math.floor(val / 60)}m`}
                                     />
                                     <Tooltip
-                                        formatter={(value: any) => [formatTime(Number(value) || 0), "Time Spent"]}
+                                        formatter={(value: number | string) => [formatTime(Number(value) || 0), "Time Spent"]}
                                         contentStyle={{
                                             borderRadius: "12px",
                                             border: "none",
@@ -387,7 +387,7 @@ export default function AnalyticsClient({
 
             {/* Insights Card */}
             {scoreTrend.length > 0 && weakestSubject && strongestSubject && (
-                <div className="bg-gradient-to-br from-primary-50 to-blue-50 rounded-xl border border-primary-100 p-6 shadow-card">
+                <div className="bg-linear-to-br from-primary-50 to-blue-50 rounded-xl border border-primary-100 p-6 shadow-card">
                     <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                         <Zap className="w-5 h-5 text-primary-600" />
                         AI-Powered Insights

@@ -1,6 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { fetchMutation, fetchQuery } from "convex/nextjs";
+import { api } from "../../../../../convex/_generated/api";
 
 interface ParsedQuestion {
     question_text: string;
@@ -10,30 +12,15 @@ interface ParsedQuestion {
     image_url?: string;
 }
 
-const VALID_SUBJECTS = ["Biology", "Chemistry", "Physics", "English"];
+const VALID_SUBJECTS = ["Biology", "Chemistry", "Physics", "English", "General"] as const;
 
 export async function POST(request: Request) {
     try {
-        const supabase = await createClient();
+        const token = await convexAuthNextjsToken();
+        if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-        // Verify admin role
-        const {
-            data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
-        const { data: profile } = await supabase
-            .from("users")
-            .select("role")
-            .eq("id", user.id)
-            .single();
-
-        if (!profile || profile.role !== "admin") {
-            return NextResponse.json({ error: "Forbidden: Admin only" }, { status: 403 });
-        }
+        const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
+        if (!me || me.role !== "admin") return NextResponse.json({ error: "Forbidden: Admin only" }, { status: 403 });
 
         // Parse form data
         const formData = await request.formData();
@@ -135,33 +122,39 @@ export async function POST(request: Request) {
             subject: q.subject,
             image_url: q.image_url || null,
             options: q.options.map((opt) => ({
+                label: opt.label,
                 text: opt.text,
                 is_correct: opt.label === q.correct,
             })),
         }));
 
-        // Insert quiz, questions, and options in a single atomic transaction
-        const { data: quizId, error: rpcError } = await supabase.rpc("upload_quiz_batch", {
-            p_title: title,
-            p_year: year,
-            p_total_questions: questions.length,
-            p_questions: rpcQuestions,
-        });
-
-        if (rpcError || !quizId) {
-            return NextResponse.json(
-                { error: `Failed to upload quiz: ${rpcError?.message}` },
-                { status: 500 }
+        // Create a staging batch for review
+        const batchId = `batch_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        for (const q of rpcQuestions) {
+            await fetchMutation(
+                api.staging.createStagingQuestion,
+                {
+                    batchId,
+                    questionText: q.question_text,
+                    optionA: q.options[0]?.text ?? "",
+                    optionB: q.options[1]?.text ?? "",
+                    optionC: q.options[2]?.text ?? "",
+                    optionD: q.options[3]?.text ?? "",
+                    correctOption: (q.options.find((o) => o.is_correct)?.label ?? "A") as "A" | "B" | "C" | "D",
+                    subject: q.subject as (typeof VALID_SUBJECTS)[number],
+                    explanation: undefined,
+                    year,
+                    imageUrl: q.image_url ?? undefined,
+                },
+                { token }
             );
         }
 
-        const insertedCount = questions.length;
-
         return NextResponse.json({
             success: true,
-            quiz_id: quizId,
+            batchId,
             total_parsed: questions.length,
-            total_inserted: insertedCount,
+            total_inserted: questions.length,
             skipped_rows: skippedRows,
             skipped_count: skippedRows.length,
         });

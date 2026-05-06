@@ -14,7 +14,7 @@ import {
     Phone,
     UserCircle
 } from "lucide-react";
-import { updateProfile, updatePassword } from "./actions";
+import { setEmailNotifications, updateProfile, updatePassword } from "./actions";
 
 interface ProfileClientProps {
     user: {
@@ -52,6 +52,18 @@ export default function ProfileClient({ user }: ProfileClientProps) {
     const [phone, setPhone] = useState(user.phone || "");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [emailNotifications, setEmailNotificationsState] = useState(true);
+
+    useEffect(() => {
+        // Load current preference from API (falls back to true).
+        fetch("/api/auth/me")
+            .then((r) => (r.ok ? r.json() : null))
+            .then((p) => {
+                const enabled = p?.user?.emailNotificationsEnabled;
+                if (typeof enabled === "boolean") setEmailNotificationsState(enabled);
+            })
+            .catch(() => null);
+    }, []);
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -263,11 +275,35 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                                     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
                                         <div>
                                             <p className="font-semibold text-gray-900">Email Notifications</p>
-                                            <p className="text-xs text-gray-500">Receive weekly summaries of your performance.</p>
+                                            <p className="text-xs text-gray-500">Get important updates like payment approval.</p>
                                         </div>
-                                        <div className="w-12 h-6 bg-primary-600 rounded-full relative cursor-pointer opacity-50">
-                                            <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full transition-all" />
-                                        </div>
+                                        <button
+                                            type="button"
+                                            disabled={loading}
+                                            onClick={async () => {
+                                                const next = !emailNotifications;
+                                                setLoading(true);
+                                                setMessage(null);
+                                                try {
+                                                    await setEmailNotifications(next);
+                                                    setEmailNotificationsState(next);
+                                                    setMessage({
+                                                        type: "success",
+                                                        text: next ? "Email notifications turned on." : "Email notifications turned off.",
+                                                    });
+                                                } catch {
+                                                    setMessage({ type: "error", text: "Failed to update notification settings." });
+                                                } finally {
+                                                    setLoading(false);
+                                                }
+                                            }}
+                                            className={`w-12 h-6 rounded-full relative transition-colors ${emailNotifications ? "bg-primary-600" : "bg-gray-300"} ${loading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
+                                            aria-label="Toggle email notifications"
+                                        >
+                                            <div
+                                                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${emailNotifications ? "right-1" : "left-1"}`}
+                                            />
+                                        </button>
                                     </div>
                                     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
                                         <div>

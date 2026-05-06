@@ -16,7 +16,6 @@ import {
     Clock,
     CreditCard
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 
 function UpgradePageContent() {
     const router = useRouter();
@@ -74,39 +73,28 @@ function UpgradePageContent() {
         setUploading(true);
 
         try {
-            const supabase = createClient();
-            const { data: { user } } = await supabase.auth.getUser();
+            // 1) Upload screenshot (Convex Storage via API)
+            const uploadForm = new FormData();
+            uploadForm.append("file", screenshot);
+            uploadForm.append("fileType", "payment_proof");
+            const uploadRes = await fetch("/api/blob/upload", { method: "POST", body: uploadForm });
+            const uploadJson = await uploadRes.json();
+            if (!uploadRes.ok) throw new Error(uploadJson?.error || "Failed to upload screenshot.");
 
-            if (!user) throw new Error("Unauthorized");
-
-            // 1. Upload screenshot into images bucket
-            const fileExt = screenshot.name.split('.').pop();
-            const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-            const { error: uploadError } = await supabase.storage
-                .from("images")
-                .upload(fileName, screenshot, { cacheControl: "3600", upsert: false });
-
-            if (uploadError) throw uploadError;
-
-            const { data: { publicUrl } } = supabase.storage
-                .from("images")
-                .getPublicUrl(fileName);
-
-            // 2. Create payment request
-            const { error: requestError } = await supabase
-                .from("payment_requests")
-                .insert({
-                    user_id: user.id,
-                    user_email: user.email,
-                    transaction_id: transactionId,
-                    screenshot_url: publicUrl,
-                    amount: 2500, // Hardcoded for Elite Plan
-                    status: "pending",
-                    archive_title: parsedTitle,
-                    archive_year: parsedYear
-                });
-
-            if (requestError) throw requestError;
+            // 2) Create payment request (Convex)
+            const paymentRes = await fetch("/api/payments/submit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    transactionId,
+                    screenshotUrl: uploadJson.url,
+                    amount: 2500,
+                    archiveTitle: parsedTitle,
+                    archiveYear: parsedYear
+                })
+            });
+            const paymentJson = await paymentRes.json();
+            if (!paymentRes.ok) throw new Error(paymentJson?.error || "Failed to submit payment.");
 
             setSubmitted(true);
         } catch (error) {
@@ -127,7 +115,7 @@ function UpgradePageContent() {
                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="w-24 h-24 bg-emerald-500 text-white rounded-[2.5rem] flex items-center justify-center mb-8 shadow-2xl shadow-emerald-500/20"
+                    className="w-24 h-24 bg-emerald-500 text-white rounded-4xl flex items-center justify-center mb-8 shadow-2xl shadow-emerald-500/20"
                 >
                     <CheckCircle className="w-12 h-12" />
                 </motion.div>
@@ -152,7 +140,7 @@ function UpgradePageContent() {
                 <motion.div
                     initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    className="bg-amber-500/10 border border-amber-500/20 p-6 rounded-[2rem] flex items-center gap-4"
+                    className="bg-amber-500/10 border border-amber-500/20 p-6 rounded-4xl flex items-center gap-4"
                 >
                     <div className="w-12 h-12 rounded-2xl bg-amber-500 flex items-center justify-center text-white shadow-lg">
                         <Lock className="w-6 h-6" />
@@ -187,7 +175,7 @@ function UpgradePageContent() {
                         className="grid grid-cols-1 lg:grid-cols-2 gap-10"
                     >
                         {/* Free Tier */}
-                        <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl opacity-60">
+                        <div className="bg-white rounded-4xl p-10 border border-gray-100 shadow-xl opacity-60">
                             <h2 className="text-2xl font-black text-gray-900 italic mb-2">Standard.</h2>
                             <div className="text-5xl font-black text-gray-900 mb-8 italic">Free</div>
                             <ul className="space-y-4 mb-10">
@@ -202,8 +190,8 @@ function UpgradePageContent() {
 
                         {/* Premium Tier */}
                         <div className="relative group">
-                            <div className="absolute -inset-1 bg-gradient-to-r from-primary-600 to-purple-600 rounded-[2.6rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
-                            <div className="relative bg-black rounded-[2.5rem] p-10 text-white shadow-2xl border border-white/10">
+                            <div className="absolute -inset-1 bg-linear-to-r from-primary-600 to-purple-600 rounded-[2.6rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
+                            <div className="relative bg-black rounded-4xl p-10 text-white shadow-2xl border border-white/10">
                                 <div className="absolute top-0 right-0 p-8">
                                     <Rocket className="w-12 h-12 text-primary-500/20 rotate-12" />
                                 </div>
@@ -230,7 +218,7 @@ function UpgradePageContent() {
                                 </ul>
                                 <button
                                     onClick={() => setStep("checkout")}
-                                    className="w-full py-6 bg-primary-600 text-white font-black rounded-[1.5rem] uppercase tracking-widest text-xs hover:bg-primary-500 transition-all shadow-xl shadow-primary-600/30 flex items-center justify-center gap-3 group"
+                                    className="w-full py-6 bg-primary-600 text-white font-black rounded-3xl uppercase tracking-widest text-xs hover:bg-primary-500 transition-all shadow-xl shadow-primary-600/30 flex items-center justify-center gap-3 group"
                                 >
                                     Activate Elite Status <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                 </button>
@@ -242,7 +230,7 @@ function UpgradePageContent() {
                         key="checkout"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="max-w-2xl mx-auto bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-2xl"
+                        className="max-w-2xl mx-auto bg-white rounded-4xl p-10 border border-gray-100 shadow-2xl"
                     >
                         <button onClick={() => setStep("pricing")} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 mb-8 hover:text-gray-900 transition-colors">
                             <ChevronRight className="w-3 h-3 rotate-180" /> Back to Plans
@@ -252,7 +240,7 @@ function UpgradePageContent() {
 
                         <div className="space-y-8">
                             {/* Payment Instruction */}
-                            <div className="bg-primary-50 border border-primary-100 p-6 rounded-[2rem] space-y-4">
+                            <div className="bg-primary-50 border border-primary-100 p-6 rounded-4xl space-y-4">
                                 <div className="flex items-center gap-3">
                                     <CreditCard className="w-5 h-5 text-primary-600" />
                                     <span className="text-[10px] font-black uppercase tracking-widest text-primary-600">Payment Protocol</span>
@@ -289,7 +277,7 @@ function UpgradePageContent() {
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Screenshot Evidence</label>
                                     <div
                                         onClick={() => document.getElementById('screenshot-upload')?.click()}
-                                        className={`border-2 border-dashed rounded-[2rem] p-10 text-center cursor-pointer transition-all ${screenshot ? "border-emerald-500 bg-emerald-50" : "border-gray-100 bg-gray-50 hover:bg-white hover:border-primary-300"}`}
+                                        className={`border-2 border-dashed rounded-4xl p-10 text-center cursor-pointer transition-all ${screenshot ? "border-emerald-500 bg-emerald-50" : "border-gray-100 bg-gray-50 hover:bg-white hover:border-primary-300"}`}
                                     >
                                         <input type="file" id="screenshot-upload" className="hidden" accept="image/*" onChange={handleFileChange} />
                                         {screenshot ? (
@@ -316,7 +304,7 @@ function UpgradePageContent() {
                                 <button
                                     onClick={handleSubmitPayment}
                                     disabled={uploading || !screenshot || !transactionId}
-                                    className="w-full py-6 bg-gray-900 text-white font-black rounded-[1.5rem] uppercase tracking-widest text-xs hover:bg-black transition-all shadow-2xl shadow-black/20 flex items-center justify-center gap-3 disabled:opacity-30 active:scale-95"
+                                    className="w-full py-6 bg-gray-900 text-white font-black rounded-3xl uppercase tracking-widest text-xs hover:bg-black transition-all shadow-2xl shadow-black/20 flex items-center justify-center gap-3 disabled:opacity-30 active:scale-95"
                                 >
                                     {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Shield className="w-4 h-4 text-primary-500" />}
                                     Submit for Verification

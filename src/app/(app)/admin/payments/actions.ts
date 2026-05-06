@@ -1,85 +1,67 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { fetchMutation, fetchQuery } from "convex/nextjs";
+import { api } from "../../../../../convex/_generated/api";
+import type { Id } from "../../../../../convex/_generated/dataModel";
+import { sendEmailNotification } from "@/lib/resend";
 
 export async function approvePaymentAction(requestId: string, userId: string, adminMessage: string) {
-    const supabase = await createClient();
+    const token = await convexAuthNextjsToken();
+    if (!token) throw new Error("Unauthorized");
 
-    const { data: adminUser } = await supabase.auth.getUser();
-    const adminId = adminUser?.user?.id || null;
+    const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
+    if (!me || me.role !== "admin") throw new Error("Forbidden");
 
-    // 1. Mark request as approved with metadata
-    const { error: requestError } = await supabase
-        .from("payment_requests")
-        .update({
-            status: "approved",
-            review_reason: adminMessage,
-            verified_by: adminId,
-            processed_at: new Date().toISOString()
-        })
-        .eq("id", requestId);
+    const premiumUntil = new Date(new Date().setFullYear(new Date().getFullYear() + 10)).getTime();
 
-    if (requestError) throw requestError;
+    await fetchMutation(
+        api.payments.approvePaymentRequest,
+        { requestId: requestId as Id<"paymentRequests">, adminId: me._id, premiumUntil, reviewReason: adminMessage },
+        { token }
+    );
 
-    // 2. Update user subscription status
-    const premiumUntil = new Date();
-    premiumUntil.setFullYear(premiumUntil.getFullYear() + 10); // 10 years for "lifetime"
-
-    const { error: userError } = await supabase
-        .from("users")
-        .update({
-            subscription_type: "premium",
-            premium_until: premiumUntil.toISOString()
-        })
-        .eq("id", userId);
-
-    if (userError) throw userError;
-
-    // 3. Log a notification for the user
-    const { error: notifyError } = await supabase
-        .from("notifications")
-        .insert({
-            user_id: userId,
-            title: "Payment approved",
-            message: `Your payment has been verified and your account is now premium. Reason: ${adminMessage}`,
-            read: false
-        });
-
-    if (notifyError) console.error("Could not log notification", notifyError);
+    const target = await fetchQuery(api.users.getUserById, { userId: userId as Id<"users"> }, { token });
+    if (target?.email) {
+        const enabled = (target.emailNotificationsEnabled ?? true) === true;
+        if (enabled) {
+            await sendEmailNotification({
+                to: target.email,
+                subject: "MDCAT Xpert: Payment approved",
+                text: `Your payment was approved. ${adminMessage ? `Note: ${adminMessage}` : ""}`.trim(),
+            });
+        }
+    }
 
     revalidatePath("/admin/payments");
     return { success: true };
 }
 
 export async function rejectPaymentAction(requestId: string, userId: string, adminMessage: string) {
-    const supabase = await createClient();
+    const token = await convexAuthNextjsToken();
+    if (!token) throw new Error("Unauthorized");
 
-    const { data: adminUser } = await supabase.auth.getUser();
-    const adminId = adminUser?.user?.id || null;
+    const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
+    if (!me || me.role !== "admin") throw new Error("Forbidden");
 
-    const { error } = await supabase
-        .from("payment_requests")
-        .update({
-            status: "rejected",
-            review_reason: adminMessage,
-            verified_by: adminId,
-            processed_at: new Date().toISOString()
-        })
-        .eq("id", requestId);
+    await fetchMutation(
+        api.payments.rejectPaymentRequest,
+        { requestId: requestId as Id<"paymentRequests">, adminId: me._id, reviewReason: adminMessage },
+        { token }
+    );
 
-    if (error) throw error;
-
-    const { error: notifyError } = await supabase
-        .from("notifications")
-        .insert({
-            user_id: userId,
-            title: "Payment rejected",
-            message: `Your payment was rejected. Reason: ${adminMessage}`,
-            read: false
-        });
-
-    if (notifyError) console.error("Could not log notification", notifyError);
+    const target = await fetchQuery(api.users.getUserById, { userId: userId as Id<"users"> }, { token });
+    if (target?.email) {
+        const enabled = (target.emailNotificationsEnabled ?? true) === true;
+        if (enabled) {
+            await sendEmailNotification({
+                to: target.email,
+                subject: "MDCAT Xpert: Payment rejected",
+                text: `Your payment was rejected. Reason: ${adminMessage}`.trim(),
+            });
+        }
+    }
 
     revalidatePath("/admin/payments");
     return { success: true };

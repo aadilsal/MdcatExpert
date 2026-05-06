@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -8,15 +8,9 @@ import {
     XCircle,
     Eye,
     Clock,
-    Shield,
     DollarSign,
-    ExternalLink,
     Loader2,
-    Search,
-    Filter,
-    Mail
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { approvePaymentAction, rejectPaymentAction } from "@/app/(app)/admin/payments/actions";
 
 interface PaymentRequest {
@@ -41,22 +35,18 @@ export default function AdminPaymentsPage() {
     const [filter, setFilter] = useState<"pending" | "approved" | "rejected">("pending");
     const [viewingImage, setViewingImage] = useState<string | null>(null);
 
-    const fetchRequests = async () => {
+    const fetchRequests = useCallback(async () => {
         setLoading(true);
-        const supabase = createClient();
-        const { data, error } = await supabase
-            .from("payment_requests")
-            .select("*")
-            .eq("status", filter)
-            .order("created_at", { ascending: false });
-
-        if (data) setRequests(data);
+        const res = await fetch(`/api/admin/payments?status=${filter}`, { cache: "no-store" });
+        const json = await res.json();
+        if (res.ok) setRequests(json.requests || []);
         setLoading(false);
-    };
+    }, [filter]);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchRequests();
-    }, [filter]);
+    }, [fetchRequests]);
 
     const handleApprove = async (id: string, userId: string) => {
         const { value: reason } = await Swal.fire({
@@ -85,7 +75,7 @@ export default function AdminPaymentsPage() {
             await approvePaymentAction(id, userId, reason);
             setRequests(prev => prev.filter(r => r.id !== id));
             Swal.fire({ icon: "success", title: "Approved", text: "Premium access granted." });
-        } catch (error) {
+        } catch {
             Swal.fire({ icon: "error", title: "Approval failed", text: "Could not approve payment." });
         }
     };
@@ -117,7 +107,7 @@ export default function AdminPaymentsPage() {
             await rejectPaymentAction(id, userId, reason);
             setRequests(prev => prev.filter(r => r.id !== id));
             Swal.fire({ icon: "success", title: "Rejected", text: "Payment request rejected." });
-        } catch (error) {
+        } catch {
             Swal.fire({ icon: "error", title: "Rejection failed", text: "Could not reject payment." });
         }
     };
@@ -140,10 +130,10 @@ export default function AdminPaymentsPage() {
                     </div>
 
                     <div className="flex bg-white/5 backdrop-blur-xl p-1.5 rounded-2xl border border-white/10">
-                        {["pending", "approved", "rejected"].map((s) => (
+                        {(["pending", "approved", "rejected"] as const).map((s) => (
                             <button
                                 key={s}
-                                onClick={() => setFilter(s as any)}
+                                onClick={() => setFilter(s)}
                                 className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === s ? "bg-white text-black shadow-lg" : "text-white/40 hover:text-white"}`}
                             >
                                 {s}
@@ -160,7 +150,7 @@ export default function AdminPaymentsPage() {
                     <p className="text-gray-400 font-black uppercase tracking-widest text-xs italic">Syncing Revenue Cluster...</p>
                 </div>
             ) : requests.length === 0 ? (
-                <div className="text-center py-20 bg-white rounded-[2.5rem] border border-gray-100 italic font-bold text-gray-400">
+                <div className="text-center py-20 bg-white rounded-4xl border border-gray-100 italic font-bold text-gray-400">
                     No {filter} requests found.
                 </div>
             ) : (
@@ -170,7 +160,7 @@ export default function AdminPaymentsPage() {
                             key={req.id}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col lg:flex-row lg:items-center justify-between gap-8"
+                            className="bg-white rounded-4xl p-8 border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col lg:flex-row lg:items-center justify-between gap-8"
                         >
                             <div className="flex gap-6 items-center">
                                 <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0 border border-gray-100">
@@ -233,7 +223,7 @@ export default function AdminPaymentsPage() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setViewingImage(null)}
-                        className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex items-center justify-center p-10 cursor-zoom-out"
+                        className="fixed inset-0 z-100 bg-black/90 backdrop-blur-xl flex items-center justify-center p-10 cursor-zoom-out"
                     >
                         <motion.img
                             initial={{ scale: 0.9 }}

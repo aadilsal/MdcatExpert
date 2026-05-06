@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import NextImage from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Clock,
@@ -9,21 +10,14 @@ import {
     ChevronRight,
     CheckCircle,
     AlertCircle,
-    Loader2,
     Send,
-    Target,
     Zap,
     Maximize2,
     X,
-    LayoutDashboard,
     Bookmark,
-    BookmarkCheck,
     Menu,
     Grid3X3,
-    ArrowRight,
-    Flag,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { submitQuizAction } from "../actions";
 
 import { Quiz, Question } from "@/lib/types";
@@ -60,64 +54,31 @@ export default function QuizPage({
     useEffect(() => {
         if (!quizId) return;
         const fetchData = async () => {
-            const supabase = createClient();
-
-            const { data: quizData } = await supabase
-                .from("quizzes")
-                .select("*")
-                .eq("id", quizId)
-                .single();
-
-            const { data: qQuestions } = await supabase
-                .from("quiz_questions")
-                .select("question_id, order")
-                .eq("quiz_id", quizId)
-                .order("order", { ascending: true });
-
-            if (quizData) {
-                setQuiz(quizData);
-
-                // Premium Access Check
-                if (quizData.is_premium) {
-                    const { data: { user } } = await supabase.auth.getUser();
-                    const { data: userData } = await supabase
-                        .from("users")
-                        .select("subscription_type")
-                        .eq("id", user?.id)
-                        .single();
-
-                    if (!userData || userData.subscription_type !== "premium") {
-                        router.push("/upgrade?reason=premium_content");
-                        return;
-                    }
-                }
+            const res = await fetch(`/api/quizzes/${quizId}`, { cache: "no-store" });
+            const json = await res.json();
+            if (!res.ok) {
+                setQuiz(null);
+                setQuestions([]);
+                setLoading(false);
+                return;
             }
 
-            if (qQuestions && qQuestions.length > 0) {
-                const qIds = qQuestions.map(qq => qq.question_id);
-                const { data: questionsData } = await supabase
-                    .from("questions")
-                    .select("*")
-                    .in("id", qIds);
+            const quizData = (json?.quiz ?? null) as Quiz | null;
+            const questionsData = (json?.questions ?? []) as Question[];
+            if (quizData) setQuiz(quizData);
+            if (Array.isArray(questionsData)) setQuestions(questionsData);
 
-                if (questionsData) {
-                    // Sort by the original order from quiz_questions
-                    const sortedQuestions = qIds.map(id => questionsData.find(q => q.id === id)).filter(Boolean) as Question[];
-                    setQuestions(sortedQuestions);
-
-                    // Preload images
-                    sortedQuestions.forEach(q => {
-                        if (q.image_url) {
-                            const img = new Image();
-                            img.src = q.image_url;
-                        }
-                    });
+            // Preload images
+            questionsData.forEach((q: Question) => {
+                if (q.image_url) {
+                    const img = new window.Image();
+                    img.src = q.image_url;
                 }
-            }
+            });
             setLoading(false);
         };
         fetchData();
-    }, [quizId]);
+    }, [quizId, router]);
 
     // Timer
     useEffect(() => {
@@ -199,7 +160,7 @@ export default function QuizPage({
             if (success) {
                 router.push(`/results/${attemptId}`);
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Submit error:", err);
         } finally {
             setSubmitting(false);
@@ -223,7 +184,7 @@ export default function QuizPage({
     if (!quiz || questions.length === 0) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
-                <div className="text-center p-12 bg-white rounded-[2.5rem] border border-gray-100 shadow-xl">
+                <div className="text-center p-12 bg-white rounded-4xl border border-gray-100 shadow-xl">
                     <AlertCircle className="w-16 h-16 text-primary-200 mx-auto mb-6" />
                     <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Quiz Empty or Missing</h2>
                     <p className="text-gray-500 mb-8 font-medium">This quiz doesn&apos;t seem to have any questions currently.</p>
@@ -320,7 +281,7 @@ export default function QuizPage({
                                 animate={{ x: 0 }}
                                 exit={{ x: "-100%" }}
                                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                                className={`fixed top-0 left-0 h-full w-[280px] sm:w-[320px] z-[60] flex flex-col transition-colors duration-500 lg:hidden ${zenMode ? "bg-[#09090b] text-white" : "bg-white"
+                                className={`fixed top-0 left-0 h-full w-[280px] sm:w-[320px] z-60 flex flex-col transition-colors duration-500 lg:hidden ${zenMode ? "bg-[#09090b] text-white" : "bg-white"
                                     }`}
                             >
                                 <div className="p-6 h-full flex flex-col">
@@ -461,7 +422,7 @@ export default function QuizPage({
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
-                                className={`flex-1 flex flex-col transition-all duration-500 rounded-[1.5rem] sm:rounded-[2.5rem] overflow-hidden ${zenMode ? "bg-white/5 border border-white/5" : "bg-white border border-gray-100 shadow-xl shadow-gray-200/5 mb-8"
+                                className={`flex-1 flex flex-col transition-all duration-500 rounded-3xl sm:rounded-4xl overflow-hidden ${zenMode ? "bg-white/5 border border-white/5" : "bg-white border border-gray-100 shadow-xl shadow-gray-200/5 mb-8"
                                     }`}
                             >
                                 {/* Card Header */}
@@ -500,7 +461,13 @@ export default function QuizPage({
 
                                     {currentQuestion.image_url && (
                                         <div className="mb-8 sm:mb-12 rounded-2xl sm:rounded-3xl overflow-hidden border border-gray-100 bg-black/5 p-4 max-w-2xl mx-auto">
-                                            <img src={currentQuestion.image_url} alt="Question Diagram" className="w-full object-contain max-h-[250px] sm:max-h-[400px]" />
+                                            <NextImage
+                                                src={currentQuestion.image_url}
+                                                alt="Question Diagram"
+                                                width={1200}
+                                                height={800}
+                                                className="w-full h-auto object-contain max-h-[250px] sm:max-h-[400px]"
+                                            />
                                         </div>
                                     )}
 
@@ -547,7 +514,7 @@ export default function QuizPage({
                                     {currentIndex === questions.length - 1 ? (
                                         <button
                                             onClick={() => setShowConfirm(true)}
-                                            className="flex items-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-4 bg-emerald-600 text-white rounded-xl sm:rounded-[1.5rem] font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-700 active:scale-95 transition-all"
+                                            className="flex items-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-4 bg-emerald-600 text-white rounded-xl sm:rounded-3xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-700 active:scale-95 transition-all"
                                         >
                                             <span className="hidden sm:inline">Finish & Submit</span>
                                             <span className="sm:hidden">Finish</span>
@@ -556,7 +523,7 @@ export default function QuizPage({
                                     ) : (
                                         <button
                                             onClick={() => setCurrentIndex(i => Math.min(questions.length - 1, i + 1))}
-                                            className="flex items-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-4 bg-gray-900 text-white rounded-xl sm:rounded-[1.5rem] font-black text-xs uppercase tracking-widest shadow-2xl hover:bg-black active:scale-95 transition-all"
+                                            className="flex items-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-4 bg-gray-900 text-white rounded-xl sm:rounded-3xl font-black text-xs uppercase tracking-widest shadow-2xl hover:bg-black active:scale-95 transition-all"
                                         >
                                             <span className="hidden sm:inline">Next Question</span>
                                             <span className="sm:hidden">Next</span>
@@ -576,7 +543,7 @@ export default function QuizPage({
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-xl flex flex-col items-center justify-center text-white p-6 text-center"
+                        className="fixed inset-0 z-100 bg-black/60 backdrop-blur-xl flex flex-col items-center justify-center text-white p-6 text-center"
                     >
                         <motion.div
                             animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
@@ -597,7 +564,7 @@ export default function QuizPage({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-6"
+                        className="fixed inset-0 z-100 bg-black/60 backdrop-blur-md flex items-center justify-center p-6"
                     >
                         <motion.div
                             initial={{ scale: 0.9, y: 100 }}
@@ -605,7 +572,7 @@ export default function QuizPage({
                             exit={{ scale: 0.9, y: 100 }}
                             className="bg-white rounded-t-[3rem] sm:rounded-[3rem] p-8 sm:p-10 max-w-md w-full shadow-2xl text-gray-900"
                         >
-                            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-primary-50 text-primary-600 rounded-[1.5rem] sm:rounded-[2rem] flex items-center justify-center mx-auto mb-6">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-primary-50 text-primary-600 rounded-3xl sm:rounded-4xl flex items-center justify-center mx-auto mb-6">
                                 <Send className="w-8 h-8 sm:w-10 sm:h-10" />
                             </div>
                             <h3 className="text-2xl sm:text-3xl font-black text-center mb-4 tracking-tighter">Submit Test?</h3>

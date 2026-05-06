@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState } from "react";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -11,10 +11,8 @@ import {
     CheckCircle,
     Clock,
     CreditCard,
-    FileText,
-    ArrowLeft
+    ArrowLeft,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 
 function SignupPaymentContent() {
@@ -34,36 +32,35 @@ function SignupPaymentContent() {
             setScreenshot(file);
             setError(null);
 
-            // Validate file size (5MB max)
             if (file.size > 5 * 1024 * 1024) {
                 setError("File size must be less than 5MB");
                 setScreenshot(null);
                 return;
             }
 
-            // Parse title and year from filename
             const fileName = file.name.toLowerCase();
             const yearMatch = fileName.match(/\b(20\d{2})\b/);
             const year = yearMatch ? yearMatch[1] : "";
 
             let title = fileName
-                .replace(/\.[^.]+$/, '')
-                .replace(/\b(20\d{2})\b/g, '')
-                .replace(/[-_\s]+/g, ' ')
-                .replace(/\b(archive|payment|receipt|proof|mdcat|mcq|quiz)\b/g, '')
+                .replace(/\.[^.]+$/, "")
+                .replace(/\b(20\d{2})\b/g, "")
+                .replace(/[-_\s]+/g, " ")
+                .replace(/\b(archive|payment|receipt|proof|mdcat|mcq|quiz)\b/g, "")
                 .trim()
-                .replace(/\s+/g, ' ');
+                .replace(/\s+/g, " ");
 
-            title = title.split(' ')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ');
+            title = title
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ");
 
             setParsedTitle(title || "Payment Proof");
             setParsedYear(year);
 
             const timestamp = Date.now().toString().slice(-6);
             const yearCode = year ? year.slice(-2) : "00";
-            const titleCode = title ? title.replace(/\s+/g, '').slice(0, 3).toUpperCase() : "PAY";
+            const titleCode = title ? title.replace(/\s+/g, "").slice(0, 3).toUpperCase() : "PAY";
             const autoId = `TXN${yearCode}${titleCode}${timestamp}`;
 
             setAutoTransactionId(autoId);
@@ -81,47 +78,43 @@ function SignupPaymentContent() {
         setError(null);
 
         try {
-            const supabase = createClient();
-            const { data: { user } } = await supabase.auth.getUser();
+            const uploadForm = new FormData();
+            uploadForm.append("file", screenshot);
+            uploadForm.append("fileType", "payment_proof");
 
-            if (!user) {
-                throw new Error("You must be logged in to submit payment");
+            const uploadResponse = await fetch("/api/blob/upload", {
+                method: "POST",
+                body: uploadForm,
+                credentials: "same-origin",
+            });
+
+            const uploadResult = await uploadResponse.json();
+            if (!uploadResponse.ok || uploadResult.error) {
+                throw new Error(uploadResult.error || "Failed to upload screenshot.");
             }
 
-            // 1. Upload screenshot into images bucket
-            const fileExt = screenshot.name.split('.').pop();
-            const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-            const { error: uploadError } = await supabase.storage
-                .from("images")
-                .upload(fileName, screenshot, { cacheControl: "3600", upsert: false });
-
-            if (uploadError) throw uploadError;
-
-            const { data: { publicUrl } } = supabase.storage
-                .from("images")
-                .getPublicUrl(fileName);
-
-            // 2. Create payment request
-            const { error: requestError } = await supabase
-                .from("payment_requests")
-                .insert({
-                    user_id: user.id,
-                    user_email: user.email,
-                    transaction_id: transactionId,
-                    screenshot_url: publicUrl,
+            const submitResponse = await fetch("/api/payments/submit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    transactionId,
+                    screenshotUrl: uploadResult.url,
                     amount: 2500,
-                    status: "pending",
-                    archive_title: parsedTitle,
-                    archive_year: parsedYear
-                });
+                    archiveTitle: parsedTitle,
+                    archiveYear: parsedYear,
+                }),
+                credentials: "same-origin",
+            });
 
-            if (requestError) throw requestError;
+            const submitResult = await submitResponse.json();
+            if (!submitResponse.ok || submitResult.error) {
+                throw new Error(submitResult.error || "Failed to submit payment request.");
+            }
 
             setSubmitted(true);
         } catch (error) {
             console.error("Payment submission failed:", error);
-            const errorMessage = error instanceof Error ? error.message : "Failed to submit payment. Please try again or contact support.";
-            setError(errorMessage);
+            setError(error instanceof Error ? error.message : "Failed to submit payment. Please try again.");
         } finally {
             setUploading(false);
         }
@@ -174,13 +167,11 @@ function SignupPaymentContent() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pb-20 pt-10 px-4">
             <div className="max-w-2xl mx-auto">
-                {/* Back Button */}
                 <Link href="/dashboard" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 font-semibold mb-12 transition-colors">
                     <ArrowLeft className="w-5 h-5" />
                     Back to Dashboard
                 </Link>
 
-                {/* Header */}
                 <div className="mb-12">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-100 border border-primary-200 text-[10px] font-black uppercase tracking-[0.2em] text-primary-700 mb-4">
                         <CreditCard className="w-3.5 h-3.5" />
@@ -194,7 +185,6 @@ function SignupPaymentContent() {
                     </p>
                 </div>
 
-                {/* Main Card */}
                 <div className="bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 p-8 sm:p-12">
                     {error && (
                         <div className="mb-8 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700">
@@ -203,11 +193,8 @@ function SignupPaymentContent() {
                     )}
 
                     <div className="space-y-8">
-                        {/* File Upload Section */}
                         <div>
-                            <label className="block text-sm font-bold text-gray-900 mb-4">
-                                Payment Screenshot
-                            </label>
+                            <label className="block text-sm font-bold text-gray-900 mb-4">Payment Screenshot</label>
                             <div className="relative">
                                 <input
                                     type="file"
@@ -219,85 +206,53 @@ function SignupPaymentContent() {
                                 />
                                 <label
                                     htmlFor="screenshot-upload"
-                                    className="block p-8 border-2 border-dashed border-gray-200 rounded-2xl text-center cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-all"
+                                    className="cursor-pointer rounded-3xl border border-dashed border-gray-200 bg-gray-50 px-5 py-12 text-center hover:border-primary-600 hover:bg-primary-50 transition-all"
                                 >
-                                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                                    <p className="font-bold text-gray-900">
-                                        {screenshot ? screenshot.name : "Click to upload or drag and drop"}
-                                    </p>
-                                    <p className="text-xs text-gray-500 mt-2">PNG, JPG or PDF (max 5MB)</p>
+                                    <Upload className="mx-auto mb-4 w-10 h-10 text-primary-600" />
+                                    <p className="text-sm font-semibold text-gray-700">Choose a screenshot or PDF</p>
+                                    <p className="text-xs text-gray-400 mt-2">Maximum file size: 5MB</p>
                                 </label>
                             </div>
                         </div>
 
-                        {/* Transaction ID Section */}
-                        <div>
-                            <label className="block text-sm font-bold text-gray-900 mb-4">
-                                Transaction ID <span className="text-gray-400 text-xs font-normal">(auto-generated)</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={transactionId}
-                                onChange={(e) => setTransactionId(e.target.value)}
-                                placeholder="TXN..."
-                                className="w-full px-4 py-3 border border-gray-200 rounded-2xl font-mono text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
-                            />
-                            <p className="text-xs text-gray-500 mt-2">You can edit this if needed</p>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-900 mb-2">Transaction ID</label>
+                                <input
+                                    type="text"
+                                    value={transactionId}
+                                    onChange={(e) => setTransactionId(e.target.value)}
+                                    className="w-full rounded-3xl border border-gray-200 px-4 py-4 text-sm text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-900 mb-2">Archive Title</label>
+                                <input
+                                    type="text"
+                                    value={parsedTitle}
+                                    onChange={(e) => setParsedTitle(e.target.value)}
+                                    className="w-full rounded-3xl border border-gray-200 px-4 py-4 text-sm text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-900 mb-2">Archive Year</label>
+                                <input
+                                    type="text"
+                                    value={parsedYear}
+                                    onChange={(e) => setParsedYear(e.target.value)}
+                                    className="w-full rounded-3xl border border-gray-200 px-4 py-4 text-sm text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                                />
+                            </div>
                         </div>
 
-                        {/* File Details */}
-                        {screenshot && (
-                            <div className="bg-gray-50 rounded-2xl p-6 space-y-3 border border-gray-100">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm text-gray-600">Archive Title:</span>
-                                    <span className="font-semibold text-gray-900">{parsedTitle}</span>
-                                </div>
-                                {parsedYear && (
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm text-gray-600">Year:</span>
-                                        <span className="font-semibold text-gray-900">{parsedYear}</span>
-                                    </div>
-                                )}
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm text-gray-600">File Size:</span>
-                                    <span className="font-semibold text-gray-900">{(screenshot.size / 1024).toFixed(2)} KB</span>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Pricing Info */}
-                        <div className="bg-primary-50 border border-primary-200 rounded-2xl p-6 space-y-3">
-                            <div className="flex items-center justify-between">
-                                <span className="text-gray-700 font-semibold">Elite Plan</span>
-                                <span className="text-2xl font-black text-primary-600">Rs. 2500</span>
-                            </div>
-                            <p className="text-xs text-gray-600">
-                                One-time payment for lifetime access to all Elite features
-                            </p>
-                        </div>
-
-                        {/* Submit Button */}
                         <button
+                            type="button"
                             onClick={handleSubmitPayment}
-                            disabled={!screenshot || !transactionId || uploading}
-                            className="w-full py-4 bg-primary-600 text-white font-black rounded-2xl uppercase tracking-widest text-[10px] hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-primary-600/30 flex items-center justify-center gap-2"
+                            disabled={uploading}
+                            className="w-full inline-flex items-center justify-center gap-3 rounded-3xl bg-gray-900 px-8 py-5 text-sm font-black uppercase tracking-[0.2em] text-white shadow-2xl shadow-gray-900/20 hover:bg-black transition-all disabled:cursor-not-allowed disabled:bg-gray-400"
                         >
-                            {uploading ? (
-                                <>
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                    Submitting...
-                                </>
-                            ) : (
-                                <>
-                                    <Upload className="w-5 h-5" />
-                                    Submit Payment
-                                </>
-                            )}
+                            {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Submit Payment"}
                         </button>
-
-                        <p className="text-center text-xs text-gray-500">
-                            Your payment screenshot is secure and will only be viewed by our team
-                        </p>
                     </div>
                 </div>
             </div>
@@ -306,9 +261,5 @@ function SignupPaymentContent() {
 }
 
 export default function SignupPaymentPage() {
-    return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <SignupPaymentContent />
-        </Suspense>
-    );
+    return <SignupPaymentContent />;
 }

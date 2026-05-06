@@ -1,37 +1,46 @@
 import { Users, UserCheck, Shield, TrendingUp } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
 import StudentTable from "./StudentTable";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "../../../../../convex/_generated/api";
 
 export default async function AdminStudentsPage() {
-    const supabase = await createClient();
-
-    // Fetch all users first (avoid relational select if policy/relationship not available)
-    const { data: users, error: usersError } = await supabase
-        .from('users')
-        .select('id,name,email,role,subscription_type,premium_until,created_at')
-        .order('created_at', { ascending: false });
-
-    if (usersError) {
-        console.error("Error fetching users:", usersError, "detail:", usersError.message);
+    const token = await convexAuthNextjsToken();
+    if (!token) {
         return (
             <div className="text-center py-20 text-red-500 font-black">
-                Could not load users: {usersError.message || JSON.stringify(usersError)}
+                Unauthorized
             </div>
         );
     }
 
-    const { data: paymentRequests, error: paymentError } = await supabase
-        .from('payment_requests')
-        .select('user_id,status,amount,transaction_id,created_at')
-        .order('created_at', { ascending: false });
-
-    if (paymentError) {
-        console.error("Error fetching payment requests:", paymentError, "detail:", paymentError.message);
+    const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
+    if (!me || me.role !== "admin") {
+        return (
+            <div className="text-center py-20 text-red-500 font-black">
+                Forbidden
+            </div>
+        );
     }
 
-    const usersWithPayments = (users || []).map((user) => ({
-        ...user,
-        payment_requests: (paymentRequests || []).filter((req) => req.user_id === user.id)
+    const users = await fetchQuery(api.users.listUsers, {}, { token });
+    const paymentRequests = await fetchQuery(api.payments.getPaymentRequestsByStatus, { status: "pending" }, { token }).catch(() => []);
+
+    const usersWithPayments = (users || []).map((u) => ({
+        id: u._id,
+        name: u.name ?? "",
+        email: u.email ?? "",
+        role: u.role ?? "student",
+        subscription_type: u.subscriptionType ?? "free",
+        premium_until: u.premiumUntil ? new Date(u.premiumUntil).toISOString() : null,
+        created_at: u.createdAt ? new Date(u.createdAt).toISOString() : new Date().toISOString(),
+        payment_requests: (paymentRequests || []).filter((req: any) => String(req.userId) === String(u._id)).map((req: any) => ({
+            user_id: req.userId,
+            status: req.status,
+            amount: req.amount,
+            transaction_id: req.transactionId,
+            created_at: new Date(req.createdAt).toISOString(),
+        })),
     }));
 
     const totalUsers = usersWithPayments.length;
@@ -57,11 +66,11 @@ export default async function AdminStudentsPage() {
                         </p>
                     </div>
                     <div className="flex gap-4">
-                        <div className="bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/5 text-center px-8">
+                        <div className="bg-white/5 backdrop-blur-xl p-6 rounded-4xl border border-white/5 text-center px-8">
                             <p className="text-3xl font-black italic mb-1">{totalUsers}</p>
                             <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Total Nodes</p>
                         </div>
-                        <div className="bg-emerald-500/10 backdrop-blur-xl p-6 rounded-[2rem] border border-emerald-500/20 text-center px-8">
+                        <div className="bg-emerald-500/10 backdrop-blur-xl p-6 rounded-4xl border border-emerald-500/20 text-center px-8">
                             <p className="text-3xl font-black italic mb-1 text-emerald-400">{adminCount}</p>
                             <p className="text-[10px] font-black text-emerald-400/50 uppercase tracking-[0.2em]">Administrators</p>
                         </div>
@@ -76,7 +85,7 @@ export default async function AdminStudentsPage() {
                     { label: "Verified Admins", value: adminCount, icon: Shield, color: "text-primary-600", bg: "bg-primary-50" },
                     { label: "Growth Rate", value: "+12%", icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-50" },
                 ].map((stat, idx) => (
-                    <div key={idx} className="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-xl shadow-gray-200/20 group hover:border-primary-100 transition-all">
+                    <div key={idx} className="bg-white rounded-4xl p-8 border border-gray-100 shadow-xl shadow-gray-200/20 group hover:border-primary-100 transition-all">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>

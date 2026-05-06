@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import {
     Upload,
@@ -13,38 +12,34 @@ import {
     Users,
 } from "lucide-react";
 import { DeleteQuizButton } from "./delete-button";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "../../../../../convex/_generated/api";
 
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminQuizzesPage() {
-    const supabase = await createClient();
+    const token = await convexAuthNextjsToken();
+    if (!token) {
+        return <div className="p-10 text-center text-gray-500">Unauthorized</div>;
+    }
 
-    const { data: quizzes, error } = await supabase
-        .from("quizzes")
-        .select("*")
-        .order("created_at", { ascending: false });
+    const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
+    if (!me || me.role !== "admin") {
+        return <div className="p-10 text-center text-gray-500">Forbidden</div>;
+    }
 
-    // Get some stats
-    const { count: totalQuestions } = await supabase
-        .from("questions")
-        .select("*", { count: "exact", head: true });
-
-    const { count: totalStudents } = await supabase
-        .from("users")
-        .select("*", { count: "exact", head: true })
-        .eq("role", "student");
-
-    const { count: totalAttempts } = await supabase
-        .from("attempts")
-        .select("*", { count: "exact", head: true });
-
-    const quizzesList = quizzes || [];
+    const quizzesList = await fetchQuery(api.quizzes.getQuizzes, { subject: undefined }, { token });
+    const totalQuestions = (quizzesList ?? []).reduce((s, q) => s + Number(q.totalQuestions ?? 0), 0);
+    const users = await fetchQuery(api.users.listUsers, {}, { token });
+    const totalStudents = (users ?? []).filter((u) => (u.role ?? "student") === "student").length;
+    const totalAttempts = 0;
 
     return (
         <div className="animate-fade-in space-y-8">
             {/* Header with gradient */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-primary-900 p-8 text-white shadow-lg">
+            <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-gray-900 via-gray-800 to-primary-900 p-8 text-white shadow-lg">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
                 <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -135,7 +130,7 @@ export default async function AdminQuizzesPage() {
                 {quizzesList.length === 0 ? (
                     <div className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden">
                         <div className="p-14 text-center">
-                            <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <div className="w-16 h-16 bg-linear-to-br from-gray-100 to-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                 <FileText className="w-8 h-8 text-gray-300" />
                             </div>
                             <h3 className="font-semibold text-gray-900 mb-1">
@@ -161,7 +156,7 @@ export default async function AdminQuizzesPage() {
                                 className="bg-white rounded-xl border border-gray-100 p-5 shadow-card hover:shadow-card-hover transition-all duration-300 group"
                             >
                                 <div className="flex items-start justify-between mb-4">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                    <div className="w-12 h-12 bg-linear-to-br from-primary-100 to-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                                         <FileText className="w-6 h-6 text-primary-600" />
                                     </div>
                                     <span className="px-2.5 py-1 bg-primary-50 text-primary-700 rounded-lg text-xs font-semibold">

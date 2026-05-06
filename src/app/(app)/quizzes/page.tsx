@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import {
     BookOpen,
@@ -11,40 +10,32 @@ import {
     TrendingUp,
     Lock,
 } from "lucide-react";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "../../../../convex/_generated/api";
 
 export const dynamic = "force-dynamic";
 
 export default async function QuizzesPage() {
-    const supabase = await createClient();
+    const token = await convexAuthNextjsToken();
+    // Allow browsing even if logged out, but premium gating will require auth.
+    const user = token ? await fetchQuery(api.users.getCurrentUserProfile, {}, { token }) : null;
+    const isPremiumUser = user?.subscriptionType === "premium";
 
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-
-    const { data: quizzes } = await supabase
-        .from("quizzes")
-        .select("*")
-        .order("year", { ascending: false });
+    const quizzesList = await fetchQuery(api.quizzes.getQuizzes, {});
+    const sortedQuizzes = [...(quizzesList ?? [])].sort((a, b) => b.year - a.year);
 
     // Get attempt counts for this user
-    let attemptCounts: Record<string, number> = {};
-    if (user) {
-        const { data: attempts } = await supabase
-            .from("attempts")
-            .select("quiz_id")
-            .eq("user_id", user.id);
-
-        if (attempts) {
-            attempts.forEach((a) => {
-                attemptCounts[a.quiz_id] = (attemptCounts[a.quiz_id] || 0) + 1;
-            });
-        }
+    const attemptCounts: Record<string, number> = {};
+    if (token && user?._id) {
+        const attempts = await fetchQuery(api.attempts.getUserAttempts, { userId: user._id }, { token });
+        (attempts ?? []).forEach((a) => {
+            const qid = (a.quizId as unknown as string) ?? "";
+            if (!qid) return;
+            attemptCounts[qid] = (attemptCounts[qid] || 0) + 1;
+        });
     }
 
-    const { data: userData } = user ? await supabase.from("users").select("subscription_type").eq("id", user.id).single() : { data: null };
-    const isPremiumUser = userData?.subscription_type === "premium";
-
-    const quizzesList = quizzes || [];
     const totalQuizzes = quizzesList.length;
     const attemptedUnique = Object.keys(attemptCounts).length;
 
@@ -103,7 +94,7 @@ export default async function QuizzesPage() {
                     </div>
                 </div>
 
-                {quizzesList.length === 0 ? (
+                {sortedQuizzes.length === 0 ? (
                     <div className="bg-gray-50/50 rounded-[2.5rem] border-2 border-dashed border-gray-100 p-20 text-center">
                         <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-gray-200/50">
                             <BookOpen className="w-10 h-10 text-gray-300" />
@@ -113,15 +104,16 @@ export default async function QuizzesPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {quizzesList.map((quiz) => {
-                            const userAttempts = attemptCounts[quiz.id] || 0;
+                        {sortedQuizzes.map((quiz) => {
+                            const quizId = quiz._id as unknown as string;
+                            const userAttempts = attemptCounts[quizId] || 0;
                             const isAttempted = userAttempts > 0;
-                            const isLocked = quiz.is_premium && !isPremiumUser;
+                            const isLocked = quiz.isPremium && !isPremiumUser;
 
                             return (
                                 <Link
-                                    key={quiz.id}
-                                    href={isLocked ? "/upgrade" : `/quiz/${quiz.id}`}
+                                    key={quizId}
+                                    href={isLocked ? "/upgrade" : `/quiz/${quizId}`}
                                     className={`group relative bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col ${isLocked ? "grayscale-[0.5] opacity-90" : "hover:shadow-primary-600/10 hover:border-primary-200"}`}
                                 >
                                     {/* Glassmorphic Gradient Overlay on Hover */}
@@ -161,7 +153,7 @@ export default async function QuizzesPage() {
                                             </span>
                                             <span className="flex items-center gap-1.5">
                                                 <Hash className="w-3.5 h-3.5" />
-                                                {quiz.total_questions} Qs
+                                                {quiz.totalQuestions} Qs
                                             </span>
                                         </div>
                                     </div>

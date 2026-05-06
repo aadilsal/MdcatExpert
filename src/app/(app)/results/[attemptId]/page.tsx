@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -16,6 +15,10 @@ import {
     History,
 } from "lucide-react";
 import AIInsightCard from "../ai-insight-card";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "../../../../../convex/_generated/api";
+import type { Id } from "../../../../../convex/_generated/dataModel";
 
 export const dynamic = "force-dynamic";
 
@@ -32,34 +35,52 @@ export default async function ResultsPage({
     params: Promise<{ attemptId: string }>;
 }) {
     const { attemptId } = await params;
-    const supabase = await createClient();
+    const token = await convexAuthNextjsToken();
+    if (!token) notFound();
 
-    // Fetch attempt
-    const { data: attempt } = await supabase
-        .from("attempts")
-        .select("*, quizzes(*)")
-        .eq("id", attemptId)
-        .single();
-
+    const attempt = await fetchQuery(api.attempts.getAttemptById, { attemptId: attemptId as Id<"attempts"> }, { token });
     if (!attempt) notFound();
 
-    const quiz = attempt.quizzes as { id: string; title: string; year: number; total_questions: number };
+    const quiz = await fetchQuery(api.quizzes.getQuizById, { quizId: attempt.quizId }, { token });
+    if (!quiz) notFound();
 
-    // Fetch answers with detailed metadata
-    const { data: answers } = await supabase
-        .from("user_answers")
-        .select("*, questions(*)")
-        .eq("attempt_id", attemptId);
+    const questions = await fetchQuery(api.quizzes.getQuizQuestions, { quizId: quiz._id }, { token });
+    const questionById = new Map<string, any>();
+    for (const q of questions ?? []) {
+        if (q?._id) questionById.set(String(q._id), q);
+    }
 
-    const answersList = answers || [];
+    const rawAnswers = await fetchQuery(api.attempts.getAttemptAnswers, { attemptId: attempt._id }, { token });
+    const answersList = (rawAnswers ?? []).map((ua) => {
+        const q = questionById.get(String(ua.questionId));
+        return {
+            id: ua._id,
+            is_correct: ua.isCorrect,
+            selected_option: ua.selectedOption,
+            time_spent: 0,
+            ai_analysis: ua.aiAnalysis ?? null,
+            questions: q
+                ? {
+                      question_text: q.questionText,
+                      subject: q.subject,
+                      option_a: q.optionA,
+                      option_b: q.optionB,
+                      option_c: q.optionC,
+                      option_d: q.optionD,
+                      correct_option: q.correctOption,
+                      explanation: q.explanation ?? null,
+                      image_url: q.imageUrl ?? null,
+                  }
+                : null,
+        };
+    });
 
-    // Stats Calculation
-    const totalQuestions = quiz.total_questions;
-    const correctCount = attempt.score;
+    const totalQuestions = quiz.totalQuestions;
+    const correctCount = attempt.correctAnswers ?? attempt.score;
     const percentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
 
     // Time Analysis
-    const totalSeconds = attempt.time_taken;
+    const totalSeconds = attempt.timeTaken ?? 0;
     const avgTimePerQuestion = totalQuestions > 0 ? totalSeconds / totalQuestions : 0;
 
     const formatTime = (seconds: number) => {
@@ -98,7 +119,7 @@ export default async function ResultsPage({
         <div className="animate-fade-in max-w-5xl mx-auto space-y-12 pb-24 px-4">
 
             {/* Elite Score Hero */}
-            <div className={`relative overflow-hidden rounded-[3rem] bg-gradient-to-br ${grade.color} p-10 sm:p-16 text-white shadow-2xl transition-all duration-700`}>
+            <div className={`relative overflow-hidden rounded-[3rem] bg-linear-to-br ${grade.color} p-10 sm:p-16 text-white shadow-2xl transition-all duration-700`}>
                 <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4" />
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/4" />
 
@@ -214,7 +235,16 @@ export default async function ResultsPage({
 
                 <div className="grid gap-8">
                     {answersList.map((answer, idx) => {
-                        const question = answer.questions as any;
+                        const question = answer.questions as unknown as {
+                            question_text?: string;
+                            option_a?: string;
+                            option_b?: string;
+                            option_c?: string;
+                            option_d?: string;
+                            correct_option?: string;
+                            explanation?: string | null;
+                            image_url?: string | null;
+                        } | null;
                         if (!question) return null;
 
                         const isMistake = !answer.is_correct;

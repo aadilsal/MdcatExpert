@@ -1,26 +1,18 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { fetchMutation, fetchQuery } from "convex/nextjs";
+import { api } from "../../../../convex/_generated/api";
 
 export async function updateProfile(formData: { name: string; phone?: string }) {
-    const supabase = await createClient();
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
+    const token = await convexAuthNextjsToken();
+    if (!token) throw new Error("Unauthorized");
+    const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
+    if (!me) throw new Error("Unauthorized");
 
-    if (!user) throw new Error("Unauthorized");
-
-    const { error } = await supabase
-        .from("users")
-        .update({
-            name: formData.name,
-            phone: formData.phone || null,
-            updated_at: new Date().toISOString(),
-        })
-        .eq("id", user.id);
-
-    if (error) throw error;
+    await fetchMutation(api.users.updateProfile, { userId: me._id, name: formData.name, email: undefined }, { token });
+    await fetchMutation(api.users.setPhone, { phone: formData.phone || null }, { token });
 
     revalidatePath("/profile");
     revalidatePath("/dashboard");
@@ -28,13 +20,14 @@ export async function updateProfile(formData: { name: string; phone?: string }) 
 }
 
 export async function updatePassword(password: string) {
-    const supabase = await createClient();
+    void password;
+    throw new Error("Password change is not available yet. Use password reset from login.");
+}
 
-    const { error } = await supabase.auth.updateUser({
-        password: password,
-    });
-
-    if (error) throw error;
-
+export async function setEmailNotifications(enabled: boolean) {
+    const token = await convexAuthNextjsToken();
+    if (!token) throw new Error("Unauthorized");
+    await fetchMutation(api.users.setEmailNotificationPreference, { enabled }, { token });
+    revalidatePath("/profile");
     return { success: true };
 }

@@ -1,19 +1,41 @@
-import { type NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/middleware";
+import {
+  convexAuthNextjsMiddleware,
+  createRouteMatcher,
+  nextjsMiddlewareRedirect,
+} from "@convex-dev/auth/nextjs/server";
 
-export async function middleware(request: NextRequest) {
-    return await updateSession(request);
-}
+const isAuthPage = createRouteMatcher(["/login", "/signup"]);
+const isPublicPath = createRouteMatcher([
+  "/",
+  "/help",
+  "/terms",
+  "/privacy",
+  "/contact",
+]);
+const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
+const isProtectedRoute = (req: Request) =>
+  !isPublicPath(req) &&
+  !isAuthPage(req) &&
+  // Let Convex Auth proxy its own endpoint via middleware.
+  !(new URL(req.url).pathname.startsWith("/api/auth"));
+
+export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
+  const authed = await convexAuth.isAuthenticated();
+
+  if (isAuthPage(request) && authed) {
+    return nextjsMiddlewareRedirect(request, "/dashboard");
+  }
+
+  if (isProtectedRoute(request) && !authed) {
+    return nextjsMiddlewareRedirect(request, "/login");
+  }
+
+  // Admin gating (role check will be enforced in page loaders too).
+  if (isAdminRoute(request) && !authed) {
+    return nextjsMiddlewareRedirect(request, "/login");
+  }
+});
 
 export const config = {
-    matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
-         * - public folder
-         */
-        "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-    ],
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };

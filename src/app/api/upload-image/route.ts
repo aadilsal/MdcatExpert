@@ -1,108 +1,53 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { NextResponse } from "next/server";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { fetchMutation, fetchQuery } from "convex/nextjs";
+import { api } from "../../../../convex/_generated/api";
+import type { Id } from "../../../../convex/_generated/dataModel";
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const formData = await request.formData();
-    const file = formData.get("file") as File;
-    const questionId = formData.get("questionId") as string;
+    const token = await convexAuthNextjsToken();
+    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    if (!file || !questionId) {
-      return NextResponse.json(
-        { error: "Missing file or questionId" },
-        { status: 400 }
-      );
+    const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
+    if (!me) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const formData = await request.formData();
+    const file = formData.get("file") as File | null;
+    const fileType = (formData.get("fileType") as string) || "image";
+
+    if (!file) return NextResponse.json({ error: "No file provided." }, { status: 400 });
+
+    const uploadUrl = await fetchMutation(api.files.generateUploadUrl, {}, { token });
+    const uploadResp = await fetch(uploadUrl, {
+      method: "POST",
+      headers: { "Content-Type": file.type || "application/octet-stream" },
+      body: file,
+    });
+    if (!uploadResp.ok) {
+      const body = await uploadResp.text();
+      return NextResponse.json({ error: `Upload failed: ${body}` }, { status: uploadResp.status });
     }
 
-    // Create Supabase client with service role key
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    const { storageId } = (await uploadResp.json()) as { storageId: Id<"_storage"> };
+
+    const saved = await fetchMutation(
+      api.files.saveUploadedFile,
+      {
+        storageId,
+        userId: me._id,
+        fileType,
+        fileName: file.name,
+        contentType: file.type || "application/octet-stream",
+        fileSize: file.size,
+      },
+      { token },
     );
 
-    // Check if Images bucket exists, create if not
-    const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
-    const imagesBucket = buckets?.find(b => b.name === 'Images');
-
-    if (!imagesBucket) {
-      console.log("Images bucket doesn't exist, creating...");
-      const { error: createError } = await supabase.storage.createBucket('Images', {
-        public: true,
-        allowedMimeTypes: ['image/*'],
-        fileSizeLimit: 5242880 // 5MB
-      });
-
-      if (createError) {
-        console.error("Failed to create Images bucket:", createError);
-        return NextResponse.json(
-          { error: `Failed to create bucket: ${createError.message}` },
-          { status: 500 }
-        );
-      }
-      console.log("Images bucket created successfully");
-    } else {
-      console.log("Images bucket exists, checking if it's public...");
-      // If bucket exists but might not be public, try to update it
-      const { data: bucketDetails, error: bucketError } = await supabase.storage.getBucket('Images');
-      console.log("Bucket details:", bucketDetails);
-
-      if (bucketError) {
-        console.error("Error getting bucket details:", bucketError);
-      } else if (!bucketDetails?.public) {
-        console.log("Bucket exists but is not public, attempting to make it public...");
-        // Try to update bucket to be public
-        const { error: updateError } = await supabase.storage.updateBucket('Images', {
-          public: true,
-          allowedMimeTypes: ['image/*'],
-          fileSizeLimit: 5242880
-        });
-
-        if (updateError) {
-          console.error("Failed to update bucket to public:", updateError);
-          return NextResponse.json(
-            { error: `Failed to make bucket public: ${updateError.message}` },
-            { status: 500 }
-          );
-        }
-        console.log("Images bucket updated to public successfully");
-      } else {
-        console.log("Images bucket is already public");
-      }
-    }
-
-    const fileExt = file.name.split('.').pop();
-    const fileName = `question-${questionId}-${Date.now()}.${fileExt}`;
-
-    console.log("Uploading file:", fileName, "Size:", file.size, "Type:", file.type);
-
-    // Upload to Images bucket
-    const { error: uploadError } = await supabase.storage
-      .from("Images")
-      .upload(fileName, file, { cacheControl: "3600", upsert: false });
-
-    if (uploadError) {
-      console.error("Storage upload error:", uploadError);
-      return NextResponse.json(
-        { error: `Storage upload failed: ${uploadError.message}` },
-        { status: 500 }
-      );
-    }
-
-    console.log("File uploaded successfully");
-
-    const { data: { publicUrl } } = supabase.storage
-      .from("Images")
-      .getPublicUrl(fileName);
-
-    console.log("Generated public URL:", publicUrl);
-
-    return NextResponse.json({ publicUrl });
-
+    return NextResponse.json({ publicUrl: saved.url, storageId: saved.storageId, fileId: saved.fileId });
   } catch (error) {
     console.error("Image upload API error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -1,15 +1,19 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
+import { useAuthActions } from "@convex-dev/auth/react";
 
 export default function SignOutButton() {
     const router = useRouter();
+    const { signOut } = useAuthActions();
 
     const handleSignOut = async () => {
-        const supabase = createClient();
-        await supabase.auth.signOut();
+        try {
+            await signOut();
+        } catch (error) {
+            console.error("Sign out error", error);
+        }
         router.push("/login");
         router.refresh();
     };

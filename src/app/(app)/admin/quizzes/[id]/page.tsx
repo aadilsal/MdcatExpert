@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -6,6 +5,10 @@ import {
     FileText,
     CheckCircle,
 } from "lucide-react";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "../../../../../../convex/_generated/api";
+import type { Id } from "../../../../../../convex/_generated/dataModel";
 
 export const dynamic = "force-dynamic";
 
@@ -22,36 +25,27 @@ export default async function AdminQuizDetailPage({
     params: Promise<{ id: string }>;
 }) {
     const { id } = await params;
-    const supabase = await createClient();
+    const token = await convexAuthNextjsToken();
+    if (!token) notFound();
+    const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
+    if (!me || me.role !== "admin") notFound();
 
-    const { data: quiz } = await supabase
-        .from("quizzes")
-        .select("*")
-        .eq("id", id)
-        .single();
+    const quiz = await fetchQuery(api.quizzes.getQuizById, { quizId: id as Id<"quizzes"> }, { token });
+    if (!quiz) notFound();
 
-    if (!quiz) {
-        notFound();
-    }
-
-    const { data: quizQuestions } = await supabase
-        .from("quiz_questions")
-        .select("*, questions(*)")
-        .eq("quiz_id", id)
-        .order("order_index", { ascending: true });
-
-    const questionsList = quizQuestions?.map(qq => qq.questions) || [];
+    const questionsList = await fetchQuery(api.quizzes.getQuizQuestions, { quizId: quiz._id }, { token });
 
     // Subject counts
     const subjectCounts: Record<string, number> = {};
-    questionsList.forEach((q) => {
-        subjectCounts[q.subject] = (subjectCounts[q.subject] || 0) + 1;
+    (questionsList ?? []).forEach((q) => {
+        const subject = q?.subject ?? "General";
+        subjectCounts[subject] = (subjectCounts[subject] || 0) + 1;
     });
 
     return (
         <div className="animate-fade-in space-y-8">
             {/* Header */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 via-primary-700 to-blue-800 p-8 text-white shadow-lg">
+            <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-primary-600 via-primary-700 to-blue-800 p-8 text-white shadow-lg">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
                 <div className="relative">
                     <Link

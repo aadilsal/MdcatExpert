@@ -1,14 +1,18 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { UserPlus, Eye, EyeOff, Loader2, AlertCircle, Mail, Lock, User, Sparkles } from "lucide-react";
-import { signupAction } from "../actions";
+import { useAuthActions } from "@convex-dev/auth/react";
 
 export default function SignupPage() {
-    const [state, action, isPending] = useActionState(signupAction, null);
+    const router = useRouter();
+    const { signIn } = useAuthActions();
     const [showPassword, setShowPassword] = useState(false);
+    const [isPending, setIsPending] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const searchParams = useSearchParams();
     const goElite = searchParams.get("goElite") === "true";
 
@@ -25,10 +29,10 @@ export default function SignupPage() {
                     </p>
                 </div>
 
-                {state?.error && (
+                {error && (
                     <div className="mb-8 p-4 rounded-xl bg-red-50 border border-red-100 flex items-start gap-3 text-red-700 animate-shake">
                         <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-                        <p className="text-sm font-medium leading-relaxed">{state.error}</p>
+                        <p className="text-sm font-medium leading-relaxed">{error}</p>
                     </div>
                 )}
 
@@ -42,8 +46,25 @@ export default function SignupPage() {
                     </div>
                 )}
 
-                <form action={action} className="space-y-5">
-                    <input type="hidden" name="goElite" value={goElite ? "true" : "false"} />
+                <form
+                    className="space-y-5"
+                    onSubmit={async (e) => {
+                        e.preventDefault();
+                        setIsPending(true);
+                        setError(null);
+                        try {
+                            const formData = new FormData(e.currentTarget);
+                            formData.set("flow", "signUp");
+                            await signIn("password", formData);
+                            router.push(goElite ? "/signup-payment" : "/dashboard");
+                            router.refresh();
+                        } catch (err) {
+                            setError(err instanceof Error ? err.message : "Signup failed.");
+                        } finally {
+                            setIsPending(false);
+                        }
+                    }}
+                >
 
                     <div>
                         <label
@@ -62,15 +83,9 @@ export default function SignupPage() {
                                 type="text"
                                 required
                                 placeholder="Ahmad Ali"
-                                className={`w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all duration-200 ${state?.fieldErrors?.name ? "border-red-300 ring-red-100" : ""
-                                    }`}
+                                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all duration-200"
                             />
                         </div>
-                        {state?.fieldErrors?.name && (
-                            <p className="mt-2 text-xs font-medium text-red-500 ml-1">
-                                {state.fieldErrors.name[0]}
-                            </p>
-                        )}
                     </div>
 
                     <div>
@@ -90,15 +105,9 @@ export default function SignupPage() {
                                 type="email"
                                 required
                                 placeholder="you@example.com"
-                                className={`w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all duration-200 ${state?.fieldErrors?.email ? "border-red-300 ring-red-100" : ""
-                                    }`}
+                                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all duration-200"
                             />
                         </div>
-                        {state?.fieldErrors?.email && (
-                            <p className="mt-2 text-xs font-medium text-red-500 ml-1">
-                                {state.fieldErrors.email[0]}
-                            </p>
-                        )}
                     </div>
 
                     <div>
@@ -119,8 +128,7 @@ export default function SignupPage() {
                                 required
                                 minLength={6}
                                 placeholder="Min. 6 characters"
-                                className={`w-full pl-11 pr-12 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all duration-200 ${state?.fieldErrors?.password ? "border-red-300 ring-red-100" : ""
-                                    }`}
+                                className="w-full pl-11 pr-12 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all duration-200"
                             />
                             <button
                                 type="button"
@@ -134,11 +142,6 @@ export default function SignupPage() {
                                 )}
                             </button>
                         </div>
-                        {state?.fieldErrors?.password && (
-                            <p className="mt-2 text-xs font-medium text-red-500 ml-1">
-                                {state.fieldErrors.password[0]}
-                            </p>
-                        )}
                     </div>
 
                     <button

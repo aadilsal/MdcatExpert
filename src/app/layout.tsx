@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
+import NavigationLoadingOverlay from "@/components/navigation-loading-overlay";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -14,7 +16,7 @@ export const metadata: Metadata = {
   keywords: ["MDCAT", "quizzes", "practice tests", "medical", "Pakistan", "preparation"],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -22,7 +24,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} font-sans antialiased`}>
-        {children}
+        <ConvexAuthNextjsServerProvider>
+          <NavigationLoadingOverlay />
+          {children}
+        </ConvexAuthNextjsServerProvider>
       </body>
     </html>
   );
