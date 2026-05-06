@@ -87,7 +87,7 @@ export default function AppLayout({
                 {/* Logo Section */}
                 <div className="h-24 flex items-center justify-between px-8 border-b border-gray-50/50 shrink-0">
                     <Link href="/dashboard" className="flex items-center gap-3 active:scale-95 transition-transform">
-                        <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg shadow-primary-600/20">
+                        <div className="w-10 h-10 bg-linear-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg shadow-primary-600/20">
                             <BookOpen className="w-6 h-6 text-white" />
                         </div>
                         <span className="text-xl font-black text-gray-900 tracking-tight">

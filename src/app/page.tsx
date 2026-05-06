@@ -44,7 +44,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center gap-3 active:scale-95 transition-transform">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg shadow-primary-600/20">
+              <div className="w-10 h-10 bg-linear-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg shadow-primary-600/20">
                 <BookOpen className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-black text-gray-900 tracking-tight">
@@ -143,7 +143,7 @@ export default function HomePage() {
           >
             <Link
               href="/signup"
-              className="group relative w-full sm:w-auto inline-flex items-center justify-center gap-3 px-10 py-5 text-lg font-black text-white bg-primary-600 rounded-[2rem] hover:bg-primary-700 transition-all shadow-2xl shadow-primary-600/30 active:scale-95"
+              className="group relative w-full sm:w-auto inline-flex items-center justify-center gap-3 px-10 py-5 text-lg font-black text-white bg-primary-600 rounded-4xl hover:bg-primary-700 transition-all shadow-2xl shadow-primary-600/30 active:scale-95"
             >
               Start For Free
               <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
@@ -317,7 +317,7 @@ export default function HomePage() {
 
           {/* Elite Tier */}
           <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary-600 to-purple-600 rounded-[2.6rem] blur opacity-25" />
+            <div className="absolute -inset-1 bg-linear-to-r from-primary-600 to-purple-600 rounded-[2.6rem] blur opacity-25" />
             <div className="relative bg-black rounded-[2.5rem] p-10 text-white shadow-2xl flex flex-col justify-between h-full">
               <div>
                 <div className="flex justify-between items-start mb-2">
@@ -361,7 +361,7 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
                 whileHover={{ y: -5 }}
-                className="p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:border-primary-100 transition-all group"
+                className="p-8 rounded-4xl bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:border-primary-100 transition-all group"
               >
                 <div className="mb-6 w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                   <item.icon className="w-6 h-6" />
@@ -383,7 +383,7 @@ export default function HomePage() {
             className="bg-black rounded-[3rem] p-12 sm:p-20 text-center relative overflow-hidden"
           >
             {/* Dark Mode Glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-primary-500/50 to-transparent" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-linear-to-r from-transparent via-primary-500/50 to-transparent" />
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[200px] bg-primary-600/20 rounded-full blur-[100px] pointer-events-none" />
 
             <h2 className="text-4xl sm:text-6xl font-black text-white mb-8 tracking-tighter">
@@ -395,7 +395,7 @@ export default function HomePage() {
             </p>
             <Link
               href="/signup"
-              className="inline-flex items-center gap-4 px-12 py-6 text-xl font-black text-black bg-white rounded-[2rem] hover:bg-primary-50 transition-all active:scale-95"
+              className="inline-flex items-center gap-4 px-12 py-6 text-xl font-black text-black bg-white rounded-4xl hover:bg-primary-50 transition-all active:scale-95"
             >
               Sign Up For Free
               <ChevronRight className="w-6 h-6" />

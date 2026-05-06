@@ -208,7 +208,7 @@ export default function QuizPage({
             {/* Professional EdTech Header */}
             <header className={`sticky top-0 z-40 w-full border-b transition-all duration-500 ${zenMode ? "bg-black/50 backdrop-blur-xl border-white/10" : "bg-white border-gray-100 shadow-sm"
                 }`}>
-                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+                <div className="max-w-400 mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3 sm:gap-6">
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -217,7 +217,7 @@ export default function QuizPage({
                             <Menu className="w-5 h-5" />
                         </button>
                         <div className="h-6 w-px bg-gray-200 hidden sm:block" />
-                        <div className="max-w-[120px] sm:max-w-none truncate">
+                        <div className="max-w-30 sm:max-w-none truncate">
                             <h1 className={`font-black tracking-tight text-[10px] sm:text-sm uppercase truncate ${zenMode ? "text-white" : "text-gray-900"}`}>
                                 {quiz.title}
                             </h1>
@@ -263,7 +263,7 @@ export default function QuizPage({
                 </div>
             </header>
 
-            <div className="flex-1 flex max-w-[1600px] mx-auto w-full relative h-full">
+            <div className="flex-1 flex max-w-400 mx-auto w-full relative h-full">
 
                 {/* Mobile Palette Overlay/Drawer */}
                 <AnimatePresence>

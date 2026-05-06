@@ -61,7 +61,7 @@ export default function AIInsightCard({ answerId, initialInsight }: AIInsightCar
                 Elite AI Analysis
             </div>
 
-            <div className="bg-gradient-to-br from-gray-50 to-white border border-primary-100 rounded-[2rem] p-6 sm:p-8 shadow-sm">
+            <div className="bg-linear-to-br from-gray-50 to-white border border-primary-100 rounded-4xl p-6 sm:p-8 shadow-sm">
                 <div className="space-y-6">
                     {/* Reasoning Section */}
                     <div className="flex gap-4">

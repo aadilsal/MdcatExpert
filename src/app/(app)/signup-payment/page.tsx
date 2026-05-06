@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -23,7 +22,6 @@ function SignupPaymentContent() {
     const [submitted, setSubmitted] = useState(false);
     const [parsedTitle, setParsedTitle] = useState<string>("");
     const [parsedYear, setParsedYear] = useState<string>("");
-    const [autoTransactionId, setAutoTransactionId] = useState<string>("");
     const [error, setError] = useState<string | null>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +61,6 @@ function SignupPaymentContent() {
             const titleCode = title ? title.replace(/\s+/g, "").slice(0, 3).toUpperCase() : "PAY";
             const autoId = `TXN${yearCode}${titleCode}${timestamp}`;
 
-            setAutoTransactionId(autoId);
             setTransactionId(autoId);
         }
     };
@@ -122,7 +119,7 @@ function SignupPaymentContent() {
 
     if (submitted) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-white to-gray-50">
+            <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-linear-to-b from-white to-gray-50">
                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -165,7 +162,7 @@ function SignupPaymentContent() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pb-20 pt-10 px-4">
+        <div className="min-h-screen bg-linear-to-b from-white to-gray-50 pb-20 pt-10 px-4">
             <div className="max-w-2xl mx-auto">
                 <Link href="/dashboard" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 font-semibold mb-12 transition-colors">
                     <ArrowLeft className="w-5 h-5" />

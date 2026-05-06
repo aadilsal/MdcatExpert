@@ -94,7 +94,7 @@ export default function StudentTable({ users }: StudentTableProps) {
     return (
         <div className="space-y-6">
             {/* Search and Filters */}
-            <div className="bg-white rounded-[2rem] border border-gray-100 p-6 shadow-xl shadow-gray-200/20">
+            <div className="bg-white rounded-4xl border border-gray-100 p-6 shadow-xl shadow-gray-200/20">
                 <div className="flex flex-col sm:flex-row gap-4">
                     <div className="relative flex-1">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />

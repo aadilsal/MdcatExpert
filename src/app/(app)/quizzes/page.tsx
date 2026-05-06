@@ -114,10 +114,10 @@ export default async function QuizzesPage() {
                                 <Link
                                     key={quizId}
                                     href={isLocked ? "/upgrade" : `/quiz/${quizId}`}
-                                    className={`group relative bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col ${isLocked ? "grayscale-[0.5] opacity-90" : "hover:shadow-primary-600/10 hover:border-primary-200"}`}
+                                    className={`group relative bg-white rounded-4xl border border-gray-100 p-8 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col ${isLocked ? "grayscale-[0.5] opacity-90" : "hover:shadow-primary-600/10 hover:border-primary-200"}`}
                                 >
                                     {/* Glassmorphic Gradient Overlay on Hover */}
-                                    {!isLocked && <div className="absolute inset-0 bg-gradient-to-br from-primary-600/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 rounded-[2rem] transition-opacity pointer-events-none" />}
+                                    {!isLocked && <div className="absolute inset-0 bg-linear-to-br from-primary-600/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 rounded-4xl transition-opacity pointer-events-none" />}
 
                                     <div className="relative flex items-start justify-between mb-8">
                                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${isLocked ? "bg-amber-50 text-amber-600 shadow-lg shadow-amber-500/10" : isAttempted
@@ -180,7 +180,7 @@ export default async function QuizzesPage() {
 
             {/* Quick Actions / Tips */}
             <div className="grid md:grid-cols-2 gap-8 pt-8">
-                <div className="bg-emerald-50 rounded-[2rem] p-8 border border-emerald-100/50 flex items-center gap-6 group hover:translate-y-[-4px] transition-all">
+                <div className="bg-emerald-50 rounded-4xl p-8 border border-emerald-100/50 flex items-center gap-6 group hover:-translate-y-1 transition-all">
                     <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-lg shadow-emerald-500/5 transition-transform group-hover:scale-110">
                         <TrendingUp className="w-8 h-8" />
                     </div>
@@ -189,7 +189,7 @@ export default async function QuizzesPage() {
                         <p className="font-bold text-emerald-800 text-sm leading-tight">Users who practice daily see a 24% score increase.</p>
                     </div>
                 </div>
-                <div className="bg-primary-50 rounded-[2rem] p-8 border border-primary-100/50 flex items-center gap-6 group hover:translate-y-[-4px] transition-all">
+                <div className="bg-primary-50 rounded-4xl p-8 border border-primary-100/50 flex items-center gap-6 group hover:-translate-y-1 transition-all">
                     <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-primary-600 shadow-lg shadow-primary-500/5 transition-transform group-hover:scale-110">
                         <Sparkles className="w-8 h-8" />
                     </div>

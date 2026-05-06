@@ -1,9 +1,18 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { Id } from "./_generated/datamodel";
 
 export const getQuizzes = query({
-  args: { subject: v.optional(v.string()) },
+  args: { 
+    subject: v.optional(
+      v.union(
+        v.literal("Biology"),
+        v.literal("Chemistry"),
+        v.literal("Physics"),
+        v.literal("English"),
+        v.literal("General")
+      )
+    ) 
+  },
   handler: async (ctx, { subject }) => {
     if (subject) {
       return await ctx.db

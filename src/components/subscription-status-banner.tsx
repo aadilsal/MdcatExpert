@@ -16,8 +16,8 @@ export default function SubscriptionStatusBanner({
 }: SubscriptionStatusBannerProps) {
     if (subscriptionType === "premium" && !hasPendingPayment) {
         return (
-            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-6 mb-8 flex items-start gap-4">
-                <div className="flex-shrink-0">
+            <div className="bg-linear-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-6 mb-8 flex items-start gap-4">
+                <div className="shrink-0">
                     <CheckCircle className="w-6 h-6 text-emerald-600 mt-0.5" />
                 </div>
                 <div className="flex-1">
@@ -37,8 +37,8 @@ export default function SubscriptionStatusBanner({
 
     if (hasPendingPayment) {
         return (
-            <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-2xl p-6 mb-8 flex items-start gap-4">
-                <div className="flex-shrink-0">
+            <div className="bg-linear-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-2xl p-6 mb-8 flex items-start gap-4">
+                <div className="shrink-0">
                     <Clock className="w-6 h-6 text-blue-600 mt-0.5 animate-pulse" />
                 </div>
                 <div className="flex-1">
@@ -56,8 +56,8 @@ export default function SubscriptionStatusBanner({
     }
 
     return (
-        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6 mb-8 flex items-start gap-4">
-            <div className="flex-shrink-0">
+        <div className="bg-linear-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6 mb-8 flex items-start gap-4">
+            <div className="shrink-0">
                 <Sparkles className="w-6 h-6 text-amber-600 mt-0.5" />
             </div>
             <div className="flex-1">

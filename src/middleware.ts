@@ -3,6 +3,7 @@ import {
   createRouteMatcher,
   nextjsMiddlewareRedirect,
 } from "@convex-dev/auth/nextjs/server";
+import type { NextRequest } from "next/server";
 
 const isAuthPage = createRouteMatcher(["/login", "/signup"]);
 const isPublicPath = createRouteMatcher([
@@ -13,7 +14,7 @@ const isPublicPath = createRouteMatcher([
   "/contact",
 ]);
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
-const isProtectedRoute = (req: Request) =>
+const isProtectedRoute = (req: NextRequest) =>
   !isPublicPath(req) &&
   !isAuthPage(req) &&
   // Let Convex Auth proxy its own endpoint via middleware.

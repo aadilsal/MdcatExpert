@@ -275,14 +275,14 @@ export default function AdminUploadPage() {
                             onDragOver={handleDrag}
                             onDrop={handleDrop}
                             onClick={() => fileInputRef.current?.click()}
-                            className={`relative border-2 border-dashed rounded-[2rem] p-12 text-center transition-all duration-500 cursor-pointer group/drop ${dragActive
+                            className={`relative border-2 border-dashed rounded-4xl p-12 text-center transition-all duration-500 cursor-pointer group/drop ${dragActive
                                 ? "border-primary-500 bg-primary-500/5 scale-[1.01]"
                                 : file
                                     ? "border-emerald-500 bg-emerald-50"
                                     : "border-gray-100 bg-gray-50/50 hover:border-primary-300 hover:bg-white hover:scale-[1.01]"
                                 }`}
                         >
-                            <div className={`absolute inset-0 bg-primary-600/5 opacity-0 group-hover/drop:opacity-100 transition-opacity rounded-[2rem] pointer-events-none`} />
+                            <div className={`absolute inset-0 bg-primary-600/5 opacity-0 group-hover/drop:opacity-100 transition-opacity rounded-4xl pointer-events-none`} />
 
                             <input ref={fileInputRef} type="file" accept={uploadMode === 'pdf' ? '.pdf' : '.xlsx,.xls'} onChange={handleFileSelect} className="hidden" />
 
