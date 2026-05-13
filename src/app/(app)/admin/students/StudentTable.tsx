@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Swal from "sweetalert2";
-import { Users, Search, Mail, Calendar, Shield, ShieldCheck, Loader2 } from "lucide-react";
+import { Users, Search, Mail, Calendar, Shield, ShieldCheck, Loader2, Ticket } from "lucide-react";
 import { updateUserRoleAction, updateUserSubscriptionAction } from "./actions";
 
 interface PaymentRequestBrief {
@@ -18,6 +18,8 @@ interface UserProfile {
     email: string;
     role: "student" | "admin";
     subscription_type: "free" | "premium";
+    promo_code?: string | null;
+    promo_source?: string | null;
     premium_until?: string | null;
     created_at: string;
     payment_requests?: PaymentRequestBrief[];
@@ -130,6 +132,7 @@ export default function StudentTable({ users }: StudentTableProps) {
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Joined Date</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Current Role</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Subscription</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Promo Origin</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Recent Payment</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Action</th>
                             </tr>
@@ -183,6 +186,18 @@ export default function StudentTable({ users }: StudentTableProps) {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
+                                            <div className="flex justify-center items-center gap-2">
+                                                <Ticket className="w-4 h-4 text-amber-500" />
+                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${user.promo_code ? "bg-amber-50 border-amber-200 text-amber-600" : "bg-gray-50 border-gray-200 text-gray-400"}`}>
+                                                    {user.promo_code
+                                                        ? user.promo_source && user.promo_source !== user.promo_code
+                                                            ? `${user.promo_code} / ${user.promo_source}`
+                                                            : user.promo_code
+                                                        : "None"}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-6">
                                             <div className="text-center">
                                                 {user.payment_requests && user.payment_requests.length > 0 ? (
                                                     (() => {
@@ -229,7 +244,7 @@ export default function StudentTable({ users }: StudentTableProps) {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="px-8 py-20 text-center">
+                                    <td colSpan={6} className="px-8 py-20 text-center">
                                         <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 opacity-50">
                                             <Users className="w-8 h-8 text-gray-300" />
                                         </div>

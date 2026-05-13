@@ -4,15 +4,21 @@ import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../convex/_generated/api";
 
+const VALID_SUBJECTS = ["Biology", "Chemistry", "Physics", "English", "General"] as const;
+
+type ValidSubject = (typeof VALID_SUBJECTS)[number];
+
 interface ParsedQuestion {
     question_text: string;
-    subject: string;
+    subject: ValidSubject;
     options: { text: string; label: string }[];
     correct: string;
     image_url?: string;
 }
 
-const VALID_SUBJECTS = ["Biology", "Chemistry", "Physics", "English", "General"] as const;
+function isValidSubject(s: string): s is ValidSubject {
+    return (VALID_SUBJECTS as readonly string[]).includes(s);
+}
 
 export async function POST(request: Request) {
     try {
@@ -90,7 +96,7 @@ export async function POST(request: Request) {
                 return;
             }
 
-            if (!VALID_SUBJECTS.includes(subject)) {
+            if (!isValidSubject(subject)) {
                 skippedRows.push(index + 2);
                 return;
             }
@@ -141,7 +147,7 @@ export async function POST(request: Request) {
                     optionC: q.options[2]?.text ?? "",
                     optionD: q.options[3]?.text ?? "",
                     correctOption: (q.options.find((o) => o.is_correct)?.label ?? "A") as "A" | "B" | "C" | "D",
-                    subject: q.subject as (typeof VALID_SUBJECTS)[number],
+                    subject: q.subject,
                     explanation: undefined,
                     year,
                     imageUrl: q.image_url ?? undefined,

@@ -1,7 +1,6 @@
 "use server";
 
 import { analyzeMistake } from "@/lib/ai/analyzer";
-import { revalidatePath } from "next/cache";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../../convex/_generated/api";
@@ -15,7 +14,7 @@ export async function generateAnswerInsight(answerId: string) {
     if (!token) throw new Error("Unauthorized");
 
     const ua = await fetchQuery(
-        api.userAnswers.getByIdWithQuestion,
+        api.attempts.getUserAnswerWithQuestion,
         { userAnswerId: answerId as Id<"userAnswers"> },
         { token }
     );

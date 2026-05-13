@@ -94,7 +94,7 @@ export default function HomePage() {
             transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
             className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-100/30 rounded-full blur-[100px]"
           />
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]" />
+          <div className="absolute inset-0 opacity-[0.04] bg-[linear-gradient(rgba(0,0,0,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.07)_1px,transparent_1px)] bg-size-[24px_24px]" />
         </div>
 
         <motion.div
@@ -432,9 +432,9 @@ export default function HomePage() {
             <ul className="space-y-4">
               {[
                 { name: 'Home', href: '/' },
-                { name: 'Features', href: '#features' }, // Features are on this page
-                { name: 'Analytics', href: '/login' }, // Gated: ask to login first
-                { name: 'Quizzes', href: '/login' }     // Gated: ask to login first
+                { name: 'Features', href: '#features' },
+                { name: 'Analytics (sign in)', href: '/login' },
+                { name: 'Quizzes (sign in)', href: '/login' }
               ].map(i => (
                 <li key={i.name}><Link href={i.href} className="text-gray-500 text-sm font-semibold hover:text-primary-600 transition-colors">{i.name}</Link></li>
               ))}

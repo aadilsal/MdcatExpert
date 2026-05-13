@@ -46,8 +46,7 @@ export async function POST(request: Request) {
       { token },
     );
 
-    const prefs = await fetchQuery(api.users.getEmailNotificationPreference, {}, { token });
-    if (prefs?.emailNotificationsEnabled && user.email) {
+    if (user.emailNotificationsEnabled && user.email) {
       await sendEmailNotification({
         to: user.email,
         subject: "MDCAT Xpert: Payment received",

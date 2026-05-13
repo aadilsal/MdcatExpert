@@ -11,8 +11,16 @@ export async function updateProfile(formData: { name: string; phone?: string }) 
     const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
     if (!me) throw new Error("Unauthorized");
 
-    await fetchMutation(api.users.updateProfile, { userId: me._id, name: formData.name, email: undefined }, { token });
-    await fetchMutation(api.users.setPhone, { phone: formData.phone || null }, { token });
+    await fetchMutation(
+        api.users.updateProfile,
+        {
+            userId: me._id,
+            name: formData.name,
+            email: undefined,
+            phone: formData.phone ?? undefined,
+        },
+        { token },
+    );
 
     revalidatePath("/profile");
     revalidatePath("/dashboard");
@@ -27,7 +35,13 @@ export async function updatePassword(password: string) {
 export async function setEmailNotifications(enabled: boolean) {
     const token = await convexAuthNextjsToken();
     if (!token) throw new Error("Unauthorized");
-    await fetchMutation(api.users.setEmailNotificationPreference, { enabled }, { token });
+    const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
+    if (!me) throw new Error("Unauthorized");
+    await fetchMutation(
+        api.users.updateProfile,
+        { userId: me._id, emailNotificationsEnabled: enabled },
+        { token },
+    );
     revalidatePath("/profile");
     return { success: true };
 }

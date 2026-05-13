@@ -18,7 +18,7 @@ import AIInsightCard from "../ai-insight-card";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../convex/_generated/api";
-import type { Id } from "../../../../../convex/_generated/dataModel";
+import type { Doc, Id } from "../../../../../convex/_generated/dataModel";
 
 export const dynamic = "force-dynamic";
 
@@ -41,16 +41,20 @@ export default async function ResultsPage({
     const attempt = await fetchQuery(api.attempts.getAttemptById, { attemptId: attemptId as Id<"attempts"> }, { token });
     if (!attempt) notFound();
 
-    const quiz = await fetchQuery(api.quizzes.getQuizById, { quizId: attempt.quizId }, { token });
+    const [quiz, rawAnswers] = await Promise.all([
+        fetchQuery(api.quizzes.getQuizById, { quizId: attempt.quizId }, { token }),
+        fetchQuery(api.attempts.getAttemptAnswers, { attemptId: attempt._id }, { token }),
+    ]);
     if (!quiz) notFound();
 
     const questions = await fetchQuery(api.quizzes.getQuizQuestions, { quizId: quiz._id }, { token });
-    const questionById = new Map<string, any>();
+    const questionById = new Map<string, Doc<"questions">>();
     for (const q of questions ?? []) {
-        if (q?._id) questionById.set(String(q._id), q);
+        if (q?._id) {
+            questionById.set(String(q._id), q as Doc<"questions">);
+        }
     }
 
-    const rawAnswers = await fetchQuery(api.attempts.getAttemptAnswers, { attemptId: attempt._id }, { token });
     const answersList = (rawAnswers ?? []).map((ua) => {
         const q = questionById.get(String(ua.questionId));
         return {
@@ -94,7 +98,7 @@ export default async function ResultsPage({
     // Subject & Time Breakdown
     const subjectStats: Record<string, { correct: number; total: number; time: number }> = {};
     answersList.forEach((a) => {
-        const question = a.questions as { subject: string };
+        const question = a.questions;
         if (!question) return;
         const subject = question.subject;
         if (!subjectStats[subject]) {
@@ -236,6 +240,7 @@ export default async function ResultsPage({
                 <div className="grid gap-8">
                     {answersList.map((answer, idx) => {
                         const question = answer.questions as unknown as {
+                            subject?: string;
                             question_text?: string;
                             option_a?: string;
                             option_b?: string;
@@ -274,7 +279,7 @@ export default async function ResultsPage({
                                             </div>
                                         </div>
                                     </div>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-300">{question.subject}</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-300">{question.subject ?? "—"}</span>
                                 </div>
 
                                 <div className="p-10">
@@ -286,7 +291,13 @@ export default async function ResultsPage({
                                         {(["A", "B", "C", "D"] as const).map((label) => {
                                             const isSelected = answer.selected_option === label;
                                             const isCorrect = question.correct_option === label;
-                                            const optionText = question[`option_${label.toLowerCase()}`];
+                                            const opts = {
+                                                A: question.option_a,
+                                                B: question.option_b,
+                                                C: question.option_c,
+                                                D: question.option_d,
+                                            } as const;
+                                            const optionText = opts[label];
 
                                             return (
                                                 <div
@@ -333,7 +344,7 @@ export default async function ResultsPage({
                     Archive
                 </Link>
                 <Link
-                    href={`/quiz/${quiz.id}`}
+                    href={`/quiz/${quiz._id}`}
                     className="flex items-center gap-3 px-10 py-5 bg-gray-900 text-white font-black uppercase tracking-widest text-xs rounded-3xl hover:bg-black transition-all active:scale-95 shadow-2xl shadow-black/30"
                 >
                     <RotateCcw className="w-4 h-4 italic" />

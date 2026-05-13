@@ -11,9 +11,10 @@ import {
     Layers,
     Loader2,
     Image as ImageIcon,
-    AlertTriangle
+    AlertTriangle,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { Spinner } from "@/components/spinner";
 
 interface StagingQuestion {
     id: string;
@@ -42,6 +43,10 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
     const [publishing, setPublishing] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editForm, setEditForm] = useState<Partial<StagingQuestion>>({});
+    const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
+    const [savingEdit, setSavingEdit] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [uploadingImageId, setUploadingImageId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchStaging = async () => {
@@ -60,6 +65,8 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
     }, [batchId]);
 
     const handleStatusUpdate = async (id: string, status: "approved" | "rejected") => {
+        if (statusUpdatingId) return;
+        setStatusUpdatingId(id);
         try {
             const res = await fetch(`/api/staging/question/${id}`, {
                 method: "PATCH",
@@ -70,6 +77,8 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
             setQuestions(prev => prev.map(q => q.id === id ? { ...q, status } : q));
         } catch (error) {
             console.error("Failed to update status:", error);
+        } finally {
+            setStatusUpdatingId(null);
         }
     };
 
@@ -79,7 +88,8 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
     };
 
     const handleSaveEdit = async () => {
-        if (!editingId) return;
+        if (!editingId || savingEdit) return;
+        setSavingEdit(true);
         try {
             const res = await fetch(`/api/staging/question/${editingId}`, {
                 method: "PATCH",
@@ -91,10 +101,14 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
             setEditingId(null);
         } catch (error) {
             console.error("Failed to save edit:", error);
+        } finally {
+            setSavingEdit(false);
         }
     };
 
     const handleImageUpload = async (questionId: string, file: File) => {
+        if (uploadingImageId) return;
+        setUploadingImageId(questionId);
         try {
             // Upload image via Convex Storage API
             const formData = new FormData();
@@ -127,10 +141,13 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
         } catch (error) {
             console.error("Failed to upload image:", error);
             alert(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        } finally {
+            setUploadingImageId(null);
         }
     };
 
     const handlePublish = async () => {
+        if (publishing) return;
         setPublishing(true);
         try {
             const res = await fetch(`/api/staging/publish/${batchId}`, {
@@ -152,6 +169,22 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
         }
     };
 
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure you want to remove this question?")) return;
+        if (deletingId) return;
+        setDeletingId(id);
+        try {
+            const res = await fetch(`/api/staging/question/${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Failed to delete.");
+            setQuestions(prev => prev.filter(q => q.id !== id));
+        } catch (error) {
+            console.error("Failed to delete question:", error);
+            alert("Failed to delete question. Please try again.");
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
@@ -160,18 +193,6 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
             </div>
         );
     }
-
-    const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to remove this question?")) return;
-        try {
-            const res = await fetch(`/api/staging/question/${id}`, { method: "DELETE" });
-            if (!res.ok) throw new Error("Failed to delete.");
-            setQuestions(prev => prev.filter(q => q.id !== id));
-        } catch (error) {
-            console.error("Failed to delete question:", error);
-            alert("Failed to delete question. Please try again.");
-        }
-    };
 
     return (
         <div className="space-y-12 pb-20 max-w-7xl mx-auto">
@@ -192,9 +213,9 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
                     <button
                         onClick={handlePublish}
                         disabled={publishing || questions.length === 0}
-                        className="px-10 py-5 bg-primary-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-primary-700 transition-all shadow-2xl shadow-primary-600/30 active:scale-95 disabled:opacity-50 flex items-center gap-3"
+                        className="px-10 py-5 bg-primary-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-primary-700 transition-all shadow-2xl shadow-primary-600/30 active:scale-95 disabled:opacity-50 disabled:pointer-events-none flex items-center gap-3"
                     >
-                        {publishing ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
+                        {publishing ? <Loader2 className="w-5 h-5 animate-spin text-white" /> : <CheckCircle className="w-5 h-5" />}
                         Commit to Alpha
                     </button>
                 </div>
@@ -226,45 +247,84 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
                             </div>
                             <div className="flex items-center gap-2">
                                 <button
+                                    type="button"
                                     onClick={() => handleStatusUpdate(q.id, "approved")}
-                                    className={`p-2 rounded-xl transition-all ${q.status === "approved" ? "bg-emerald-500 text-white" : "border border-gray-100 text-gray-400 hover:bg-emerald-50 hover:text-emerald-500"}`}
+                                    disabled={statusUpdatingId !== null}
+                                    className={`p-2 rounded-xl transition-all disabled:opacity-50 disabled:pointer-events-none ${q.status === "approved" ? "bg-emerald-500 text-white" : "border border-gray-100 text-gray-400 hover:bg-emerald-50 hover:text-emerald-500"}`}
                                 >
-                                    <CheckCircle className="w-5 h-5" />
+                                    {statusUpdatingId === q.id ? (
+                                        <Spinner size="md" className="border-gray-300 border-t-emerald-600" />
+                                    ) : (
+                                        <CheckCircle className="w-5 h-5" />
+                                    )}
                                 </button>
                                 <button
+                                    type="button"
                                     onClick={() => handleStatusUpdate(q.id, "rejected")}
-                                    className={`p-2 rounded-xl transition-all ${q.status === "rejected" ? "bg-red-500 text-white" : "border border-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500"}`}
+                                    disabled={statusUpdatingId !== null}
+                                    className={`p-2 rounded-xl transition-all disabled:opacity-50 disabled:pointer-events-none ${q.status === "rejected" ? "bg-red-500 text-white" : "border border-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500"}`}
                                 >
-                                    <XCircle className="w-5 h-5" />
+                                    {statusUpdatingId === q.id ? (
+                                        <Spinner size="md" className="border-gray-300 border-t-red-600" />
+                                    ) : (
+                                        <XCircle className="w-5 h-5" />
+                                    )}
                                 </button>
                                 <div className="w-px h-6 bg-gray-100 mx-2" />
                                 {/* Image Upload Button */}
-                                <label className="relative cursor-pointer">
+                                <label
+                                    className={`relative ${uploadingImageId !== null ? "cursor-not-allowed opacity-50 pointer-events-none" : "cursor-pointer"}`}
+                                >
                                     <input
                                         type="file"
                                         accept="image/*"
+                                        disabled={uploadingImageId !== null}
                                         onChange={(e) => {
                                             const file = e.target.files?.[0];
                                             if (file) handleImageUpload(q.id, file);
+                                            e.target.value = "";
                                         }}
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
                                     />
                                     <div className={`p-2 rounded-xl border transition-all ${q.image_url ? "border-emerald-300 bg-emerald-50 text-emerald-600" : "border-gray-100 text-gray-400 hover:bg-primary-50 hover:text-primary-500 hover:border-primary-300"}`}>
-                                        <ImageIcon className="w-5 h-5" />
+                                        {uploadingImageId === q.id ? (
+                                            <Spinner size="md" className="border-gray-300 border-t-primary-600" />
+                                        ) : (
+                                            <ImageIcon className="w-5 h-5" />
+                                        )}
                                     </div>
                                 </label>
                                 <div className="w-px h-6 bg-gray-100 mx-2" />
                                 {editingId === q.id ? (
-                                    <button onClick={handleSaveEdit} className="p-2 rounded-xl bg-primary-600 text-white shadow-lg shadow-primary-600/20">
-                                        <Save className="w-5 h-5" />
+                                    <button
+                                        type="button"
+                                        onClick={handleSaveEdit}
+                                        disabled={savingEdit}
+                                        className="p-2 rounded-xl bg-primary-600 text-white shadow-lg shadow-primary-600/20 disabled:opacity-60 disabled:pointer-events-none"
+                                    >
+                                        {savingEdit ? <Loader2 className="w-5 h-5 animate-spin text-white" /> : <Save className="w-5 h-5" />}
                                     </button>
                                 ) : (
-                                    <button onClick={() => handleEdit(q)} className="p-2 rounded-xl border border-gray-100 text-gray-400 hover:bg-primary-50 hover:text-primary-500">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleEdit(q)}
+                                        disabled={savingEdit || statusUpdatingId !== null}
+                                        className="p-2 rounded-xl border border-gray-100 text-gray-400 hover:bg-primary-50 hover:text-primary-500 disabled:opacity-40 disabled:pointer-events-none"
+                                    >
                                         <Edit3 className="w-5 h-5" />
                                     </button>
                                 )}
-                                <button onClick={() => handleDelete(q.id)} className="p-2 rounded-xl border border-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500">
-                                    <Trash2 className="w-5 h-5" />
+                                <button
+                                    type="button"
+                                    onClick={() => handleDelete(q.id)}
+                                    disabled={deletingId !== null}
+                                    className="p-2 rounded-xl border border-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500 disabled:opacity-50 disabled:pointer-events-none"
+                                >
+                                    {deletingId === q.id ? (
+                                        <Spinner size="md" className="border-gray-300 border-t-red-600" />
+                                    ) : (
+                                        <Trash2 className="w-5 h-5" />
+                                    )}
                                 </button>
                             </div>
                         </div>

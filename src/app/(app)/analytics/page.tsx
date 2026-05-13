@@ -3,8 +3,11 @@ import AnalyticsClient from "./analytics-client";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "../../../../convex/_generated/api";
+import type { Doc, Id } from "../../../../convex/_generated/dataModel";
 
 export const dynamic = "force-dynamic";
+
+type AttemptWithPaper = Doc<"attempts"> & { paper: Doc<"quizzes"> | null };
 
 export default async function AnalyticsPage() {
     const token = await convexAuthNextjsToken();
@@ -25,8 +28,12 @@ export default async function AnalyticsPage() {
         );
     }
 
-    const attempts = await fetchQuery(api.attempts.getUserAttempts, { userId: me._id }, { token });
-    const subjectStats = await fetchQuery(api.attempts.getSubjectPerformance, { userId: me._id }, { token });
+    const [attemptsRaw, subjectStats] = await Promise.all([
+        fetchQuery(api.attempts.getUserAttempts, { userId: me._id as Id<"users"> }, { token }),
+        fetchQuery(api.attempts.getSubjectPerformance, { userId: me._id as Id<"users"> }, { token }),
+    ]);
+
+    const attempts = (attemptsRaw ?? []) as AttemptWithPaper[];
 
     const subjectData = (subjectStats ?? [])
         .map((s) => ({
@@ -40,25 +47,29 @@ export default async function AnalyticsPage() {
     const totalCorrect = subjectData.reduce((sum, s) => sum + s.correct, 0);
     const totalAnswered = subjectData.reduce((sum, s) => sum + s.total, 0);
 
-    const totalAttempts = (attempts ?? []).length;
+    const totalAttempts = attempts.length;
     const overallAccuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
     const totalIncorrect = Math.max(0, totalAnswered - totalCorrect);
     const avgTime = totalAttempts > 0
-        ? Math.round((attempts ?? []).reduce((s, a) => s + Number(a.timeTaken ?? 0), 0) / totalAttempts)
+        ? Math.round(attempts.reduce((s, a) => s + Number(a.timeTaken ?? 0), 0) / totalAttempts)
         : 0;
     const bestScore = totalAttempts > 0
-        ? Math.round(Math.max(...(attempts ?? []).map((a) => {
-            const total = Number((a as any)?.paper?.totalQuestions ?? 0);
+        ? Math.round(Math.max(...attempts.map((a) => {
+            const total = Number(a.paper?.totalQuestions ?? 0);
             return total > 0 ? (Number(a.score ?? 0) / total) * 100 : 0;
         })))
         : 0;
 
-    const scoreTrend = (attempts ?? []).map((a) => {
-        const total = Number((a as any)?.paper?.totalQuestions ?? 0);
+    const scoreTrend = attempts.map((a) => {
+        const total = Number(a.paper?.totalQuestions ?? 0);
+        const created = a.createdAt;
         return {
-            label: (a as any)?.paper?.title ?? "Quiz",
+            label: a.paper?.title ?? "Quiz",
             pct: total > 0 ? Math.round((Number(a.score ?? 0) / total) * 100) : 0,
-            date: new Date(a.createdAt ?? Date.now()).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+            date:
+                typeof created === "number" && created > 0
+                    ? new Date(created).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                    : "—",
             timeTaken: Number(a.timeTaken ?? 0),
         };
     });

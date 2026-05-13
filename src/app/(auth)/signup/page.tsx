@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { UserPlus, Eye, EyeOff, Loader2, AlertCircle, Mail, Lock, User, Sparkles } from "lucide-react";
+import { UserPlus, Eye, EyeOff, AlertCircle, Mail, Lock, User, Sparkles, Ticket } from "lucide-react";
 import { useAuthActions } from "@convex-dev/auth/react";
+import { LoadingButton } from "@/components/loading-button";
 
 export default function SignupPage() {
     const router = useRouter();
@@ -13,6 +14,7 @@ export default function SignupPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [promoCode, setPromoCode] = useState("");
     const searchParams = useSearchParams();
     const goElite = searchParams.get("goElite") === "true";
 
@@ -56,6 +58,27 @@ export default function SignupPage() {
                             const formData = new FormData(e.currentTarget);
                             formData.set("flow", "signUp");
                             await signIn("password", formData);
+
+                            const trimmedPromo = promoCode.trim();
+                            if (trimmedPromo) {
+                                const promoRes = await fetch("/api/auth/redeem-promo", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ promoCode: trimmedPromo.toUpperCase() }),
+                                });
+
+                                if (!promoRes.ok) {
+                                    const promoData = await promoRes.json();
+                                    const promoError = promoData?.error || "Invalid promo code.";
+                                    setError(promoError);
+                                    return;
+                                }
+
+                                router.push("/dashboard");
+                                router.refresh();
+                                return;
+                            }
+
                             router.push(goElite ? "/signup-payment" : "/dashboard");
                             router.refresh();
                         } catch (err) {
@@ -144,20 +167,40 @@ export default function SignupPage() {
                         </div>
                     </div>
 
-                    <button
+                    <div>
+                        <label
+                            htmlFor="promoCode"
+                            className="block text-sm font-semibold text-gray-700 mb-2 ml-1"
+                        >
+                            Promo Code <span className="text-xs font-normal text-gray-400">(optional)</span>
+                        </label>
+                        <div className="relative group">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-amber-500 transition-colors">
+                                <Ticket className="w-5 h-5" />
+                            </div>
+                            <input
+                                id="promoCode"
+                                name="promoCode"
+                                type="text"
+                                value={promoCode}
+                                onChange={(e) => setPromoCode(e.target.value)}
+                                placeholder="e.g. FIRST100"
+                                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:bg-white transition-all duration-200 uppercase"
+                            />
+                        </div>
+                        <p className="text-xs text-gray-400 mt-1 ml-1">Enter a free promo code to bypass payment and unlock Premium.</p>
+                    </div>
+
+                    <LoadingButton
                         type="submit"
-                        disabled={isPending}
+                        loading={isPending}
                         className="w-full flex items-center justify-center gap-3 px-6 py-3.5 bg-primary-600 text-white font-bold rounded-2xl hover:bg-primary-700 hover:shadow-lg hover:shadow-primary-600/20 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 mt-2"
                     >
-                        {isPending ? (
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                        ) : (
-                            <>
-                                <span>{goElite ? "Continue to Payment" : "Create Account"}</span>
-                                {goElite ? <Sparkles className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
-                            </>
-                        )}
-                    </button>
+                        <>
+                            <span>{goElite ? "Continue to Payment" : "Create Account"}</span>
+                            {goElite ? <Sparkles className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
+                        </>
+                    </LoadingButton>
                 </form>
 
                 <div className="mt-10 pt-8 border-t border-gray-100 text-center">

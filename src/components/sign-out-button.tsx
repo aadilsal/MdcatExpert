@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { useAuthActions } from "@convex-dev/auth/react";
+import { clearMeClientCache } from "@/lib/me-client-cache";
 
 export default function SignOutButton() {
     const router = useRouter();
@@ -14,6 +15,7 @@ export default function SignOutButton() {
         } catch (error) {
             console.error("Sign out error", error);
         }
+        clearMeClientCache();
         router.push("/login");
         router.refresh();
     };

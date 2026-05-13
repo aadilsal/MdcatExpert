@@ -267,7 +267,7 @@ export default function AnalyticsClient({
                                     />
                                     <Tooltip
                                         cursor={{ fill: "transparent" }}
-                                        formatter={(value: number | string) => [`${value}%`, "Accuracy"]}
+                                        formatter={(value) => [`${value ?? 0}%`, "Accuracy"]}
                                         contentStyle={{
                                             borderRadius: "12px",
                                             border: "none",
@@ -317,7 +317,7 @@ export default function AnalyticsClient({
                                         tickFormatter={(val) => `${Math.floor(val / 60)}m`}
                                     />
                                     <Tooltip
-                                        formatter={(value: number | string) => [formatTime(Number(value) || 0), "Time Spent"]}
+                                        formatter={(value) => [formatTime(Number(value ?? 0)), "Time Spent"]}
                                         contentStyle={{
                                             borderRadius: "12px",
                                             border: "none",
