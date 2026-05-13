@@ -13,6 +13,15 @@ const nextConfig = {
       sizeLimit: "50mb",
     },
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+        pathname: "/**",
+      },
+    ],
+  },
 } as unknown as NextConfig;
 
 export default nextConfig;
