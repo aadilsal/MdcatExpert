@@ -1,14 +1,5 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { getAuthUserId } from "@convex-dev/auth/server";
-
-const subject = v.union(
-  v.literal("Biology"),
-  v.literal("Chemistry"),
-  v.literal("Physics"),
-  v.literal("English"),
-  v.literal("General"),
-);
 
 export const getStagingQuestions = query({
   args: { batchId: v.string() },
@@ -28,122 +19,80 @@ export const createStagingQuestion = mutation({
     optionB: v.string(),
     optionC: v.string(),
     optionD: v.string(),
-    correctOption: v.union(v.literal("A"), v.literal("B"), v.literal("C"), v.literal("D")),
-    subject,
+    correctOption: v.string(),
+    subject: v.string(),
     explanation: v.optional(v.string()),
     year: v.optional(v.number()),
     imageUrl: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
-    const me = await getAuthUserId(ctx);
-    if (!me) throw new Error("Unauthorized");
-    const meDoc = await ctx.db.get(me);
-    if (!meDoc || meDoc.role !== "admin") throw new Error("Forbidden");
-
+  handler: async (ctx, { batchId, questionText, optionA, optionB, optionC, optionD, correctOption, subject, explanation, year, imageUrl }) => {
     return await ctx.db.insert("stagingQuestions", {
-      ...args,
+      batchId,
+      questionText,
+      optionA,
+      optionB,
+      optionC,
+      optionD,
+      correctOption: correctOption as "A" | "B" | "C" | "D",
+      subject: subject as any,
+      explanation,
+      year,
+      imageUrl,
       status: "pending",
       createdAt: Date.now(),
     });
   },
 });
 
-export const updateStagingQuestion = mutation({
+export const approveStagingQuestion = mutation({
   args: {
     stagingQuestionId: v.id("stagingQuestions"),
-    patch: v.object({
-      questionText: v.optional(v.string()),
-      optionA: v.optional(v.string()),
-      optionB: v.optional(v.string()),
-      optionC: v.optional(v.string()),
-      optionD: v.optional(v.string()),
-      correctOption: v.optional(
-        v.union(v.literal("A"), v.literal("B"), v.literal("C"), v.literal("D")),
-      ),
-      subject: v.optional(subject),
-      explanation: v.optional(v.string()),
-      year: v.optional(v.number()),
-      imageUrl: v.optional(v.string()),
-      status: v.optional(v.union(v.literal("pending"), v.literal("approved"), v.literal("rejected"))),
-    }),
+    quizId: v.id("quizzes"),
   },
-  handler: async (ctx, { stagingQuestionId, patch }) => {
-    const me = await getAuthUserId(ctx);
-    if (!me) throw new Error("Unauthorized");
-    const meDoc = await ctx.db.get(me);
-    if (!meDoc || meDoc.role !== "admin") throw new Error("Forbidden");
-    return await ctx.db.patch(stagingQuestionId, patch);
-  },
-});
+  handler: async (ctx, { stagingQuestionId, quizId }) => {
+    const staging = await ctx.db.get(stagingQuestionId);
+    if (!staging) throw new Error("Staging question not found");
 
-export const deleteStagingQuestion = mutation({
-  args: { stagingQuestionId: v.id("stagingQuestions") },
-  handler: async (ctx, { stagingQuestionId }) => {
-    const me = await getAuthUserId(ctx);
-    if (!me) throw new Error("Unauthorized");
-    const meDoc = await ctx.db.get(me);
-    if (!meDoc || meDoc.role !== "admin") throw new Error("Forbidden");
-    await ctx.db.delete(stagingQuestionId);
-    return true;
-  },
-});
-
-export const publishBatch = mutation({
-  args: {
-    batchId: v.string(),
-    title: v.string(),
-    year: v.number(),
-    subject,
-    isPremium: v.boolean(),
-  },
-  handler: async (ctx, { batchId, title, year, subject: subj, isPremium }) => {
-    const me = await getAuthUserId(ctx);
-    if (!me) throw new Error("Unauthorized");
-    const meDoc = await ctx.db.get(me);
-    if (!meDoc || meDoc.role !== "admin") throw new Error("Forbidden");
-
-    const staged = await ctx.db
-      .query("stagingQuestions")
-      .withIndex("by_batchId", (q) => q.eq("batchId", batchId))
-      .collect();
-    const publishable = staged.filter((s) => s.status !== "rejected");
-    if (publishable.length === 0) throw new Error("No questions to publish");
-
-    const quizId = await ctx.db.insert("quizzes", {
-      title,
-      year,
-      subject: subj,
-      totalQuestions: publishable.length,
-      isPremium,
-      createdBy: me,
+    // Create the actual question
+    const questionId = await ctx.db.insert("questions", {
+      quizId,
+      questionText: staging.questionText,
+      optionA: staging.optionA,
+      optionB: staging.optionB,
+      optionC: staging.optionC,
+      optionD: staging.optionD,
+      correctOption: staging.correctOption,
+      subject: staging.subject,
+      explanation: staging.explanation,
+      imageUrl: staging.imageUrl,
       createdAt: Date.now(),
     });
 
-    let order = 1;
-    for (const s of publishable) {
-      const questionId = await ctx.db.insert("questions", {
-        quizId,
-        questionText: s.questionText,
-        optionA: s.optionA,
-        optionB: s.optionB,
-        optionC: s.optionC,
-        optionD: s.optionD,
-        correctOption: s.correctOption,
-        subject: s.subject,
-        explanation: s.explanation,
-        imageUrl: s.imageUrl,
-        createdAt: Date.now(),
-      });
-      await ctx.db.insert("quizQuestions", {
-        quizId,
-        questionId,
-        order,
-        createdAt: Date.now(),
-      });
-      order += 1;
-      await ctx.db.patch(s._id, { status: "approved" });
-    }
+    // Update staging status
+    await ctx.db.patch(stagingQuestionId, { status: "approved" });
 
-    return { quizId, published: publishable.length };
+    return questionId;
+  },
+});
+
+export const rejectStagingQuestion = mutation({
+  args: {
+    stagingQuestionId: v.id("stagingQuestions"),
+    reviewReason: v.string(),
+  },
+  handler: async (ctx, { stagingQuestionId, reviewReason }) => {
+    return await ctx.db.patch(stagingQuestionId, {
+      status: "rejected",
+      reviewReason,
+    });
+  },
+});
+
+export const getPendingStagingQuestions = query({
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("stagingQuestions")
+      .withIndex("by_status", (q) => q.eq("status", "pending"))
+      .collect();
   },
 });

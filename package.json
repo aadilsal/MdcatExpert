@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "convex:dev": "npx convex dev"
+    "typecheck": "tsc --noEmit",
+    "convex:dev": "npx convex dev",
+    "convex:seed-promos": "npx convex run seed:seedTestPromoCodes"
   },
   "dependencies": {
     "@auth/core": "0.37.0",

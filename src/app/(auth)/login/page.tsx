@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogIn, Eye, EyeOff, Loader2, AlertCircle, Mail, Lock } from "lucide-react";
+import { LogIn, Eye, EyeOff, AlertCircle, Mail, Lock } from "lucide-react";
 import { useAuthActions } from "@convex-dev/auth/react";
+import { LoadingButton } from "@/components/loading-button";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -113,20 +114,16 @@ export default function LoginPage() {
                         </div>
                     </div>
 
-                    <button
+                    <LoadingButton
                         type="submit"
-                        disabled={isPending}
+                        loading={isPending}
                         className="w-full flex items-center justify-center gap-3 px-6 py-3.5 bg-primary-600 text-white font-bold rounded-2xl hover:bg-primary-700 hover:shadow-lg hover:shadow-primary-600/20 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200"
                     >
-                        {isPending ? (
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                        ) : (
-                            <>
-                                <span>Sign In</span>
-                                <LogIn className="w-5 h-5" />
-                            </>
-                        )}
-                    </button>
+                        <>
+                            <span>Sign In</span>
+                            <LogIn className="w-5 h-5" />
+                        </>
+                    </LoadingButton>
                 </form>
 
                 <div className="mt-10 pt-8 border-t border-gray-100 text-center">

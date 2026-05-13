@@ -2,10 +2,7 @@ import Link from "next/link";
 import {
     Upload,
     FileText,
-    Calendar,
     Hash,
-    Clock,
-    Trash2,
     Eye,
     BarChart3,
     TrendingUp,
@@ -30,7 +27,7 @@ export default async function AdminQuizzesPage() {
         return <div className="p-10 text-center text-gray-500">Forbidden</div>;
     }
 
-    const quizzesList = await fetchQuery(api.quizzes.getQuizzes, { subject: undefined }, { token });
+    const quizzesList = (await fetchQuery(api.quizzes.getQuizzes, {}, { token })) ?? [];
     const totalQuestions = (quizzesList ?? []).reduce((s, q) => s + Number(q.totalQuestions ?? 0), 0);
     const users = await fetchQuery(api.users.listUsers, {}, { token });
     const totalStudents = (users ?? []).filter((u) => (u.role ?? "student") === "student").length;
@@ -121,12 +118,6 @@ export default async function AdminQuizzesPage() {
                     Uploaded Quizzes
                 </h2>
 
-                {error && (
-                    <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm mb-4">
-                        Failed to load quizzes: {error.message}
-                    </div>
-                )}
-
                 {quizzesList.length === 0 ? (
                     <div className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden">
                         <div className="p-14 text-center">
@@ -152,7 +143,7 @@ export default async function AdminQuizzesPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {quizzesList.map((quiz) => (
                             <div
-                                key={quiz.id}
+                                key={quiz._id}
                                 className="bg-white rounded-xl border border-gray-100 p-5 shadow-card hover:shadow-card-hover transition-all duration-300 group"
                             >
                                 <div className="flex items-start justify-between mb-4">
@@ -175,9 +166,9 @@ export default async function AdminQuizzesPage() {
                                     </span>
                                     <span className="flex items-center gap-1.5">
                                         <Hash className="w-3.5 h-3.5" />
-                                        {quiz.total_questions} questions
+                                        {quiz.totalQuestions} questions
                                     </span>
-                                    {quiz.is_premium && (
+                                    {quiz.isPremium && (
                                         <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-bold uppercase">
                                             Premium
                                         </span>
@@ -186,13 +177,13 @@ export default async function AdminQuizzesPage() {
 
                                 <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
                                     <Link
-                                        href={`/admin/quizzes/${quiz.id}`}
+                                        href={`/admin/quizzes/${quiz._id}`}
                                         className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors"
                                     >
                                         <Eye className="w-4 h-4" />
                                         Preview
                                     </Link>
-                                    <DeleteQuizButton quizId={quiz.id} quizTitle={quiz.title} />
+                                    <DeleteQuizButton quizId={String(quiz._id)} quizTitle={quiz.title} />
                                 </div>
                             </div>
                         ))}

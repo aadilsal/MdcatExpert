@@ -16,6 +16,7 @@ import type * as http from "../http.js";
 import type * as notifications from "../notifications.js";
 import type * as payments from "../payments.js";
 import type * as quizzes from "../quizzes.js";
+import type * as seed from "../seed.js";
 import type * as staging from "../staging.js";
 import type * as users from "../users.js";
 
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   notifications: typeof notifications;
   payments: typeof payments;
   quizzes: typeof quizzes;
+  seed: typeof seed;
   staging: typeof staging;
   users: typeof users;
 }>;

@@ -59,10 +59,10 @@ export default async function AdminQuizDetailPage({
                     <div className="flex items-center gap-4 mt-3 text-primary-100 text-sm">
                         <span>Year: {quiz.year}</span>
                         <span>•</span>
-                        <span>{quiz.total_questions} questions</span>
+                        <span>{quiz.totalQuestions} questions</span>
                         <span>•</span>
                         <span>
-                            Uploaded {new Date(quiz.created_at).toLocaleDateString()}
+                            Uploaded {new Date(quiz.createdAt).toLocaleDateString()}
                         </span>
                     </div>
                 </div>
@@ -90,9 +90,16 @@ export default async function AdminQuizDetailPage({
                     All Questions ({questionsList.length})
                 </h2>
                 <div className="space-y-4">
-                    {questionsList.map((question, idx) => (
+                    {questionsList.map((question, idx) => {
+                        const optionMap = {
+                            A: question.optionA,
+                            B: question.optionB,
+                            C: question.optionC,
+                            D: question.optionD,
+                        } as const;
+                        return (
                         <div
-                            key={question.id}
+                            key={question._id}
                             className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden"
                         >
                             <div className="px-5 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
@@ -101,14 +108,14 @@ export default async function AdminQuizDetailPage({
                                         {idx + 1}
                                     </span>
                                     <span
-                                        className={`px-2.5 py-0.5 rounded-md text-xs font-medium ${subjectColors[question.subject] ||
+                                        className={`px-2.5 py-0.5 rounded-md text-xs font-medium ${subjectColors[question.subject ?? "General"] ||
                                             "bg-gray-100 text-gray-700"
                                             }`}
                                     >
                                         {question.subject}
                                     </span>
                                 </div>
-                                {question.image_url && (
+                                {question.imageUrl && (
                                     <span className="text-xs text-gray-400 flex items-center gap-1">
                                         <FileText className="w-3 h-3" />
                                         Has image
@@ -117,13 +124,13 @@ export default async function AdminQuizDetailPage({
                             </div>
                             <div className="p-5">
                                 <p className="text-gray-900 font-medium mb-4">
-                                    {question.question_text}
+                                    {question.questionText}
                                 </p>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                     {(["A", "B", "C", "D"] as const).map(
                                         (label) => {
-                                            const isCorrect = question.correct_option === label;
-                                            const optionText = question[`option_${label.toLowerCase()}` as keyof typeof question];
+                                            const isCorrect = question.correctOption === label;
+                                            const optionText = optionMap[label];
                                             return (
                                                 <div
                                                     key={label}
@@ -151,7 +158,8 @@ export default async function AdminQuizDetailPage({
                                 </div>
                             </div>
                         </div>
-                    ))}
+                    );
+                    })}
                 </div>
             </div>
         </div>

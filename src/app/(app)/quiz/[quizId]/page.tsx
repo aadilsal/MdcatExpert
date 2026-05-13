@@ -68,17 +68,25 @@ export default function QuizPage({
             if (quizData) setQuiz(quizData);
             if (Array.isArray(questionsData)) setQuestions(questionsData);
 
-            // Preload images
-            questionsData.forEach((q: Question) => {
-                if (q.image_url) {
-                    const img = new window.Image();
-                    img.src = q.image_url;
-                }
-            });
             setLoading(false);
         };
         fetchData();
     }, [quizId, router]);
+
+    // Preload images for current and adjacent questions only (saves bandwidth on long papers)
+    useEffect(() => {
+        if (loading || questions.length === 0) return;
+        const indices = [currentIndex - 1, currentIndex, currentIndex + 1].filter(
+            (i) => i >= 0 && i < questions.length,
+        );
+        for (const i of indices) {
+            const url = questions[i]?.image_url;
+            if (url) {
+                const img = new window.Image();
+                img.src = url;
+            }
+        }
+    }, [questions, currentIndex, loading]);
 
     // Timer
     useEffect(() => {

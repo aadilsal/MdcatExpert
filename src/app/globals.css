@@ -42,6 +42,7 @@
   --animate-float: float 6s ease-in-out infinite;
   --animate-shake: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
   --animate-glow: glow 2s ease-in-out infinite alternate;
+  --animate-nav-progress-bar: nav-progress-bar 1.05s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 @keyframes float {
@@ -121,6 +122,16 @@
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes nav-progress-bar {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(320%);
   }
 }
 

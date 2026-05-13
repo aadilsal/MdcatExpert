@@ -15,8 +15,10 @@ import {
     X,
     Shield,
     ChevronRight,
+    Ticket,
 } from "lucide-react";
 import UserDropdown from "./user-dropdown";
+import { fetchMeCached } from "@/lib/me-client-cache";
 
 const studentNav = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -28,6 +30,7 @@ const adminNav = [
     { href: "/admin/quizzes", label: "Manage Quizzes", icon: FileText },
     { href: "/admin/upload", label: "Upload Quiz", icon: Upload },
     { href: "/admin/students", label: "Students", icon: Users },
+    { href: "/admin/discounts", label: "Discount Codes", icon: Ticket },
 ];
 
 export default function AppLayout({
@@ -42,19 +45,11 @@ export default function AppLayout({
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch("/api/auth/me");
-                if (!response.ok) {
+                const row = await fetchMeCached();
+                if (!row) {
                     return;
                 }
-                const payload = await response.json();
-                if (!payload?.user) {
-                    return;
-                }
-                setUserData({
-                    name: payload.user.name || "Student",
-                    email: payload.user.email || "",
-                    role: payload.user.role || "student",
-                });
+                setUserData(row);
             } catch (error) {
                 console.error("Failed to load user profile", error);
             }

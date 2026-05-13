@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
-import NavigationLoadingOverlay from "@/components/navigation-loading-overlay";
+import NavigationProgress from "@/components/navigation-progress";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,7 +25,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} font-sans antialiased`}>
         <ConvexAuthNextjsServerProvider>
-          <NavigationLoadingOverlay />
+          <NavigationProgress />
           {children}
         </ConvexAuthNextjsServerProvider>
       </body>

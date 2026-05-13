@@ -18,6 +18,8 @@ export default defineSchema({
     subscriptionType: v.optional(v.union(v.literal("free"), v.literal("premium"))),
     premiumUntil: v.optional(v.number()),
     emailNotificationsEnabled: v.optional(v.boolean()),
+    promoCode: v.optional(v.string()),
+    promoSource: v.optional(v.string()),
     createdAt: v.optional(v.number()),
     lastLoginAt: v.optional(v.number()),
     isActive: v.optional(v.boolean()),
@@ -167,4 +169,16 @@ export default defineSchema({
   })
     .index("by_userId", ["userId"])
     .index("by_fileType", ["fileType"]),
+
+  promoCodes: defineTable({
+    code: v.string(),
+    description: v.optional(v.string()),
+    maxUses: v.number(),
+    usedCount: v.number(),
+    isActive: v.boolean(),
+    createdBy: v.id("users"),
+    createdAt: v.number(),
+  })
+    .index("by_code", ["code"])
+    .index("by_isActive", ["isActive"]),
 });

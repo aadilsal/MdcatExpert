@@ -3,14 +3,17 @@ import { DataModel } from "./_generated/dataModel";
 
 export default Password<DataModel>({
   profile(params) {
-    const email = params.email as string | undefined;
-    const name = (params.name as string | undefined) ?? undefined;
+    const email = String(params.email ?? "").trim();
+    if (!email) {
+      throw new Error("Email is required.");
+    }
+    const name = String(params.name ?? "").trim() || undefined;
 
     return {
       email,
       name,
-      role: "student",
-      subscriptionType: "free",
+      role: "student" as const,
+      subscriptionType: "free" as const,
       createdAt: Date.now(),
       isActive: true,
     };

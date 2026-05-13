@@ -16,6 +16,7 @@ export function DeleteQuizButton({
     const [showConfirm, setShowConfirm] = useState(false);
 
     const handleDelete = async () => {
+        if (deleting) return;
         setDeleting(true);
         try {
             const res = await fetch(`/api/quizzes/${quizId}`, { method: "DELETE" });
@@ -38,11 +39,7 @@ export function DeleteQuizButton({
                     disabled={deleting}
                     className="flex items-center gap-1 px-3 py-2 rounded-lg bg-red-500 text-white text-xs font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
                 >
-                    {deleting ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                        "Confirm"
-                    )}
+                    {deleting ? <Loader2 className="w-3.5 h-3.5 animate-spin text-white" /> : "Confirm"}
                 </button>
                 <button
                     onClick={() => setShowConfirm(false)}

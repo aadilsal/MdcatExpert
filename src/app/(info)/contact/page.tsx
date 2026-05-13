@@ -1,12 +1,13 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import { motion } from "framer-motion";
-import { Mail, MessageCircle, Send, Globe, Sparkles, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { Mail, MessageCircle, Send, Globe, Sparkles, CheckCircle, AlertCircle } from "lucide-react";
 import { sendContactEmail } from "./actions";
+import { FormSubmitButton } from "@/components/form-submit-button";
 
 export default function ContactPage() {
-    const [state, action, isPending] = useActionState(sendContactEmail, null);
+    const [state, action] = useActionState(sendContactEmail, null);
 
     if (state?.success) {
         return (
@@ -135,20 +136,10 @@ export default function ContactPage() {
                             <textarea name="message" rows={4} placeholder="How can we help?" className={`w-full px-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:ring-4 focus:ring-primary-100 focus:bg-white focus:border-primary-500 transition-all text-sm font-medium resize-none ${state?.fieldErrors?.message ? "border-red-300 ring-red-50" : ""}`}></textarea>
                             {state?.fieldErrors?.message && <p className="text-xs font-bold text-red-500 ml-1">{state.fieldErrors.message[0]}</p>}
                         </div>
-                        <button
-                            type="submit"
-                            disabled={isPending}
-                            className="w-full flex items-center justify-center gap-3 px-8 py-5 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition-all shadow-xl shadow-primary-600/30 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
-                        >
-                            {isPending ? (
-                                <Loader2 className="w-6 h-6 animate-spin" />
-                            ) : (
-                                <>
-                                    <span>Send Message</span>
-                                    <Send className="w-5 h-5" />
-                                </>
-                            )}
-                        </button>
+                        <FormSubmitButton className="w-full flex items-center justify-center gap-3 px-8 py-5 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition-all shadow-xl shadow-primary-600/30 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed">
+                            <span>Send Message</span>
+                            <Send className="w-5 h-5" />
+                        </FormSubmitButton>
                     </form>
                 </motion.div>
             </div>

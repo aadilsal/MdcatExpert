@@ -31,7 +31,7 @@ export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
     return nextjsMiddlewareRedirect(request, "/login");
   }
 
-  // Admin gating (role check will be enforced in page loaders too).
+  // Admin routes: role is enforced on each admin page (Convex). Authenticated non-admins get 403 there.
   if (isAdminRoute(request) && !authed) {
     return nextjsMiddlewareRedirect(request, "/login");
   }

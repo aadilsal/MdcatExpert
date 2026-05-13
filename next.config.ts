@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig = {
   reactCompiler: true,
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   serverActions: {
     bodySizeLimit: "20mb",
