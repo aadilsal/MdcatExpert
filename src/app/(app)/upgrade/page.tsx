@@ -249,8 +249,8 @@ function UpgradePageContent() {
                                     <p className="text-sm font-bold text-gray-700 italic">Please send <span className="text-primary-600">Rs. 2500</span> to:</p>
                                     <div className="p-4 bg-white rounded-xl border border-primary-200">
                                         <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">JazzCash / EasyPaisa</p>
-                                        <p className="text-lg font-black text-gray-900 tracking-tight">0300 0000000</p>
-                                        <p className="text-[9px] font-bold text-gray-400 mt-1 uppercase">Account Title: MDCAT EXPERT ADMIN</p>
+                                        <p className="text-lg font-black text-gray-900 tracking-tight">03035116528</p>
+                                        <p className="text-[9px] font-bold text-gray-400 mt-1 uppercase">Account Title: Adil Salman Butt</p>
                                     </div>
                                 </div>
                             </div>
