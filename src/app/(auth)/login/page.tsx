@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { LogIn, Eye, EyeOff, AlertCircle, Mail, Lock } from "lucide-react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { LoadingButton } from "@/components/loading-button";
+import { formatUserError } from "@/lib/format-user-error";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -51,7 +52,7 @@ export default function LoginPage() {
                             router.push("/dashboard");
                             router.refresh();
                         } catch (err) {
-                            setError(err instanceof Error ? err.message : "Sign in failed.");
+                            setError(formatUserError(err, "Sign in failed. Please check your email and password."));
                         } finally {
                             setIsPending(false);
                         }

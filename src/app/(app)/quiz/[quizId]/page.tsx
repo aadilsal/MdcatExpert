@@ -19,7 +19,7 @@ import {
     Grid3X3,
 } from "lucide-react";
 import { submitQuizAction } from "../actions";
-
+import { formatUserError } from "@/lib/format-user-error";
 import { Quiz, Question } from "@/lib/types";
 
 export default function QuizPage({
@@ -170,6 +170,7 @@ export default function QuizPage({
             }
         } catch (err: unknown) {
             console.error("Submit error:", err);
+            alert(formatUserError(err, "Failed to submit quiz. Please try again."));
         } finally {
             setSubmitting(false);
             setShowConfirm(false);

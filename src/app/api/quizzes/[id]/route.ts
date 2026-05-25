@@ -3,6 +3,7 @@ import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
+import { formatUserError } from "@/lib/format-user-error";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -51,8 +52,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ quiz: mappedQuiz, questions: mappedQuestions });
   } catch (error) {
     console.error("Quiz GET error", error);
-    const message = error instanceof Error ? error.message : "Unable to load quiz.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: formatUserError(error, "Unable to load quiz.") },
+      { status: 500 },
+    );
   }
 }
 
@@ -69,7 +72,9 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Quiz DELETE error", error);
-    const message = error instanceof Error ? error.message : "Unable to delete quiz.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: formatUserError(error, "Unable to delete quiz.") },
+      { status: 500 },
+    );
   }
 }

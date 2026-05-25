@@ -3,6 +3,7 @@ import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../convex/_generated/api";
 import { sendEmailNotification } from "@/lib/resend";
+import { formatUserError } from "@/lib/format-user-error";
 
 export async function POST(request: Request) {
   try {
@@ -57,7 +58,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Payment submit error", error);
-    const message = error instanceof Error ? error.message : "Unable to submit payment.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: formatUserError(error, "Unable to submit payment. Please try again.") },
+      { status: 500 },
+    );
   }
 }

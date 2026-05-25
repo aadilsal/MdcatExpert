@@ -3,6 +3,7 @@ import * as XLSX from "xlsx";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../convex/_generated/api";
+import { formatUserError } from "@/lib/format-user-error";
 
 const VALID_SUBJECTS = ["Biology", "Chemistry", "Physics", "English", "General"] as const;
 
@@ -159,6 +160,7 @@ export async function POST(request: Request) {
         return NextResponse.json({
             success: true,
             batchId,
+            batch_id: batchId,
             total_parsed: questions.length,
             total_inserted: questions.length,
             skipped_rows: skippedRows,
@@ -167,8 +169,8 @@ export async function POST(request: Request) {
     } catch (error) {
         console.error("Upload error:", error);
         return NextResponse.json(
-            { error: "An unexpected error occurred while processing the file." },
-            { status: 500 }
+            { error: formatUserError(error, "An unexpected error occurred while processing the file.") },
+            { status: 500 },
         );
     }
 }

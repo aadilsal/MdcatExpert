@@ -1,6 +1,8 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 
+import { formatUserError } from "@/lib/format-user-error";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -111,7 +113,7 @@ function SignupPaymentContent() {
             setSubmitted(true);
         } catch (error) {
             console.error("Payment submission failed:", error);
-            setError(error instanceof Error ? error.message : "Failed to submit payment. Please try again.");
+            setError(formatUserError(error, "Failed to submit payment. Please try again."));
         } finally {
             setUploading(false);
         }

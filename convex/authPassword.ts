@@ -1,11 +1,15 @@
 import { Password } from "@convex-dev/auth/providers/Password";
+import { ConvexError } from "convex/values";
+import { Scrypt } from "lucia";
 import { DataModel } from "./_generated/dataModel";
+
+const scrypt = new Scrypt();
 
 export default Password<DataModel>({
   profile(params) {
     const email = String(params.email ?? "").trim();
     if (!email) {
-      throw new Error("Email is required.");
+      throw new ConvexError("Please enter your email address.");
     }
     const name = String(params.name ?? "").trim() || undefined;
 
@@ -18,5 +22,21 @@ export default Password<DataModel>({
       isActive: true,
     };
   },
+  validatePasswordRequirements(password: string) {
+    if (!password || password.length < 6) {
+      throw new ConvexError("Password must be at least 6 characters.");
+    }
+  },
+  crypto: {
+    async hashSecret(password: string) {
+      return await scrypt.hash(password);
+    },
+    async verifySecret(password: string, hash: string) {
+      const valid = await scrypt.verify(hash, password);
+      if (!valid) {
+        throw new ConvexError("Incorrect email or password.");
+      }
+      return valid;
+    },
+  },
 });
-

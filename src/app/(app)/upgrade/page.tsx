@@ -2,6 +2,7 @@
 
 import { useState, type SVGProps, Suspense } from "react";
 import Swal from "sweetalert2";
+import { formatUserError } from "@/lib/format-user-error";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -102,7 +103,7 @@ function UpgradePageContent() {
             await Swal.fire({
                 icon: "error",
                 title: "Submission failed",
-                text: "Failed to submit payment. Please try again or contact support.",
+                text: formatUserError(error, "Failed to submit payment. Please try again or contact support."),
             });
         } finally {
             setUploading(false);

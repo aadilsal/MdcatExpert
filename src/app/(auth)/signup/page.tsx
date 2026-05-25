@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { UserPlus, Eye, EyeOff, AlertCircle, Mail, Lock, User, Sparkles, Ticket } from "lucide-react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { LoadingButton } from "@/components/loading-button";
+import { formatUserError } from "@/lib/format-user-error";
 
 export default function SignupPage() {
     const router = useRouter();
@@ -69,8 +70,12 @@ export default function SignupPage() {
 
                                 if (!promoRes.ok) {
                                     const promoData = await promoRes.json();
-                                    const promoError = promoData?.error || "Invalid promo code.";
-                                    setError(promoError);
+                                    setError(
+                                        formatUserError(
+                                            promoData?.error ?? "Invalid promo code.",
+                                            "Invalid promo code.",
+                                        ),
+                                    );
                                     return;
                                 }
 
@@ -82,7 +87,7 @@ export default function SignupPage() {
                             router.push(goElite ? "/signup-payment" : "/dashboard");
                             router.refresh();
                         } catch (err) {
-                            setError(err instanceof Error ? err.message : "Signup failed.");
+                            setError(formatUserError(err, "Signup failed. Please try again."));
                         } finally {
                             setIsPending(false);
                         }

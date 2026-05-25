@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Spinner } from "@/components/spinner";
+import { formatUserError } from "@/lib/format-user-error";
 
 interface StagingQuestion {
     id: string;
@@ -140,7 +141,7 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
 
         } catch (error) {
             console.error("Failed to upload image:", error);
-            alert(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            alert(formatUserError(error, "Failed to upload image. Please try again."));
         } finally {
             setUploadingImageId(null);
         }
@@ -160,10 +161,12 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
                     isPremium: false,
                 }),
             });
-            if (!res.ok) throw new Error("Failed to publish batch. Ensure at least one question exists.");
+            const json = await res.json();
+            if (!res.ok) throw new Error(json?.error || "Failed to publish batch.");
             router.push("/admin/quizzes");
         } catch (error) {
             console.error("Publishing error:", error);
+            alert(formatUserError(error, "Failed to publish. Ensure at least one question is not rejected."));
         } finally {
             setPublishing(false);
         }

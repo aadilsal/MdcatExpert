@@ -3,6 +3,7 @@ import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../../convex/_generated/api";
 import type { Id } from "../../../../convex/_generated/dataModel";
+import { formatUserError } from "@/lib/format-user-error";
 
 export async function POST(request: Request) {
   try {
@@ -47,7 +48,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ publicUrl: saved.url, storageId: saved.storageId, fileId: saved.fileId });
   } catch (error) {
     console.error("Image upload API error:", error);
-    const message = error instanceof Error ? error.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: formatUserError(error, "Image upload failed. Please try again.") },
+      { status: 500 },
+    );
   }
 }

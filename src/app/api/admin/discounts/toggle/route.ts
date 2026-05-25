@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchMutation } from "convex/nextjs";
 import { api } from "../../../../../../convex/_generated/api";
+import { formatUserError } from "@/lib/format-user-error";
 
 export async function POST(request: Request) {
   try {
@@ -26,7 +27,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Failed to toggle promo code", error);
-    const message = error instanceof Error ? error.message : "Failed to toggle promo code";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: formatUserError(error, "Failed to update promo code.") },
+      { status: 500 },
+    );
   }
 }

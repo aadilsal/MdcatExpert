@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../convex/_generated/api";
+import { formatUserError } from "@/lib/format-user-error";
 
 export async function GET() {
   try {
@@ -15,7 +16,9 @@ export async function GET() {
     return NextResponse.json({ promoCodes });
   } catch (error) {
     console.error("Failed to load promo codes", error);
-    const message = error instanceof Error ? error.message : "Failed to load promo codes";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: formatUserError(error, "Failed to load promo codes.") },
+      { status: 500 },
+    );
   }
 }

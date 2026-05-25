@@ -16,6 +16,7 @@ import {
     Layers,
     Database,
 } from "lucide-react";
+import { formatUserError } from "@/lib/format-user-error";
 
 export default function AdminUploadPage() {
     const router = useRouter();
@@ -94,7 +95,8 @@ export default function AdminUploadPage() {
             formData.append("title", title.trim());
             formData.append("year", yearNumber.toString());
 
-            const endpoint = uploadMode === 'pdf' ? "/api/py/upload-pdf" : "/api/py/upload";
+            const endpoint =
+                uploadMode === "pdf" ? "/api/quizzes/upload-pdf" : "/api/quizzes/upload";
             const res = await fetch(endpoint, {
                 method: "POST",
                 body: formData,
@@ -111,7 +113,10 @@ export default function AdminUploadPage() {
 
                 // Redirect to review page after a short delay
                 setTimeout(() => {
-                    router.push(`/admin/upload/review/${data.batch_id}?title=${encodeURIComponent(title)}&year=${year}`);
+                    const batchId = data.batchId ?? data.batch_id;
+                    router.push(
+                        `/admin/upload/review/${batchId}?title=${encodeURIComponent(title)}&year=${year}`,
+                    );
                 }, 2000);
 
                 setFile(null);
@@ -124,7 +129,7 @@ export default function AdminUploadPage() {
                     data?.detail ||
                     (res.status === 413 ? "Upload too large (body size limit exceeded)." : `${res.status} ${res.statusText}`) ||
                     "Upload failed."
-                setResult({ success: false, error: message });
+                setResult({ success: false, error: formatUserError(message, "Upload failed. Please try again.") });
             }
         } catch {
             setResult({
