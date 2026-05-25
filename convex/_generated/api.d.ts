@@ -13,6 +13,8 @@ import type * as auth from "../auth.js";
 import type * as authPassword from "../authPassword.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
+import type * as lib_auth from "../lib/auth.js";
+import type * as lib_userErrors from "../lib/userErrors.js";
 import type * as notifications from "../notifications.js";
 import type * as payments from "../payments.js";
 import type * as quizzes from "../quizzes.js";
@@ -32,6 +34,8 @@ declare const fullApi: ApiFromModules<{
   authPassword: typeof authPassword;
   files: typeof files;
   http: typeof http;
+  "lib/auth": typeof lib_auth;
+  "lib/userErrors": typeof lib_userErrors;
   notifications: typeof notifications;
   payments: typeof payments;
   quizzes: typeof quizzes;

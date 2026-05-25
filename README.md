@@ -92,7 +92,7 @@ After signing up, set `role` to `admin` for your user in the [Convex dashboard](
 
 ## Admin Excel upload format
 
-Upload at **Admin → Upload** (`.xlsx` / `.xls`). **Release year** is required in the form. **Archive title** is optional; if omitted, it is resolved from (in order):
+Upload at **Admin → Upload** (`.xlsx` / `.xls`). **All worksheets** with the correct layout are imported (e.g. Physics, Chemistry, Biology, English tabs in one file). **Release year** is required in the form. **Archive title** is optional; if omitted, it is resolved from (in order):
 
 1. Form field  
 2. `Title` column in the sheet (first non-empty row)  
@@ -105,8 +105,8 @@ Upload at **Admin → Upload** (`.xlsx` / `.xls`). **Release year** is required 
 | ------ | ----------- |
 | `Question` | Question text |
 | `A`–`D` | Four options |
-| `Correct` | `A`, `B`, `C`, or `D` |
-| `Subject` | `Biology`, `Chemistry`, `Physics`, `English`, or `General` |
+| `Correct` | `A`, `B`, `C`, or `D` — also accepts `C)`, `C) playing`, or the option text (e.g. `playing`) |
+| `Subject` | `Biology`, `Chemistry`, `Physics`, `English`, or `General` (optional if the **sheet tab** is named after a subject) |
 
 ### Optional columns
 
