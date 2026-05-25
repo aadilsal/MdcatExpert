@@ -21,6 +21,31 @@ function isValidSubject(s: string): s is ValidSubject {
     return (VALID_SUBJECTS as readonly string[]).includes(s);
 }
 
+function titleFromFileName(fileName: string): string {
+    const base = fileName.replace(/\.[^.]+$/, "").trim();
+    return base.replace(/[_-]+/g, " ").trim() || "Imported Quiz";
+}
+
+function resolveArchiveTitle(
+    formTitle: string | null,
+    fileName: string,
+    sheetName: string,
+    rows: Record<string, string>[],
+): string {
+    const fromForm = (formTitle ?? "").trim();
+    if (fromForm) return fromForm;
+
+    for (const row of rows) {
+        const fromColumn = row["Title"]?.toString().trim();
+        if (fromColumn && fromColumn !== "nan") return fromColumn;
+    }
+
+    const fromSheet = sheetName.trim();
+    if (fromSheet && fromSheet.toLowerCase() !== "sheet1") return fromSheet;
+
+    return titleFromFileName(fileName);
+}
+
 export async function POST(request: Request) {
     try {
         const token = await convexAuthNextjsToken();
@@ -32,13 +57,17 @@ export async function POST(request: Request) {
         // Parse form data
         const formData = await request.formData();
         const file = formData.get("file") as File;
-        const title = formData.get("title") as string;
-        const year = parseInt(formData.get("year") as string);
+        const formTitle = (formData.get("title") as string | null) ?? "";
+        const yearRaw = formData.get("year") as string;
+        const year = parseInt(yearRaw, 10);
 
-        if (!file || !title || !year) {
+        if (!file) {
+            return NextResponse.json({ error: "No file provided." }, { status: 400 });
+        }
+        if (!yearRaw || !Number.isInteger(year) || year <= 0) {
             return NextResponse.json(
-                { error: "Missing required fields: file, title, year" },
-                { status: 400 }
+                { error: "Please enter a valid release year (e.g., 2024)." },
+                { status: 400 },
             );
         }
 
@@ -48,6 +77,7 @@ export async function POST(request: Request) {
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const rows = XLSX.utils.sheet_to_json<Record<string, string>>(sheet);
+        const title = resolveArchiveTitle(formTitle, file.name, sheetName, rows);
 
         if (rows.length === 0) {
             return NextResponse.json(
@@ -159,6 +189,7 @@ export async function POST(request: Request) {
 
         return NextResponse.json({
             success: true,
+            title,
             batchId,
             batch_id: batchId,
             total_parsed: questions.length,

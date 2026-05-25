@@ -78,7 +78,7 @@ export default function AdminUploadPage() {
     };
 
     const handleUpload = async () => {
-        if (!file || !title.trim() || !year.trim()) return;
+        if (!file || !year.trim()) return;
 
         const yearNumber = Number(year.trim());
         if (!Number.isInteger(yearNumber) || yearNumber <= 0) {
@@ -92,7 +92,7 @@ export default function AdminUploadPage() {
         try {
             const formData = new FormData();
             formData.append("file", file);
-            formData.append("title", title.trim());
+            if (title.trim()) formData.append("title", title.trim());
             formData.append("year", yearNumber.toString());
 
             const endpoint =
@@ -114,8 +114,10 @@ export default function AdminUploadPage() {
                 // Redirect to review page after a short delay
                 setTimeout(() => {
                     const batchId = data.batchId ?? data.batch_id;
+                    const resolvedTitle =
+                        (typeof data.title === "string" && data.title) || title.trim() || "Imported Quiz";
                     router.push(
-                        `/admin/upload/review/${batchId}?title=${encodeURIComponent(title)}&year=${year}`,
+                        `/admin/upload/review/${batchId}?title=${encodeURIComponent(resolvedTitle)}&year=${year}`,
                     );
                 }, 2000);
 
@@ -141,7 +143,7 @@ export default function AdminUploadPage() {
         }
     };
 
-    const canUpload = file && title.trim() && year.trim() && !uploading;
+    const canUpload = file && year.trim() && !uploading;
 
     return (
         <div className="space-y-12 pb-20 max-w-6xl mx-auto">
@@ -245,12 +247,14 @@ export default function AdminUploadPage() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Archive Title</label>
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                                    Archive Title <span className="font-normal normal-case text-gray-400">(optional)</span>
+                                </label>
                                 <input
                                     type="text"
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
-                                    placeholder="e.g. MDCAT 2024 ELITE QUIZ"
+                                    placeholder="Leave blank to use Title column, sheet name, or file name"
                                     className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-white focus:border-primary-500 transition-all font-bold text-gray-900 italic"
                                 />
                             </div>
@@ -357,6 +361,7 @@ export default function AdminUploadPage() {
                                 "Option A, B, C, D",
                                 "Correct Index (A/B/C/D)",
                                 "Subject Classifier",
+                                "Title (optional, same on each row)",
                             ].map((col, i) => (
                                 <div key={col} className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50/50 border border-gray-100 group hover:border-primary-200 transition-colors">
                                     <span className="text-[10px] font-black text-primary-300 italic">0{i + 1}</span>
