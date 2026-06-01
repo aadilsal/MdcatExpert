@@ -8,6 +8,17 @@ const ERROR_MESSAGES: Record<string, string> = {
   CredentialsSignin: "Incorrect email or password.",
   "Incorrect email or password": "Incorrect email or password.",
   "Incorrect email or password.": "Incorrect email or password.",
+  "Invalid credentials": "Incorrect email or password.",
+  "Invalid code": "That code is invalid or expired. Try again or request a new code.",
+  "Password reset is not enabled for password":
+    "Password reset is unavailable. Please contact support.",
+  "Could not send password reset email.":
+    "Could not send reset email. Please try again later.",
+  "Password reset email is not configured.":
+    "Password reset is unavailable. Please contact support.",
+  "Current password is incorrect.": "Current password is incorrect.",
+  "We could not find an email for your account.":
+    "We could not find an email for your account.",
   AccountNotFound: "No account found with this email. Try signing up instead.",
   UserAlreadyExists: "An account with this email already exists. Try logging in instead.",
   "User already exists": "An account with this email already exists. Try logging in instead.",

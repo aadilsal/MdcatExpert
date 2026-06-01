@@ -2,6 +2,8 @@ import { Password } from "@convex-dev/auth/providers/Password";
 import { ConvexError } from "convex/values";
 import { Scrypt } from "lucia";
 import { DataModel } from "./_generated/dataModel";
+import { ResendOTPPasswordReset } from "./ResendOTPPasswordReset";
+import { validatePasswordRequirements } from "./lib/passwordValidation";
 
 const scrypt = new Scrypt();
 
@@ -22,11 +24,8 @@ export default Password<DataModel>({
       isActive: true,
     };
   },
-  validatePasswordRequirements(password: string) {
-    if (!password || password.length < 6) {
-      throw new ConvexError("Password must be at least 6 characters.");
-    }
-  },
+  validatePasswordRequirements,
+  reset: ResendOTPPasswordReset,
   crypto: {
     async hashSecret(password: string) {
       return await scrypt.hash(password);

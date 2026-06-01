@@ -5,7 +5,12 @@ import {
 } from "@convex-dev/auth/nextjs/server";
 import type { NextRequest } from "next/server";
 
-const isAuthPage = createRouteMatcher(["/login", "/signup"]);
+const isAuthPage = createRouteMatcher([
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+]);
 const isPublicPath = createRouteMatcher([
   "/",
   "/help",

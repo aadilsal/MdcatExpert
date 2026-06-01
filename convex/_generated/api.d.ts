@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as ResendOTPPasswordReset from "../ResendOTPPasswordReset.js";
 import type * as adminAnalytics from "../adminAnalytics.js";
 import type * as analytics from "../analytics.js";
 import type * as attempts from "../attempts.js";
@@ -16,8 +17,10 @@ import type * as authPassword from "../authPassword.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as lib_auth from "../lib/auth.js";
+import type * as lib_passwordValidation from "../lib/passwordValidation.js";
 import type * as lib_userErrors from "../lib/userErrors.js";
 import type * as notifications from "../notifications.js";
+import type * as passwordChange from "../passwordChange.js";
 import type * as payments from "../payments.js";
 import type * as questionReports from "../questionReports.js";
 import type * as quizAccess from "../quizAccess.js";
@@ -33,6 +36,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  ResendOTPPasswordReset: typeof ResendOTPPasswordReset;
   adminAnalytics: typeof adminAnalytics;
   analytics: typeof analytics;
   attempts: typeof attempts;
@@ -41,8 +45,10 @@ declare const fullApi: ApiFromModules<{
   files: typeof files;
   http: typeof http;
   "lib/auth": typeof lib_auth;
+  "lib/passwordValidation": typeof lib_passwordValidation;
   "lib/userErrors": typeof lib_userErrors;
   notifications: typeof notifications;
+  passwordChange: typeof passwordChange;
   payments: typeof payments;
   questionReports: typeof questionReports;
   quizAccess: typeof quizAccess;

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
-import { fetchMutation, fetchQuery } from "convex/nextjs";
+import { fetchAction, fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../../convex/_generated/api";
 
 export async function updateProfile(formData: { name: string; phone?: string }) {
@@ -27,9 +27,18 @@ export async function updateProfile(formData: { name: string; phone?: string }) 
     return { success: true };
 }
 
-export async function updatePassword(password: string) {
-    void password;
-    throw new Error("Password change is not available yet. Use password reset from login.");
+export async function updatePassword(currentPassword: string, newPassword: string) {
+    const token = await convexAuthNextjsToken();
+    if (!token) throw new Error("Unauthorized");
+
+    await fetchAction(
+        api.passwordChange.changePassword,
+        { currentPassword, newPassword },
+        { token },
+    );
+
+    revalidatePath("/profile");
+    return { success: true };
 }
 
 export async function setEmailNotifications(enabled: boolean) {

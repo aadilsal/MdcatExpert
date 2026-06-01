@@ -57,8 +57,9 @@ Typical variables:
 | `NEXT_PUBLIC_CONVEX_URL` | Convex deployment URL (from `npx convex dev`) |
 | `CONVEX_DEPLOYMENT` | Convex deployment name |
 | `GROQ_API_KEY` | AI features |
-| `RESEND_API_KEY` | Transactional email |
-| `RESEND_FROM_EMAIL` | Sender address for Resend |
+| `RESEND_API_KEY` | Transactional email (Next.js) |
+| `RESEND_FROM_EMAIL` | Sender address for Resend (Next.js and Convex) |
+| `AUTH_RESEND_KEY` | Password reset OTP emails (**Convex** dashboard env; can match `RESEND_API_KEY`) |
 
 ### Run locally
 
