@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
     BookOpen,
     CheckCircle,
@@ -13,6 +14,7 @@ import {
     Lock,
 } from "lucide-react";
 import type { Doc } from "../../../../convex/_generated/dataModel";
+import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics-events";
 
 type QuizRow = Doc<"quizzes">;
 
@@ -20,12 +22,18 @@ export function QuizzesCatalog({
     sortedQuizzes,
     attemptCounts,
     isPremiumUser,
+    unlockedQuizIds,
+    freeUnlockLimit,
 }: {
     sortedQuizzes: QuizRow[];
     attemptCounts: Record<string, number>;
     isPremiumUser: boolean;
+    unlockedQuizIds: string[];
+    freeUnlockLimit: number;
 }) {
+    const router = useRouter();
     const [filter, setFilter] = useState("");
+    const unlockedSet = useMemo(() => new Set(unlockedQuizIds), [unlockedQuizIds]);
 
     const filteredQuizzes = useMemo(() => {
         const q = filter.trim().toLowerCase();
@@ -60,6 +68,11 @@ export function QuizzesCatalog({
                         <p className="text-gray-400 font-medium max-w-md leading-relaxed">
                             Master Pakistan&apos;s toughest exams with real-time feedback and subject-wise precision.
                         </p>
+                        {!isPremiumUser && totalQuizzes > freeUnlockLimit && (
+                            <p className="text-sm font-bold text-primary-300/90 max-w-md">
+                                Free plan: {freeUnlockLimit} quizzes unlocked. Upgrade to Elite for the full library.
+                            </p>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -116,12 +129,22 @@ export function QuizzesCatalog({
                             const quizId = quiz._id as unknown as string;
                             const userAttempts = attemptCounts[quizId] || 0;
                             const isAttempted = userAttempts > 0;
-                            const isLocked = quiz.isPremium && !isPremiumUser;
+                            const isLocked = !isPremiumUser && !unlockedSet.has(quizId);
 
                             return (
                                 <Link
                                     key={quizId}
-                                    href={isLocked ? "/upgrade" : `/quiz/${quizId}`}
+                                    href={isLocked ? "/upgrade?reason=premium_content" : `/quiz/${quizId}`}
+                                    onClick={(e) => {
+                                        if (isLocked) {
+                                            e.preventDefault();
+                                            trackEvent(ANALYTICS_EVENTS.PAYWALL_HIT, {
+                                                quizId,
+                                                source: "catalog",
+                                            });
+                                            router.push("/upgrade?reason=premium_content");
+                                        }
+                                    }}
                                     className={`group relative bg-white rounded-4xl border border-gray-100 p-8 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col ${isLocked ? "grayscale-[0.5] opacity-90" : "hover:shadow-primary-600/10 hover:border-primary-200"}`}
                                 >
                                     {!isLocked && (
@@ -146,7 +169,11 @@ export function QuizzesCatalog({
                                             </span>
                                             {isLocked ? (
                                                 <span className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-100 text-amber-700 rounded-md text-[9px] font-black uppercase tracking-widest">
-                                                    PREMIUM
+                                                    LOCKED
+                                                </span>
+                                            ) : !isPremiumUser && unlockedSet.has(quizId) ? (
+                                                <span className="flex items-center gap-1.5 px-2 py-0.5 bg-primary-100 text-primary-700 rounded-md text-[9px] font-black uppercase tracking-widest">
+                                                    FREE
                                                 </span>
                                             ) : (
                                                 isAttempted && (

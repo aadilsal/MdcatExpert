@@ -16,9 +16,11 @@ import {
     Shield,
     ChevronRight,
     Ticket,
+    DollarSign,
 } from "lucide-react";
 import UserDropdown from "./user-dropdown";
 import { fetchMeCached } from "@/lib/me-client-cache";
+import AnalyticsTracker from "@/components/analytics-tracker";
 
 const studentNav = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -27,9 +29,11 @@ const studentNav = [
 ];
 
 const adminNav = [
+    { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
     { href: "/admin/quizzes", label: "Manage Quizzes", icon: FileText },
     { href: "/admin/upload", label: "Upload Quiz", icon: Upload },
     { href: "/admin/students", label: "Students", icon: Users },
+    { href: "/admin/payments", label: "Payments", icon: DollarSign },
     { href: "/admin/discounts", label: "Discount Codes", icon: Ticket },
 ];
 
@@ -61,6 +65,7 @@ export default function AppLayout({
 
     return (
         <div className="min-h-screen bg-[#FDFDFF]">
+            <AnalyticsTracker />
             {/* Mobile overlay */}
             <AnimatePresence>
                 {sidebarOpen && (

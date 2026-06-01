@@ -2,6 +2,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { mutation, query, type QueryCtx } from "./_generated/server";
 import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
+import { assertCanAccessQuiz } from "./quizAccess";
 
 async function assertSelfOrAdmin(ctx: QueryCtx, subjectUserId: Id<"users">) {
   const me = await getAuthUserId(ctx);
@@ -32,6 +33,7 @@ export const createAttempt = mutation({
     if (!me || me !== userId) {
       throw new Error("Unauthorized");
     }
+    await assertCanAccessQuiz(ctx, quizId);
     return await ctx.db.insert("attempts", {
       userId,
       quizId,

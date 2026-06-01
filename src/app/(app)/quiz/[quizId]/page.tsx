@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { submitQuizAction } from "../actions";
 import { formatUserError } from "@/lib/format-user-error";
+import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics-events";
 import { Quiz, Question } from "@/lib/types";
 
 export default function QuizPage({
@@ -40,6 +41,7 @@ export default function QuizPage({
     const [showConfirm, setShowConfirm] = useState(false);
     const [zenMode, setZenMode] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [accessDenied, setAccessDenied] = useState(false);
 
     const [timePerQuestion, setTimePerQuestion] = useState<Record<string, number>>({});
     const lastQuestionStartTime = useRef<number>(Date.now());
@@ -56,17 +58,34 @@ export default function QuizPage({
         const fetchData = async () => {
             const res = await fetch(`/api/quizzes/${quizId}`, { cache: "no-store" });
             const json = await res.json();
-            if (!res.ok) {
+            if (res.status === 403) {
+                trackEvent(ANALYTICS_EVENTS.PAYWALL_HIT, {
+                    quizId,
+                    source: "quiz_page",
+                });
+                setAccessDenied(true);
                 setQuiz(null);
                 setQuestions([]);
                 setLoading(false);
                 return;
             }
+            if (!res.ok) {
+                setAccessDenied(false);
+                setQuiz(null);
+                setQuestions([]);
+                setLoading(false);
+                return;
+            }
+            setAccessDenied(false);
 
             const quizData = (json?.quiz ?? null) as Quiz | null;
             const questionsData = (json?.questions ?? []) as Question[];
             if (quizData) setQuiz(quizData);
             if (Array.isArray(questionsData)) setQuestions(questionsData);
+
+            if (quizData) {
+                trackEvent(ANALYTICS_EVENTS.QUIZ_STARTED, { quizId });
+            }
 
             setLoading(false);
         };
@@ -166,6 +185,7 @@ export default function QuizPage({
             );
 
             if (success) {
+                trackEvent(ANALYTICS_EVENTS.QUIZ_COMPLETED, { quizId });
                 router.push(`/results/${attemptId}`);
             }
         } catch (err: unknown) {
@@ -186,6 +206,34 @@ export default function QuizPage({
                     className="w-12 h-12 border-4 border-primary-100 border-t-primary-600 rounded-full"
                 />
                 <p className="text-gray-400 font-black text-xs uppercase tracking-widest">Constructing Question Set...</p>
+            </div>
+        );
+    }
+
+    if (accessDenied) {
+        return (
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="text-center p-12 bg-white rounded-4xl border border-amber-100 shadow-xl max-w-lg">
+                    <AlertCircle className="w-16 h-16 text-amber-400 mx-auto mb-6" />
+                    <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Quiz Locked</h2>
+                    <p className="text-gray-500 mb-8 font-medium">
+                        Free accounts include 5 practice quizzes. Upgrade to Elite to unlock the full preparation library.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button
+                            onClick={() => router.push("/upgrade?reason=premium_content")}
+                            className="px-8 py-4 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition-all shadow-xl shadow-primary-600/20 active:scale-95"
+                        >
+                            Upgrade to Elite
+                        </button>
+                        <button
+                            onClick={() => router.push("/quizzes")}
+                            className="px-8 py-4 bg-gray-100 text-gray-900 font-black rounded-2xl hover:bg-gray-200 transition-all"
+                        >
+                            Browse Quizzes
+                        </button>
+                    </div>
+                </div>
             </div>
         );
     }

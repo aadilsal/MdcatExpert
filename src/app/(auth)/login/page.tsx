@@ -52,7 +52,7 @@ export default function LoginPage() {
                             router.push("/dashboard");
                             router.refresh();
                         } catch (err) {
-                            setError(formatUserError(err, "Sign in failed. Please check your email and password."));
+                            setError(formatUserError(err, "Incorrect email or password."));
                         } finally {
                             setIsPending(false);
                         }

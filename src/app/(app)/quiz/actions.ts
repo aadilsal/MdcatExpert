@@ -5,6 +5,11 @@ import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../../convex/_generated/api";
 import type { Id } from "../../../../convex/_generated/dataModel";
+import {
+    canAccessQuiz,
+    isActivePremiumUser,
+    sortQuizzesForCatalog,
+} from "@/lib/quiz-access";
 
 /**
  * Securely submits a quiz.
@@ -25,6 +30,28 @@ export async function submitQuizAction(
 
     const quiz = await fetchQuery(api.quizzes.getQuizById, { quizId: quizId as Id<"quizzes"> }, { token });
     if (!quiz) throw new Error("Quiz not found.");
+
+    const allQuizzes = await fetchQuery(api.quizzes.getQuizzes, {}, { token });
+    const catalogEntries = sortQuizzesForCatalog(
+        (allQuizzes ?? []).map((q) => ({
+            _id: String(q._id),
+            year: q.year,
+            title: q.title,
+        })),
+    );
+    const premium = isActivePremiumUser(me);
+    let allowed = canAccessQuiz(quizId, catalogEntries, premium);
+    if (!allowed) {
+        const attempts = await fetchQuery(
+            api.attempts.getUserAttempts,
+            { userId: me._id },
+            { token },
+        );
+        allowed = (attempts ?? []).some((a) => String(a.quizId) === quizId);
+    }
+    if (!allowed) {
+        throw new Error("Premium required: upgrade to Elite to access this quiz.");
+    }
 
     const questions = await fetchQuery(api.quizzes.getQuizQuestions, { quizId: quizId as Id<"quizzes"> }, { token });
     const questionById = new Map<string, any>();

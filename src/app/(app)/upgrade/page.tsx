@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type SVGProps, Suspense } from "react";
+import { useState, type SVGProps, Suspense, useEffect } from "react";
 import Swal from "sweetalert2";
 import { formatUserError } from "@/lib/format-user-error";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -17,6 +17,7 @@ import {
     Clock,
     CreditCard
 } from "lucide-react";
+import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics-events";
 
 function UpgradePageContent() {
     const router = useRouter();
@@ -30,6 +31,10 @@ function UpgradePageContent() {
     const [parsedTitle, setParsedTitle] = useState<string>("");
     const [parsedYear, setParsedYear] = useState<string>("");
     const [autoTransactionId, setAutoTransactionId] = useState<string>("");
+
+    useEffect(() => {
+        trackEvent(ANALYTICS_EVENTS.UPGRADE_PAGE_VIEW, reason ? { reason } : undefined);
+    }, [reason]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -97,6 +102,7 @@ function UpgradePageContent() {
             const paymentJson = await paymentRes.json();
             if (!paymentRes.ok) throw new Error(paymentJson?.error || "Failed to submit payment.");
 
+            trackEvent(ANALYTICS_EVENTS.PAYMENT_SUBMITTED);
             setSubmitted(true);
         } catch (error) {
             console.error("Payment submission failed:", error);
@@ -180,7 +186,7 @@ function UpgradePageContent() {
                             <h2 className="text-2xl font-black text-gray-900 italic mb-2">Standard.</h2>
                             <div className="text-5xl font-black text-gray-900 mb-8 italic">Free</div>
                             <ul className="space-y-4 mb-10">
-                                {["Limited Quizzes", "Basic Analytics", "Community Support"].map(f => (
+                                {["5 Practice Quizzes", "Basic Analytics", "Community Support"].map(f => (
                                     <li key={f} className="flex items-center gap-3 text-gray-500 font-bold italic text-sm">
                                         <Check className="w-4 h-4 text-gray-400" /> {f}
                                     </li>
@@ -249,7 +255,7 @@ function UpgradePageContent() {
                                 <div className="space-y-2">
                                     <p className="text-sm font-bold text-gray-700 italic">Please send <span className="text-primary-600">Rs. 2500</span> to:</p>
                                     <div className="p-4 bg-white rounded-xl border border-primary-200">
-                                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">JazzCash / EasyPaisa</p>
+                                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">JazzCash / Nayapay</p>
                                         <p className="text-lg font-black text-gray-900 tracking-tight">03035116528</p>
                                         <p className="text-[9px] font-bold text-gray-400 mt-1 uppercase">Account Title: Adil Salman Butt</p>
                                     </div>

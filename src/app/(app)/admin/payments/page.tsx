@@ -37,10 +37,16 @@ export default function AdminPaymentsPage() {
 
     const fetchRequests = useCallback(async () => {
         setLoading(true);
-        const res = await fetch(`/api/admin/payments?status=${filter}`, { cache: "no-store" });
-        const json = await res.json();
-        if (res.ok) setRequests(json.requests || []);
-        setLoading(false);
+        try {
+            const res = await fetch(`/api/admin/payments?status=${filter}`, { cache: "no-store" });
+            const json = await res.json();
+            if (res.ok) setRequests(json.requests || []);
+            else setRequests([]);
+        } catch {
+            setRequests([]);
+        } finally {
+            setLoading(false);
+        }
     }, [filter]);
 
     useEffect(() => {

@@ -181,4 +181,15 @@ export default defineSchema({
   })
     .index("by_code", ["code"])
     .index("by_isActive", ["isActive"]),
+
+  analyticsEvents: defineTable({
+    eventName: v.string(),
+    userId: v.optional(v.id("users")),
+    sessionId: v.optional(v.string()),
+    properties: v.optional(v.record(v.string(), v.string())),
+    createdAt: v.number(),
+  })
+    .index("by_eventName", ["eventName"])
+    .index("by_createdAt", ["createdAt"])
+    .index("by_userId", ["userId"]),
 });

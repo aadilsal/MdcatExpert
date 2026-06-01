@@ -8,6 +8,8 @@
  * @module
  */
 
+import type * as adminAnalytics from "../adminAnalytics.js";
+import type * as analytics from "../analytics.js";
 import type * as attempts from "../attempts.js";
 import type * as auth from "../auth.js";
 import type * as authPassword from "../authPassword.js";
@@ -17,6 +19,7 @@ import type * as lib_auth from "../lib/auth.js";
 import type * as lib_userErrors from "../lib/userErrors.js";
 import type * as notifications from "../notifications.js";
 import type * as payments from "../payments.js";
+import type * as quizAccess from "../quizAccess.js";
 import type * as quizzes from "../quizzes.js";
 import type * as seed from "../seed.js";
 import type * as staging from "../staging.js";
@@ -29,6 +32,8 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  adminAnalytics: typeof adminAnalytics;
+  analytics: typeof analytics;
   attempts: typeof attempts;
   auth: typeof auth;
   authPassword: typeof authPassword;
@@ -38,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   "lib/userErrors": typeof lib_userErrors;
   notifications: typeof notifications;
   payments: typeof payments;
+  quizAccess: typeof quizAccess;
   quizzes: typeof quizzes;
   seed: typeof seed;
   staging: typeof staging;

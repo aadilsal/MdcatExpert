@@ -15,6 +15,7 @@ import {
     UserCircle
 } from "lucide-react";
 import { setEmailNotifications, updateProfile, updatePassword } from "./actions";
+import { formatUserError } from "@/lib/format-user-error";
 
 interface ProfileClientProps {
     user: {
@@ -73,7 +74,10 @@ export default function ProfileClient({ user }: ProfileClientProps) {
             await updateProfile({ name, phone });
             setMessage({ type: "success", text: "Profile updated successfully!" });
         } catch (err) {
-            setMessage({ type: "error", text: "Failed to update profile. Please try again." });
+            setMessage({
+                type: "error",
+                text: formatUserError(err, "Failed to update profile. Please try again."),
+            });
         } finally {
             setLoading(false);
         }
@@ -98,7 +102,10 @@ export default function ProfileClient({ user }: ProfileClientProps) {
             setNewPassword("");
             setConfirmPassword("");
         } catch (err) {
-            setMessage({ type: "error", text: "Failed to update password." });
+            setMessage({
+                type: "error",
+                text: formatUserError(err, "Failed to update password. Please try again."),
+            });
         } finally {
             setLoading(false);
         }

@@ -4,6 +4,11 @@ import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
 import { formatUserError } from "@/lib/format-user-error";
+import {
+  canAccessQuiz,
+  isActivePremiumUser,
+  sortQuizzesForCatalog,
+} from "@/lib/quiz-access";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -15,9 +20,28 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     if (!quiz) return NextResponse.json({ error: "Quiz not found" }, { status: 404 });
 
     const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
-    const isPremiumUser = (me?.subscriptionType ?? "free") === "premium" && (!!me?.premiumUntil ? me.premiumUntil > Date.now() : true);
+    const isPremiumUser = isActivePremiumUser(me);
 
-    if (quiz.isPremium && !isPremiumUser) {
+    const allQuizzes = await fetchQuery(api.quizzes.getQuizzes, {}, { token });
+    const catalogEntries = sortQuizzesForCatalog(
+      (allQuizzes ?? []).map((q) => ({
+        _id: String(q._id),
+        year: q.year,
+        title: q.title,
+      })),
+    );
+
+    let allowed = canAccessQuiz(String(quiz._id), catalogEntries, isPremiumUser);
+    if (!allowed && me?._id) {
+      const attempts = await fetchQuery(
+        api.attempts.getUserAttempts,
+        { userId: me._id },
+        { token },
+      );
+      allowed = (attempts ?? []).some((a) => String(a.quizId) === String(quiz._id));
+    }
+
+    if (!allowed) {
       return NextResponse.json(
         { error: "Premium required", upgradeUrl: "/upgrade?reason=premium_content", quiz: { id: quiz._id } },
         { status: 403 },

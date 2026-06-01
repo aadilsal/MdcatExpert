@@ -1,6 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
+import { assertCanAccessQuiz } from "./quizAccess";
 
 export const getQuizzes = query({
   args: {
@@ -35,6 +36,7 @@ export const getQuizById = query({
 export const getQuizQuestions = query({
   args: { quizId: v.id("quizzes") },
   handler: async (ctx, { quizId }) => {
+    await assertCanAccessQuiz(ctx, quizId);
     const questions = await ctx.db
       .query("quizQuestions")
       .withIndex("by_quizId", (q) => q.eq("quizId", quizId))

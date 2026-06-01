@@ -12,17 +12,21 @@ import {
   Zap,
   TrendingUp,
   GraduationCap,
-  Star,
   ChevronRight,
   Sparkles,
   ShieldCheck,
   Smartphone,
   AlertTriangle as AlertTriangleIcon,
 } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
+import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics-events";
 
 export default function HomePage() {
   const containerRef = useRef(null);
+
+  useEffect(() => {
+    trackEvent(ANALYTICS_EVENTS.LANDING_VIEW);
+  }, []);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
@@ -305,7 +309,7 @@ export default function HomePage() {
               <h3 className="text-2xl font-black text-gray-900 italic mb-2">Standard.</h3>
               <div className="text-5xl font-black text-gray-900 mb-8 italic">Free</div>
               <ul className="space-y-4 mb-10">
-                {["Limited Quizzes", "Basic Analytics", "Community Support"].map(f => (
+                {["5 Practice Quizzes", "Basic Analytics", "Community Support"].map(f => (
                   <li key={f} className="flex items-center gap-3 text-gray-500 font-bold italic text-sm">
                     <CheckCircle className="w-4 h-4 text-gray-300" /> {f}
                   </li>
@@ -348,12 +352,11 @@ export default function HomePage() {
       {/* Grid Highlights */}
       <section className="py-24 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { title: "Authentic Quizzes", desc: "No fake questions. Only real MDCAT materials.", icon: ShieldCheck, color: "blue" },
               { title: "All Devices", desc: "Practice on your phone while commuting.", icon: Smartphone, color: "emerald" },
               { title: "Subject Focus", desc: "Drill down into Biology, Physics or Chemistry.", icon: Box, color: "purple" },
-              { title: "Free Always", desc: "Premium features without the premium price.", icon: Star, color: "amber" },
             ].map((item, idx) => (
               <motion.div
                 key={item.title}
@@ -403,8 +406,6 @@ export default function HomePage() {
 
             <div className="mt-12 flex items-center justify-center gap-4 text-xs font-black tracking-widest text-gray-600 uppercase">
               <span className="flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-primary-500" /> SECURE</span>
-              <span className="w-1 h-1 bg-gray-800 rounded-full" />
-              <span className="flex items-center gap-1.5"><Sparkles className="w-4 h-4 text-primary-500" /> FREE</span>
               <span className="w-1 h-1 bg-gray-800 rounded-full" />
               <span className="flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-primary-500" /> OFFICIAL QUIZZES</span>
             </div>

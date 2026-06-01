@@ -182,7 +182,7 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
             setQuestions(prev => prev.filter(q => q.id !== id));
         } catch (error) {
             console.error("Failed to delete question:", error);
-            alert("Failed to delete question. Please try again.");
+            alert(formatUserError(error, "Failed to delete question. Please try again."));
         } finally {
             setDeletingId(null);
         }
