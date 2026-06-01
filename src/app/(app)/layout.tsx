@@ -17,6 +17,7 @@ import {
     ChevronRight,
     Ticket,
     DollarSign,
+    AlertTriangle,
 } from "lucide-react";
 import UserDropdown from "./user-dropdown";
 import { fetchMeCached } from "@/lib/me-client-cache";
@@ -31,6 +32,7 @@ const studentNav = [
 const adminNav = [
     { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
     { href: "/admin/quizzes", label: "Manage Quizzes", icon: FileText },
+    { href: "/admin/reports", label: "Question Reports", icon: AlertTriangle, badge: true },
     { href: "/admin/upload", label: "Upload Quiz", icon: Upload },
     { href: "/admin/students", label: "Students", icon: Users },
     { href: "/admin/payments", label: "Payments", icon: DollarSign },
@@ -45,6 +47,7 @@ export default function AppLayout({
     const pathname = usePathname();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userData, setUserData] = useState<{ name: string; email: string; role: string } | null>(null);
+    const [openReportCount, setOpenReportCount] = useState(0);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -54,6 +57,13 @@ export default function AppLayout({
                     return;
                 }
                 setUserData(row);
+                if (row.role === "admin") {
+                    const res = await fetch("/api/admin/reports?status=open", { cache: "no-store" });
+                    if (res.ok) {
+                        const json = await res.json();
+                        setOpenReportCount(json.openCount ?? 0);
+                    }
+                }
             } catch (error) {
                 console.error("Failed to load user profile", error);
             }
@@ -145,6 +155,10 @@ export default function AppLayout({
                             <div className="space-y-1.5">
                                 {adminNav.map((item) => {
                                     const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                                    const showBadge =
+                                        "badge" in item &&
+                                        item.badge &&
+                                        openReportCount > 0;
                                     return (
                                         <Link
                                             key={item.href}
@@ -158,6 +172,11 @@ export default function AppLayout({
                                             <div className="flex items-center gap-3">
                                                 <item.icon className={`w-5 h-5 transition-colors ${isActive ? "text-white" : "text-gray-400 group-hover:text-gray-900"}`} />
                                                 {item.label}
+                                                {showBadge && (
+                                                    <span className="min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center rounded-full bg-rose-500 text-white text-[10px] font-black">
+                                                        {openReportCount > 99 ? "99+" : openReportCount}
+                                                    </span>
+                                                )}
                                             </div>
                                             {!isActive && <ChevronRight className="w-4 h-4 text-gray-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />}
                                         </Link>

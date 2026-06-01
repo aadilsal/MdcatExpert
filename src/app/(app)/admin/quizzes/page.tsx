@@ -9,6 +9,7 @@ import {
     Users,
 } from "lucide-react";
 import { DeleteQuizButton } from "./delete-button";
+import { EditQuizTitleButton } from "./edit-title-button";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../convex/_generated/api";
@@ -155,9 +156,10 @@ export default async function AdminQuizzesPage() {
                                     </span>
                                 </div>
 
-                                <h3 className="font-semibold text-gray-900 mb-3 text-lg">
-                                    {quiz.title}
-                                </h3>
+                                <EditQuizTitleButton
+                                    quizId={String(quiz._id)}
+                                    initialTitle={quiz.title}
+                                />
 
                                 <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-5">
                                     <span className="flex items-center gap-1.5 font-bold text-primary-600">
@@ -181,7 +183,7 @@ export default async function AdminQuizzesPage() {
                                         className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors"
                                     >
                                         <Eye className="w-4 h-4" />
-                                        Preview
+                                        Manage
                                     </Link>
                                     <DeleteQuizButton quizId={String(quiz._id)} quizTitle={quiz.title} />
                                 </div>

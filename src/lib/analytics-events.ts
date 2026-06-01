@@ -6,6 +6,7 @@ export const ANALYTICS_EVENTS = {
   QUIZ_STARTED: "quiz_started",
   QUIZ_COMPLETED: "quiz_completed",
   PAYMENT_SUBMITTED: "payment_submitted",
+  QUESTION_REPORTED: "question_reported",
 } as const;
 
 export type AnalyticsEventName =

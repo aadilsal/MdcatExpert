@@ -182,6 +182,36 @@ export default defineSchema({
     .index("by_code", ["code"])
     .index("by_isActive", ["isActive"]),
 
+  questionReports: defineTable({
+    userId: v.id("users"),
+    userEmail: v.string(),
+    quizId: v.id("quizzes"),
+    quizTitle: v.string(),
+    questionId: v.id("questions"),
+    questionOrder: v.number(),
+    category: v.union(
+      v.literal("wrong_answer"),
+      v.literal("ambiguous"),
+      v.literal("typo"),
+      v.literal("image_issue"),
+      v.literal("other"),
+    ),
+    comment: v.optional(v.string()),
+    status: v.union(
+      v.literal("open"),
+      v.literal("resolved"),
+      v.literal("dismissed"),
+    ),
+    adminNote: v.optional(v.string()),
+    resolvedBy: v.optional(v.id("users")),
+    resolvedAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_status", ["status"])
+    .index("by_quizId", ["quizId"])
+    .index("by_questionId", ["questionId"])
+    .index("by_userId_questionId", ["userId", "questionId"]),
+
   analyticsEvents: defineTable({
     eventName: v.string(),
     userId: v.optional(v.id("users")),

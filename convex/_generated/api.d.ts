@@ -19,6 +19,7 @@ import type * as lib_auth from "../lib/auth.js";
 import type * as lib_userErrors from "../lib/userErrors.js";
 import type * as notifications from "../notifications.js";
 import type * as payments from "../payments.js";
+import type * as questionReports from "../questionReports.js";
 import type * as quizAccess from "../quizAccess.js";
 import type * as quizzes from "../quizzes.js";
 import type * as seed from "../seed.js";
@@ -43,6 +44,7 @@ declare const fullApi: ApiFromModules<{
   "lib/userErrors": typeof lib_userErrors;
   notifications: typeof notifications;
   payments: typeof payments;
+  questionReports: typeof questionReports;
   quizAccess: typeof quizAccess;
   quizzes: typeof quizzes;
   seed: typeof seed;

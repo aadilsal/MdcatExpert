@@ -17,11 +17,14 @@ import {
     Bookmark,
     Menu,
     Grid3X3,
+    Flag,
 } from "lucide-react";
 import { submitQuizAction } from "../actions";
+import { reportQuestionAction } from "../report-actions";
 import { formatUserError } from "@/lib/format-user-error";
 import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics-events";
 import { Quiz, Question } from "@/lib/types";
+import ReportQuestionModal from "@/components/report-question-modal";
 
 export default function QuizPage({
     params,
@@ -42,6 +45,7 @@ export default function QuizPage({
     const [zenMode, setZenMode] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [accessDenied, setAccessDenied] = useState(false);
+    const [reportModalOpen, setReportModalOpen] = useState(false);
 
     const [timePerQuestion, setTimePerQuestion] = useState<Record<string, number>>({});
     const lastQuestionStartTime = useRef<number>(Date.now());
@@ -162,6 +166,20 @@ export default function QuizPage({
             return next;
         });
     };
+
+    const handleReportSubmit = useCallback(
+        async (category: Parameters<typeof reportQuestionAction>[2], comment: string) => {
+            const q = questions[currentIndex];
+            if (!quizId || !q) return;
+            await reportQuestionAction(quizId, q.id, category, comment || undefined);
+            trackEvent(ANALYTICS_EVENTS.QUESTION_REPORTED, {
+                quizId,
+                questionId: q.id,
+                category,
+            });
+        },
+        [quizId, questions, currentIndex],
+    );
 
     const handleSubmit = async () => {
         if (submitting || !quizId) return;
@@ -497,17 +515,28 @@ export default function QuizPage({
                                         </span>
                                     </div>
 
-                                    <button
-                                        onClick={() => toggleFlag(currentQuestion.id)}
-                                        className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${flaggedQuestions.has(currentQuestion.id)
-                                            ? "bg-amber-500 text-white shadow-lg shadow-amber-500/20"
-                                            : zenMode ? "bg-white/5 text-white/40 hover:bg-white/10" : "bg-gray-100 text-gray-400 hover:bg-amber-50 hover:text-amber-600"
-                                            }`}
-                                    >
-                                        <Bookmark className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${flaggedQuestions.has(currentQuestion.id) ? "fill-current" : ""}`} />
-                                        <span className="hidden sm:inline">{flaggedQuestions.has(currentQuestion.id) ? "Flagged" : "Flag for Review"}</span>
-                                        <span className="sm:hidden">{flaggedQuestions.has(currentQuestion.id) ? "Flagged" : "Flag"}</span>
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setReportModalOpen(true)}
+                                            className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${zenMode ? "bg-white/5 text-white/40 hover:bg-rose-500/20 hover:text-rose-300" : "bg-gray-100 text-gray-400 hover:bg-rose-50 hover:text-rose-600"}`}
+                                        >
+                                            <Flag className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                                            <span className="hidden sm:inline">Report</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleFlag(currentQuestion.id)}
+                                            className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${flaggedQuestions.has(currentQuestion.id)
+                                                ? "bg-amber-500 text-white shadow-lg shadow-amber-500/20"
+                                                : zenMode ? "bg-white/5 text-white/40 hover:bg-white/10" : "bg-gray-100 text-gray-400 hover:bg-amber-50 hover:text-amber-600"
+                                                }`}
+                                        >
+                                            <Bookmark className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${flaggedQuestions.has(currentQuestion.id) ? "fill-current" : ""}`} />
+                                            <span className="hidden sm:inline">{flaggedQuestions.has(currentQuestion.id) ? "Flagged" : "Flag for Review"}</span>
+                                            <span className="sm:hidden">{flaggedQuestions.has(currentQuestion.id) ? "Flagged" : "Flag"}</span>
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Content */}
@@ -663,6 +692,15 @@ export default function QuizPage({
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {currentQuestion && (
+                <ReportQuestionModal
+                    open={reportModalOpen}
+                    onClose={() => setReportModalOpen(false)}
+                    onSubmit={handleReportSubmit}
+                    questionNumber={currentIndex + 1}
+                />
+            )}
         </div>
     );
 }

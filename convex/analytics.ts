@@ -9,6 +9,7 @@ const ALLOWED_EVENTS = new Set([
   "quiz_started",
   "quiz_completed",
   "payment_submitted",
+  "question_reported",
 ]);
 
 const PUBLIC_EVENTS = new Set(["landing_view"]);
