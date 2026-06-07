@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
     BarChart3,
@@ -11,7 +11,9 @@ import {
     AlertTriangle,
     Target,
     BookOpen,
+    Globe,
 } from "lucide-react";
+import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics-events";
 import {
     ResponsiveContainer,
     LineChart,
@@ -28,6 +30,7 @@ import type { AdminDashboardData } from "./types";
 
 const TABS = [
     { id: "overview", label: "Overview", icon: BarChart3 },
+    { id: "traffic", label: "Traffic", icon: Globe },
     { id: "growth", label: "Growth", icon: TrendingUp },
     { id: "engagement", label: "Engagement", icon: Activity },
     { id: "revenue", label: "Revenue", icon: DollarSign },
@@ -68,8 +71,12 @@ function formatCurrency(amount: number): string {
 
 export default function AdminAnalyticsClient({ data }: { data: AdminDashboardData }) {
     const [tab, setTab] = useState<TabId>("overview");
-    const { overview, timeSeries, funnel, engagement, payments, promos, retentionCohorts, content, alerts } =
+    const { overview, timeSeries, funnel, engagement, payments, promos, retentionCohorts, content, alerts, traffic } =
         data;
+
+    useEffect(() => {
+        trackEvent(ANALYTICS_EVENTS.ADMIN_ANALYTICS_VIEW);
+    }, []);
 
     const combinedTrend = timeSeries.signupsByDay.map((row, i) => ({
         date: formatDayLabel(row.date),
@@ -190,6 +197,18 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                             value={overview.pendingPayments}
                             hint={`Avg approval: ${overview.avgApprovalHours}h`}
                         />
+                        <KpiCard
+                            label="Page views"
+                            value={traffic.pageViews}
+                            hint={`${traffic.pageUniqueSessions} unique sessions`}
+                            color="text-sky-600"
+                        />
+                        <KpiCard
+                            label="Homepage views"
+                            value={traffic.landingViews}
+                            hint={`${traffic.landingUniqueSessions} unique sessions`}
+                            color="text-violet-600"
+                        />
                     </div>
 
                     <div className="bg-white rounded-4xl border border-gray-100 p-6 shadow-sm">
@@ -208,6 +227,98 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                                     <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="#f59e0b" strokeWidth={2} dot={false} />
                                 </LineChart>
                             </ResponsiveContainer>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {tab === "traffic" && (
+                <div className="space-y-8">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <KpiCard
+                            label="Page views"
+                            value={traffic.pageViews}
+                            hint={`${traffic.pageUniqueSessions} unique sessions`}
+                            color="text-sky-600"
+                        />
+                        <KpiCard
+                            label="Homepage views"
+                            value={traffic.landingViews}
+                            hint={`${traffic.landingUniqueSessions} unique sessions`}
+                            color="text-violet-600"
+                        />
+                        <KpiCard
+                            label="Admin dashboard views"
+                            value={traffic.adminAnalyticsViews}
+                            hint={`${traffic.adminAnalyticsUniqueSessions} unique sessions`}
+                            color="text-gray-900"
+                        />
+                        <KpiCard
+                            label="Paywall hits"
+                            value={traffic.paywallHits}
+                            hint={`Quiz started: ${traffic.quizStarted} · completed: ${traffic.quizCompleted}`}
+                            color="text-amber-600"
+                        />
+                    </div>
+
+                    <div className="bg-white rounded-4xl border border-gray-100 p-6 shadow-sm">
+                        <h2 className="text-lg font-black text-gray-900 mb-6">Page views & homepage traffic</h2>
+                        <div className="h-80">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart
+                                    data={traffic.pageViewsByDay.map((row, i) => ({
+                                        date: formatDayLabel(row.date),
+                                        pageViews: row.count,
+                                        homepage: traffic.landingViewsByDay[i]?.count ?? 0,
+                                    }))}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                    <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                                    <YAxis tick={{ fontSize: 11 }} />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" dataKey="pageViews" name="All pages" stroke="#0ea5e9" strokeWidth={2} dot={false} />
+                                    <Line type="monotone" dataKey="homepage" name="Homepage" stroke="#8b5cf6" strokeWidth={2} dot={false} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <p className="text-xs text-gray-400 mt-4 font-medium">
+                            Page views track every route change site-wide. Homepage views are a separate landing-page metric.
+                            Historical data before this update only includes homepage events.
+                        </p>
+                    </div>
+
+                    <div className="bg-white rounded-4xl border border-gray-100 overflow-hidden">
+                        <div className="p-6 border-b border-gray-50">
+                            <h2 className="text-lg font-black">Top pages (last {data.periodDays} days)</h2>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-50">
+                                        <th className="p-4">Path</th>
+                                        <th className="p-4">Views</th>
+                                        <th className="p-4">Unique sessions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {traffic.topPages.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={3} className="p-8 text-center text-gray-400 font-medium">
+                                                No page views recorded yet — data appears after visitors browse the site
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        traffic.topPages.map((p) => (
+                                            <tr key={p.path} className="border-b border-gray-50 hover:bg-gray-50/50">
+                                                <td className="p-4 font-mono text-xs font-bold">{p.path}</td>
+                                                <td className="p-4 font-black text-sky-600">{p.views}</td>
+                                                <td className="p-4">{p.uniqueSessions}</td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

@@ -4,6 +4,8 @@ import { v } from "convex/values";
 
 const ALLOWED_EVENTS = new Set([
   "landing_view",
+  "page_view",
+  "admin_analytics_view",
   "upgrade_page_view",
   "paywall_hit",
   "quiz_started",
@@ -12,7 +14,7 @@ const ALLOWED_EVENTS = new Set([
   "question_reported",
 ]);
 
-const PUBLIC_EVENTS = new Set(["landing_view"]);
+const PUBLIC_EVENTS = new Set(["landing_view", "page_view"]);
 
 const MAX_PROPERTY_KEYS = 10;
 const MAX_PROPERTY_VALUE_LEN = 500;

@@ -1,6 +1,8 @@
 /** Analytics event names — keep in sync with convex/analytics.ts allowlist. */
 export const ANALYTICS_EVENTS = {
   LANDING_VIEW: "landing_view",
+  PAGE_VIEW: "page_view",
+  ADMIN_ANALYTICS_VIEW: "admin_analytics_view",
   UPGRADE_PAGE_VIEW: "upgrade_page_view",
   PAYWALL_HIT: "paywall_hit",
   QUIZ_STARTED: "quiz_started",
@@ -14,6 +16,7 @@ export type AnalyticsEventName =
 
 export const PUBLIC_ANALYTICS_EVENTS: ReadonlySet<string> = new Set([
   ANALYTICS_EVENTS.LANDING_VIEW,
+  ANALYTICS_EVENTS.PAGE_VIEW,
 ]);
 
 const SESSION_STORAGE_KEY = "mdcat_analytics_session";

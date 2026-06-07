@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import NavigationProgress from "@/components/navigation-progress";
+import PageViewTracker from "@/components/page-view-tracker";
 import { getSiteUrl } from "@/lib/site-url";
 
 const inter = Inter({
@@ -85,6 +86,7 @@ export default async function RootLayout({
         />
         <ConvexAuthNextjsServerProvider>
           <NavigationProgress />
+          <PageViewTracker />
           {children}
         </ConvexAuthNextjsServerProvider>
       </body>

@@ -41,6 +41,64 @@ function countByDay(items: { ts: number }[], periodDays: number, now: number) {
   return keys.map((date) => ({ date, count: map.get(date) ?? 0 }));
 }
 
+type AnalyticsEvent = Doc<"analyticsEvents">;
+
+function countEvents(events: AnalyticsEvent[], eventName: string, periodStart: number): number {
+  let count = 0;
+  for (const e of events) {
+    if (e.eventName === eventName && e.createdAt >= periodStart) count++;
+  }
+  return count;
+}
+
+function distinctSessions(events: AnalyticsEvent[], eventName: string, periodStart: number): number {
+  const set = new Set<string>();
+  for (const e of events) {
+    if (e.eventName !== eventName || e.createdAt < periodStart) continue;
+    if (e.sessionId) set.add(e.sessionId);
+    else if (e.userId) set.add(`user:${e.userId}`);
+  }
+  return set.size;
+}
+
+function countEventsByDay(
+  events: AnalyticsEvent[],
+  eventName: string,
+  periodDays: number,
+  now: number,
+): { date: string; count: number }[] {
+  const cutoff = now - periodDays * MS_DAY;
+  const filtered = events
+    .filter((e) => e.eventName === eventName && e.createdAt >= cutoff)
+    .map((e) => ({ ts: e.createdAt }));
+  return countByDay(filtered, periodDays, now);
+}
+
+function topPagesFromEvents(
+  events: AnalyticsEvent[],
+  periodStart: number,
+  limit = 15,
+): { path: string; views: number; uniqueSessions: number }[] {
+  const byPath = new Map<string, { views: number; sessions: Set<string> }>();
+  for (const e of events) {
+    if (e.eventName !== "page_view" || e.createdAt < periodStart) continue;
+    const path = e.properties?.path ?? "/";
+    const prev = byPath.get(path) ?? { views: 0, sessions: new Set<string>() };
+    prev.views++;
+    if (e.sessionId) prev.sessions.add(e.sessionId);
+    else if (e.userId) prev.sessions.add(`user:${e.userId}`);
+    byPath.set(path, prev);
+  }
+  return [...byPath.entries()]
+    .map(([path, stats]) => ({
+      path,
+      views: stats.views,
+      uniqueSessions: stats.sessions.size,
+    }))
+    .sort((a, b) => b.views - a.views)
+    .slice(0, limit);
+}
+
 function distinctUsersInRange(
   userIds: Iterable<Id<"users"> | undefined>,
   _start: number,
@@ -442,6 +500,21 @@ export const getAdminDashboard = query({
       return lastActive < now - ms14;
     }).length;
 
+    const traffic = {
+      pageViews: countEvents(periodEvents, "page_view", periodStart),
+      pageUniqueSessions: distinctSessions(periodEvents, "page_view", periodStart),
+      landingViews: countEvents(periodEvents, "landing_view", periodStart),
+      landingUniqueSessions: distinctSessions(periodEvents, "landing_view", periodStart),
+      adminAnalyticsViews: countEvents(periodEvents, "admin_analytics_view", periodStart),
+      adminAnalyticsUniqueSessions: distinctSessions(periodEvents, "admin_analytics_view", periodStart),
+      paywallHits: countEvents(periodEvents, "paywall_hit", periodStart),
+      quizStarted: countEvents(periodEvents, "quiz_started", periodStart),
+      quizCompleted: countEvents(periodEvents, "quiz_completed", periodStart),
+      pageViewsByDay: countEventsByDay(allEvents, "page_view", periodDays, now),
+      landingViewsByDay: countEventsByDay(allEvents, "landing_view", periodDays, now),
+      topPages: topPagesFromEvents(periodEvents, periodStart),
+    };
+
     return {
       periodDays,
       overview: {
@@ -497,6 +570,7 @@ export const getAdminDashboard = query({
         pendingPaymentsStale: pendingOlderThan48h,
         inactiveStudents14d,
       },
+      traffic,
     };
   },
 });
