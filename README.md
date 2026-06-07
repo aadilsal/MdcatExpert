@@ -105,8 +105,8 @@ Upload at **Admin → Upload** (`.xlsx` / `.xls`). **All worksheets** with the c
 | Column | Description |
 | ------ | ----------- |
 | `Question` | Question text |
-| `A`–`D` | Four options |
-| `Correct` | `A`, `B`, `C`, or `D` — also accepts `C)`, `C) playing`, or the option text (e.g. `playing`) |
+| `A`–`D` | Full answer text for each option (prefixes like `C) playing` are stripped on import) |
+| `Correct` | `A`, `B`, `C`, or `D` — also accepts `C)`, `C) playing`, or the full matching option text |
 | `Subject` | `Biology`, `Chemistry`, `Physics`, `English`, or `General` (optional if the **sheet tab** is named after a subject) |
 
 ### Optional columns

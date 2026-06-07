@@ -358,9 +358,9 @@ export default function AdminUploadPage() {
                         <div className="space-y-3">
                             {[
                                 "Question Text",
-                                "Option A, B, C, D",
-                                "Correct Index (A/B/C/D)",
-                                "Subject Classifier",
+                                "Full answer text for options A, B, C, D",
+                                "Correct answer (A–D, or full matching option text)",
+                                "Subject Classifier (or name the tab Physics, etc.)",
                                 "Title (optional, same on each row)",
                             ].map((col, i) => (
                                 <div key={col} className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50/50 border border-gray-100 group hover:border-primary-200 transition-colors">

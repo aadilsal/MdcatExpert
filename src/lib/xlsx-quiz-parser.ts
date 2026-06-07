@@ -109,8 +109,32 @@ function cellValue(row: unknown[], index: number | undefined): string {
     return String(v).trim();
 }
 
+const OPTION_LABEL_PREFIX = /^[\s(]*([A-Da-d])(?:\s*[\).:\-–—]|\s*\)|\s+)/;
+
 /**
- * Accepts Correct values like "C", "c", "C)", "C) playing", "(C)", or option text "playing".
+ * Strips a leading option label (e.g. "C) playing" → "playing") so stored text is the full answer.
+ */
+export function normalizeOptionText(raw: string, label: "A" | "B" | "C" | "D"): string {
+    const trimmed = raw.trim();
+    if (!trimmed) return "";
+
+    const prefix = trimmed.match(OPTION_LABEL_PREFIX);
+    if (prefix && prefix[1].toUpperCase() === label) {
+        const withoutPrefix = trimmed.slice(prefix[0].length).trim();
+        if (withoutPrefix) return withoutPrefix;
+    }
+
+    return trimmed;
+}
+
+function stripAnswerPrefix(raw: string): string {
+    const trimmed = raw.trim();
+    const stripped = trimmed.replace(OPTION_LABEL_PREFIX, "").trim();
+    return stripped || trimmed;
+}
+
+/**
+ * Accepts Correct values like "C", "c", "C)", "C) playing", "(C)", or full option text.
  */
 export function normalizeCorrectAnswer(
     raw: string,
@@ -124,7 +148,7 @@ export function normalizeCorrectAnswer(
         return upper;
     }
 
-    const letterPrefix = trimmed.match(/^[\s(]*([A-Da-d])(?:\s*[\).:\-–—]|\s*\)|\s+)/);
+    const letterPrefix = trimmed.match(OPTION_LABEL_PREFIX);
     if (letterPrefix) {
         return letterPrefix[1].toUpperCase() as "A" | "B" | "C" | "D";
     }
@@ -134,7 +158,7 @@ export function normalizeCorrectAnswer(
         return letterOnly[1].toUpperCase() as "A" | "B" | "C" | "D";
     }
 
-    const normalized = trimmed.toLowerCase();
+    const normalized = stripAnswerPrefix(trimmed).toLowerCase();
     for (const label of ["A", "B", "C", "D"] as const) {
         const opt = options[label].trim().toLowerCase();
         if (!opt) continue;
@@ -199,10 +223,10 @@ function parseSheet(
 
         const excelRow = i + 1;
         const questionText = cellValue(row, columns.question);
-        const optionA = cellValue(row, columns.optionA);
-        const optionB = cellValue(row, columns.optionB);
-        const optionC = cellValue(row, columns.optionC);
-        const optionD = cellValue(row, columns.optionD);
+        const optionA = normalizeOptionText(cellValue(row, columns.optionA), "A");
+        const optionB = normalizeOptionText(cellValue(row, columns.optionB), "B");
+        const optionC = normalizeOptionText(cellValue(row, columns.optionC), "C");
+        const optionD = normalizeOptionText(cellValue(row, columns.optionD), "D");
         const correctRaw = cellValue(row, columns.correct);
         const subjectRaw = columns.subject !== undefined ? cellValue(row, columns.subject) : "";
         const imageUrl = columns.image !== undefined ? cellValue(row, columns.image) : "";
@@ -250,8 +274,9 @@ export function buildParseErrorMessage(result: ParseWorkbookResult): string {
                 : "";
         return (
             `Found worksheet layout on: ${tabs}, but every question row was rejected.${rows} ` +
-            `Check that Correct is A, B, C, or D (formats like "C" or "C) playing" are OK), options are filled, ` +
-            `and Subject is valid or the tab is named Biology, Chemistry, Physics, or English.`
+            `Check that options A–D contain full answer text, Correct is A–D or matching option text ` +
+            `(e.g. "C", "C) playing", or the full answer), and Subject is valid or the tab is named ` +
+            `Biology, Chemistry, Physics, or English.`
         );
     }
 
@@ -261,13 +286,14 @@ export function buildParseErrorMessage(result: ParseWorkbookResult): string {
     if (unrecognized.length > 0) {
         return (
             `No question tables found. Tabs without the required headers: ${unrecognized.join(", ")}. ` +
-            `Each data sheet needs columns: Question, A, B, C, D, Correct (Subject optional if the tab name is a subject).`
+            `Each data sheet needs columns: Question, A, B, C, D (full answer text), Correct ` +
+            `(Subject optional if the tab name is a subject).`
         );
     }
 
     return (
-        "No valid question sheets found. Each tab needs columns: Question, A, B, C, D, Correct " +
-        "(Subject optional if the tab is named Biology, Chemistry, Physics, or English)."
+        "No valid question sheets found. Each tab needs columns: Question, A, B, C, D (full answer text), " +
+        "Correct (Subject optional if the tab is named Biology, Chemistry, Physics, or English)."
     );
 }
 
