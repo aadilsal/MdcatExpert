@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    BookOpen,
     LayoutDashboard,
     FileText,
     BarChart3,
@@ -18,10 +17,12 @@ import {
     Ticket,
     DollarSign,
     AlertTriangle,
+    Newspaper,
 } from "lucide-react";
 import UserDropdown from "./user-dropdown";
 import { fetchMeCached } from "@/lib/me-client-cache";
 import AnalyticsTracker from "@/components/analytics-tracker";
+import MdcatLogo from "@/components/mdcat-logo";
 
 const studentNav = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -34,6 +35,7 @@ const adminNav = [
     { href: "/admin/quizzes", label: "Manage Quizzes", icon: FileText },
     { href: "/admin/reports", label: "Question Reports", icon: AlertTriangle, badge: true },
     { href: "/admin/upload", label: "Upload Quiz", icon: Upload },
+    { href: "/admin/blog", label: "Blog", icon: Newspaper },
     { href: "/admin/students", label: "Students", icon: Users },
     { href: "/admin/payments", label: "Payments", icon: DollarSign },
     { href: "/admin/discounts", label: "Discount Codes", icon: Ticket },
@@ -96,14 +98,7 @@ export default function AppLayout({
             >
                 {/* Logo Section */}
                 <div className="h-24 flex items-center justify-between px-8 border-b border-gray-50/50 shrink-0">
-                    <Link href="/dashboard" className="flex items-center gap-3 active:scale-95 transition-transform">
-                        <div className="w-10 h-10 bg-linear-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg shadow-primary-600/20">
-                            <BookOpen className="w-6 h-6 text-white" />
-                        </div>
-                        <span className="text-xl font-black text-gray-900 tracking-tight">
-                            Mdcat<span className="text-primary-600">Xpert</span>
-                        </span>
-                    </Link>
+                    <MdcatLogo href="/dashboard" size="sm" />
                     <button
                         onClick={() => setSidebarOpen(false)}
                         className="lg:hidden p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all"

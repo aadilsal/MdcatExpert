@@ -14,6 +14,7 @@ import type * as analytics from "../analytics.js";
 import type * as attempts from "../attempts.js";
 import type * as auth from "../auth.js";
 import type * as authPassword from "../authPassword.js";
+import type * as blogPosts from "../blogPosts.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as lib_auth from "../lib/auth.js";
@@ -42,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   attempts: typeof attempts;
   auth: typeof auth;
   authPassword: typeof authPassword;
+  blogPosts: typeof blogPosts;
   files: typeof files;
   http: typeof http;
   "lib/auth": typeof lib_auth;

@@ -1,0 +1,19 @@
+# MdcatXpert
+
+> Free MDCAT preparation platform for Pakistan — interactive past-paper quizzes, subject-wise analytics, and AI-powered study tools.
+
+MdcatXpert helps medical college admission test (MDCAT) aspirants in Pakistan practice with verified quiz archives, track performance across Biology, Chemistry, Physics, and English, and improve with AI-driven weakness analysis.
+
+## Key pages
+
+- Homepage: https://mdcatxpert.com/
+- Blog (MDCAT guides & study tips): https://mdcatxpert.com/blog
+- Help center: https://mdcatxpert.com/help
+- Contact: https://mdcatxpert.com/contact
+
+## Topics we cover
+
+- MDCAT preparation and study plans
+- Biology, Chemistry, Physics, and English for MDCAT
+- Past paper practice and exam strategy
+- Performance analytics for Pakistani medical entrance exams

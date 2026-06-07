@@ -17,6 +17,8 @@ const isPublicPath = createRouteMatcher([
   "/terms",
   "/privacy",
   "/contact",
+  "/blog",
+  "/blog(.*)",
 ]);
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 const isProtectedRoute = (req: NextRequest) =>

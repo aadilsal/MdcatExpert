@@ -1,6 +1,4 @@
-import Link from "next/link";
-import { BookOpen } from "lucide-react";
-
+import MdcatLogo from "@/components/mdcat-logo";
 export default function AuthLayout({
     children,
 }: {
@@ -15,14 +13,7 @@ export default function AuthLayout({
 
             {/* Header */}
             <header className="relative z-10 px-8 py-8">
-                <Link href="/" className="inline-flex items-center gap-3 group">
-                    <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-600/20 group-hover:scale-105 transition-transform">
-                        <BookOpen className="w-6 h-6 text-white" />
-                    </div>
-                    <span className="text-2xl font-black text-gray-900 tracking-tight">
-                        Mdcat<span className="text-primary-600">Xpert</span>
-                    </span>
-                </Link>
+                <MdcatLogo size="md" priority />
             </header>
 
             {/* Content */}

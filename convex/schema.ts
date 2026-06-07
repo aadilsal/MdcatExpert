@@ -222,4 +222,22 @@ export default defineSchema({
     .index("by_eventName", ["eventName"])
     .index("by_createdAt", ["createdAt"])
     .index("by_userId", ["userId"]),
+
+  blogPosts: defineTable({
+    title: v.string(),
+    slug: v.string(),
+    excerpt: v.string(),
+    content: v.string(),
+    coverImageUrl: v.optional(v.string()),
+    authorId: v.id("users"),
+    status: v.union(v.literal("draft"), v.literal("published")),
+    tags: v.array(v.string()),
+    metaTitle: v.optional(v.string()),
+    metaDescription: v.optional(v.string()),
+    publishedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_status", ["status"]),
 });
