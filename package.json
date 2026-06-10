@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "convex:dev": "npx convex dev",
     "convex:seed-promos": "npx convex run seed:seedTestPromoCodes",
+    "convex:seed-blogs": "npx convex run seedBlog:seedBlogPosts",
     "convex:seed-library": "node scripts/seed-pctb-library.mjs",
     "convex:seed-library:now": "node scripts/seed-pctb-library.mjs --now",
     "convex:seed-library:local": "node scripts/seed-pctb-library.mjs --local",
