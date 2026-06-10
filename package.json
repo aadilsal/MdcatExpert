@@ -9,7 +9,11 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "convex:dev": "npx convex dev",
-    "convex:seed-promos": "npx convex run seed:seedTestPromoCodes"
+    "convex:seed-promos": "npx convex run seed:seedTestPromoCodes",
+    "convex:seed-library": "node scripts/seed-pctb-library.mjs",
+    "convex:seed-library:now": "node scripts/seed-pctb-library.mjs --now",
+    "convex:seed-library:local": "node scripts/seed-pctb-library.mjs --local",
+    "convex:reindex-failed": "node scripts/reindex-failed-library.mjs"
   },
   "dependencies": {
     "@auth/core": "0.37.0",
@@ -22,10 +26,14 @@
     "convex": "^1.35.1",
     "framer-motion": "^12.34.3",
     "groq-sdk": "^0.37.0",
+    "jpeg-js": "^0.4.4",
     "jsonwebtoken": "^9.0.2",
     "lucia": "^3.2.2",
     "lucide-react": "^0.575.0",
+    "mammoth": "^1.12.0",
     "next": "16.1.6",
+    "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "^6.0.227",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "recharts": "^3.7.0",
@@ -37,6 +45,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",

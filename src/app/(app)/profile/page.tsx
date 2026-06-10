@@ -32,7 +32,7 @@ export default async function ProfilePage() {
                 </div>
             </div>
 
-            <Suspense fallback={<div className="h-96 animate-pulse bg-gray-50 rounded-2xl border border-gray-100" />}>
+            <Suspense fallback={<div className="h-96 animate-pulse bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-surface-border" />}>
                 <ProfileClient
                     user={{
                         id: profile._id,

@@ -14,13 +14,13 @@ function inlineMarkdown(text: string, keyPrefix: string): ReactNode[] {
     }
     if (match[2] !== undefined) {
       parts.push(
-        <strong key={`${keyPrefix}-b-${i++}`} className="font-bold text-gray-900">
+        <strong key={`${keyPrefix}-b-${i++}`} className="font-bold text-gray-900 dark:text-white">
           {match[2]}
         </strong>,
       );
     } else if (match[3] !== undefined) {
       parts.push(
-        <em key={`${keyPrefix}-i-${i++}`} className="italic text-gray-700">
+        <em key={`${keyPrefix}-i-${i++}`} className="italic text-gray-700 dark:text-slate-300">
           {match[3]}
         </em>,
       );
@@ -124,7 +124,7 @@ export default function BlogContent({ content }: { content: string }) {
             return (
               <h2
                 key={i}
-                className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight mt-12 mb-4 first:mt-0"
+                className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight mt-12 mb-4 first:mt-0"
               >
                 {inlineMarkdown(block.text, `h2-${i}`)}
               </h2>
@@ -133,7 +133,7 @@ export default function BlogContent({ content }: { content: string }) {
             return (
               <h3
                 key={i}
-                className="text-xl font-black text-gray-900 mt-8 mb-3"
+                className="text-xl font-black text-gray-900 dark:text-white mt-8 mb-3"
               >
                 {inlineMarkdown(block.text, `h3-${i}`)}
               </h3>
@@ -147,7 +147,7 @@ export default function BlogContent({ content }: { content: string }) {
                 {block.items.map((item, j) => (
                   <li
                     key={j}
-                    className="text-base sm:text-lg text-gray-600 font-medium leading-relaxed pl-1"
+                    className="text-base sm:text-lg text-gray-600 dark:text-slate-300 font-medium leading-relaxed pl-1"
                   >
                     {inlineMarkdown(item, `li-${i}-${j}`)}
                   </li>
@@ -158,7 +158,7 @@ export default function BlogContent({ content }: { content: string }) {
             return (
               <p
                 key={i}
-                className="text-base sm:text-lg text-gray-600 font-medium leading-[1.85] mb-5 indent-0"
+                className="text-base sm:text-lg text-gray-600 dark:text-slate-300 font-medium leading-[1.85] mb-5 indent-0"
               >
                 {inlineMarkdown(block.text, `p-${i}`)}
               </p>

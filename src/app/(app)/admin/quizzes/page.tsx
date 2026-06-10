@@ -20,12 +20,12 @@ export const dynamic = "force-dynamic";
 export default async function AdminQuizzesPage() {
     const token = await convexAuthNextjsToken();
     if (!token) {
-        return <div className="p-10 text-center text-gray-500">Unauthorized</div>;
+        return <div className="p-10 text-center text-gray-500 dark:text-gray-400">Unauthorized</div>;
     }
 
     const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
     if (!me || me.role !== "admin") {
-        return <div className="p-10 text-center text-gray-500">Forbidden</div>;
+        return <div className="p-10 text-center text-gray-500 dark:text-gray-400">Forbidden</div>;
     }
 
     const quizzesList = (await fetchQuery(api.quizzes.getQuizzes, {}, { token })) ?? [];
@@ -92,11 +92,11 @@ export default async function AdminQuizzesPage() {
                 ].map((stat) => (
                     <div
                         key={stat.label}
-                        className="bg-white rounded-xl border border-gray-100 p-5 shadow-card hover:shadow-card-hover transition-all duration-300 group"
+                        className="bg-surface rounded-xl border border-surface-border p-5 shadow-card hover:shadow-card-hover dark:shadow-none dark:hover:shadow-none transition-all duration-300 group"
                     >
                         <div className="flex items-start justify-between">
                             <div>
-                                <p className="text-sm font-medium text-gray-500">
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                                     {stat.label}
                                 </p>
                                 <p className={`text-3xl font-bold mt-1 ${stat.textColor}`}>
@@ -115,20 +115,20 @@ export default async function AdminQuizzesPage() {
 
             {/* Quizzes List */}
             <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                     Uploaded Quizzes
                 </h2>
 
                 {quizzesList.length === 0 ? (
-                    <div className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden">
+                    <div className="bg-surface rounded-xl border border-surface-border shadow-card dark:shadow-none overflow-hidden">
                         <div className="p-14 text-center">
                             <div className="w-16 h-16 bg-linear-to-br from-gray-100 to-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                 <FileText className="w-8 h-8 text-gray-300" />
                             </div>
-                            <h3 className="font-semibold text-gray-900 mb-1">
+                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
                                 No quizzes uploaded yet
                             </h3>
-                            <p className="text-sm text-gray-500 mb-5">
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
                                 Upload your first MDCAT quiz to get started.
                             </p>
                             <Link
@@ -145,7 +145,7 @@ export default async function AdminQuizzesPage() {
                         {quizzesList.map((quiz) => (
                             <div
                                 key={quiz._id}
-                                className="bg-white rounded-xl border border-gray-100 p-5 shadow-card hover:shadow-card-hover transition-all duration-300 group"
+                                className="bg-surface rounded-xl border border-surface-border p-5 shadow-card hover:shadow-card-hover dark:shadow-none dark:hover:shadow-none transition-all duration-300 group"
                             >
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="w-12 h-12 bg-linear-to-br from-primary-100 to-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -161,7 +161,7 @@ export default async function AdminQuizzesPage() {
                                     initialTitle={quiz.title}
                                 />
 
-                                <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-5">
+                                <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400 mb-5">
                                     <span className="flex items-center gap-1.5 font-bold text-primary-600">
                                         <Hash className="w-3.5 h-3.5" />
                                         {quiz.subject}
@@ -177,10 +177,10 @@ export default async function AdminQuizzesPage() {
                                     )}
                                 </div>
 
-                                <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                                <div className="flex items-center gap-2 pt-3 border-t border-surface-border">
                                     <Link
                                         href={`/admin/quizzes/${quiz._id}`}
-                                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors"
+                                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gray-50 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-100 transition-colors"
                                     >
                                         <Eye className="w-4 h-4" />
                                         Manage

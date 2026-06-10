@@ -8,12 +8,12 @@ export const dynamic = "force-dynamic";
 export default async function AdminNewBlogPage() {
   const token = await convexAuthNextjsToken();
   if (!token) {
-    return <div className="p-10 text-center text-gray-500">Unauthorized</div>;
+    return <div className="p-10 text-center text-gray-500 dark:text-gray-400">Unauthorized</div>;
   }
 
   const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
   if (!me || me.role !== "admin") {
-    return <div className="p-10 text-center text-gray-500">Forbidden</div>;
+    return <div className="p-10 text-center text-gray-500 dark:text-gray-400">Forbidden</div>;
   }
 
   return <BlogEditorClient />;

@@ -78,7 +78,7 @@ export function QuizzesCatalog({
                     <div className="grid grid-cols-2 gap-4">
                         <div className="bg-white/5 backdrop-blur-xl border border-white/5 p-6 rounded-3xl">
                             <p className="text-3xl font-black text-white">{totalQuizzes}</p>
-                            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-1">Available Quizzes</p>
+                            <p className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-1">Available Quizzes</p>
                         </div>
                         <div className="bg-primary-600 p-6 rounded-3xl shadow-xl shadow-primary-600/20">
                             <p className="text-3xl font-black text-white">{attemptedUnique}</p>
@@ -89,9 +89,9 @@ export function QuizzesCatalog({
             </div>
 
             <div className="space-y-8">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-surface-border pb-8">
                     <div>
-                        <h2 className="text-2xl font-black text-gray-900 tracking-tight">Browse Quizzes</h2>
+                        <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100 tracking-tight">Browse Quizzes</h2>
                         <p className="text-sm text-gray-400 font-bold uppercase tracking-widest mt-1">
                             Found {filteredQuizzes.length} of {totalQuizzes} Verified Exams
                         </p>
@@ -104,23 +104,23 @@ export function QuizzesCatalog({
                             value={filter}
                             onChange={(e) => setFilter(e.target.value)}
                             placeholder="Filter by year or title..."
-                            className="w-full pl-11 pr-4 py-3 bg-white border border-gray-100 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500 transition-all shadow-sm"
+                            className="w-full pl-11 pr-4 py-3 bg-surface-input dark:bg-slate-950 border border-surface-border rounded-2xl text-sm font-medium text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500 transition-all shadow-sm dark:shadow-none"
                         />
                     </div>
                 </div>
 
                 {sortedQuizzes.length === 0 ? (
-                    <div className="bg-gray-50/50 rounded-[2.5rem] border-2 border-dashed border-gray-100 p-20 text-center">
-                        <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-gray-200/50">
+                    <div className="bg-gray-50/50 dark:bg-slate-800/30 rounded-[2.5rem] border-2 border-dashed border-surface-border p-20 text-center">
+                        <div className="w-20 h-20 bg-surface rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-gray-200/50 dark:shadow-none">
                             <BookOpen className="w-10 h-10 text-gray-300" />
                         </div>
-                        <h3 className="text-xl font-black text-gray-900 mb-2">The shelves are empty.</h3>
+                        <h3 className="text-xl font-black text-gray-900 dark:text-gray-100 mb-2">The shelves are empty.</h3>
                         <p className="text-gray-400 font-medium max-w-sm mx-auto">
                             No quizzes have been uploaded yet. Please check back later or contact an administrator.
                         </p>
                     </div>
                 ) : filteredQuizzes.length === 0 ? (
-                    <div className="rounded-[2.5rem] border border-gray-100 bg-white p-12 text-center text-gray-500">
+                    <div className="rounded-[2.5rem] border border-surface-border bg-surface p-12 text-center text-gray-500 dark:text-gray-400">
                         No quizzes match &quot;{filter.trim()}&quot;. Try another year or title.
                     </div>
                 ) : (
@@ -145,7 +145,7 @@ export function QuizzesCatalog({
                                             router.push("/upgrade?reason=premium_content");
                                         }
                                     }}
-                                    className={`group relative bg-white rounded-4xl border border-gray-100 p-8 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col ${isLocked ? "grayscale-[0.5] opacity-90" : "hover:shadow-primary-600/10 hover:border-primary-200"}`}
+                                    className={`group relative bg-surface rounded-4xl border border-surface-border p-8 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col ${isLocked ? "grayscale-[0.5] opacity-90" : "hover:shadow-primary-600/10 hover:border-primary-200"}`}
                                 >
                                     {!isLocked && (
                                         <div className="absolute inset-0 bg-linear-to-br from-primary-600/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 rounded-4xl transition-opacity pointer-events-none" />
@@ -153,7 +153,7 @@ export function QuizzesCatalog({
 
                                     <div className="relative flex items-start justify-between mb-8">
                                         <div
-                                            className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${isLocked ? "bg-amber-50 text-amber-600 shadow-lg shadow-amber-500/10" : isAttempted ? "bg-emerald-50 text-emerald-600 shadow-lg shadow-emerald-500/10" : "bg-gray-50 text-gray-500 group-hover:bg-primary-50 group-hover:text-primary-600"}`}
+                                            className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${isLocked ? "bg-amber-50 text-amber-600 shadow-lg shadow-amber-500/10" : isAttempted ? "bg-emerald-50 text-emerald-600 shadow-lg shadow-emerald-500/10" : "bg-gray-50 text-gray-500 dark:text-gray-400 group-hover:bg-primary-50 group-hover:text-primary-600"}`}
                                         >
                                             {isLocked ? (
                                                 <Lock className="w-7 h-7" />
@@ -186,7 +186,7 @@ export function QuizzesCatalog({
                                     </div>
 
                                     <div className="relative space-y-2 mb-8">
-                                        <h3 className="font-black text-gray-900 text-2xl tracking-tight leading-tight group-hover:text-primary-600 transition-colors">
+                                        <h3 className="font-black text-gray-900 dark:text-gray-100 text-2xl tracking-tight leading-tight group-hover:text-primary-600 transition-colors">
                                             {quiz.title}
                                         </h3>
                                         <div className="flex items-center gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
@@ -201,7 +201,7 @@ export function QuizzesCatalog({
                                         </div>
                                     </div>
 
-                                    <div className="relative mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
+                                    <div className="relative mt-auto pt-6 border-t border-gray-50 dark:border-slate-800 dark:border-slate-800 flex items-center justify-between">
                                         <div className="flex -space-x-2">
                                             <div className="w-6 h-6 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center text-[8px] font-bold text-gray-400 uppercase">
                                                 XP
@@ -222,7 +222,7 @@ export function QuizzesCatalog({
 
             <div className="grid md:grid-cols-2 gap-8 pt-8">
                 <div className="bg-emerald-50 rounded-4xl p-8 border border-emerald-100/50 flex items-center gap-6 group hover:-translate-y-1 transition-all">
-                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-lg shadow-emerald-500/5 transition-transform group-hover:scale-110">
+                    <div className="w-16 h-16 bg-surface rounded-2xl flex items-center justify-center text-emerald-600 shadow-lg shadow-emerald-500/5 transition-transform group-hover:scale-110">
                         <TrendingUp className="w-8 h-8" />
                     </div>
                     <div>
@@ -233,7 +233,7 @@ export function QuizzesCatalog({
                     </div>
                 </div>
                 <div className="bg-primary-50 rounded-4xl p-8 border border-primary-100/50 flex items-center gap-6 group hover:-translate-y-1 transition-all">
-                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-primary-600 shadow-lg shadow-primary-500/5 transition-transform group-hover:scale-110">
+                    <div className="w-16 h-16 bg-surface rounded-2xl flex items-center justify-center text-primary-600 shadow-lg shadow-primary-500/5 transition-transform group-hover:scale-110">
                         <Sparkles className="w-8 h-8" />
                     </div>
                     <div>

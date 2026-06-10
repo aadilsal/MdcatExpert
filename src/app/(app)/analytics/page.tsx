@@ -14,7 +14,7 @@ export default async function AnalyticsPage() {
     if (!token) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
-                <p className="text-gray-500">Please log in to view analytics.</p>
+                <p className="text-gray-500 dark:text-gray-400">Please log in to view analytics.</p>
             </div>
         );
     }
@@ -23,7 +23,7 @@ export default async function AnalyticsPage() {
     if (!me) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
-                <p className="text-gray-500">Please log in to view analytics.</p>
+                <p className="text-gray-500 dark:text-gray-400">Please log in to view analytics.</p>
             </div>
         );
     }

@@ -121,15 +121,15 @@ export default function ProfileClient({ user }: ProfileClientProps) {
 
     return (
         <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden">
+            <div className="bg-surface rounded-2xl border border-surface-border shadow-card dark:shadow-none overflow-hidden">
                 <div className="flex flex-col md:flex-row h-full">
                     {/* Tabs Sidebar */}
-                    <div className="w-full md:w-64 bg-gray-50 border-r border-gray-100 p-4 space-y-2">
+                    <div className="w-full md:w-64 bg-gray-50 dark:bg-slate-900/60 border-r border-surface-border p-4 space-y-2">
                         <button
                             onClick={() => switchTab("personal")}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === "personal"
                                 ? "bg-primary-600 text-white shadow-md shadow-primary-200"
-                                : "text-gray-600 hover:bg-gray-100"
+                                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800"
                                 }`}
                         >
                             <User className="w-4 h-4" />
@@ -139,7 +139,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                             onClick={() => switchTab("security")}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === "security"
                                 ? "bg-primary-600 text-white shadow-md shadow-primary-200"
-                                : "text-gray-600 hover:bg-gray-100"
+                                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800"
                                 }`}
                         >
                             <Lock className="w-4 h-4" />
@@ -149,7 +149,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                             onClick={() => switchTab("preferences")}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === "preferences"
                                 ? "bg-primary-600 text-white shadow-md shadow-primary-200"
-                                : "text-gray-600 hover:bg-gray-100"
+                                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800"
                                 }`}
                         >
                             <Bell className="w-4 h-4" />
@@ -160,7 +160,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                     {/* Content Area */}
                     <div className="flex-1 p-8">
                         {message && (
-                            <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 animate-fade-in ${message.type === "success" ? "bg-green-50 text-green-700 border border-green-100" : "bg-red-50 text-red-700 border border-red-100"
+                            <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 animate-fade-in ${message.type === "success" ? "bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300 border border-green-100 dark:border-green-900/50" : "bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 border border-red-100 dark:border-red-900/50"
                                 }`}>
                                 {message.type === "success" ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
                                 <p className="text-sm font-medium">{message.text}</p>
@@ -170,39 +170,39 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                         {activeTab === "personal" && (
                             <div className="animate-fade-in space-y-6">
                                 <div>
-                                    <h2 className="text-xl font-bold text-gray-900 mb-1">Personal Information</h2>
-                                    <p className="text-sm text-gray-500">Update your account details and contact information.</p>
+                                    <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">Personal Information</h2>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Update your account details and contact information.</p>
                                 </div>
 
                                 <form onSubmit={handleUpdateProfile} className="space-y-4">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
-                                            <label className="text-sm font-semibold text-gray-700">Full Name</label>
+                                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Full Name</label>
                                             <div className="relative">
                                                 <UserCircle className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                                 <input
                                                     type="text"
                                                     value={name}
                                                     onChange={(e) => setName(e.target.value)}
-                                                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                                                    className="theme-input w-full pl-10 pr-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-900/40 focus:border-transparent outline-none transition-all"
                                                     required
                                                 />
                                             </div>
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-sm font-semibold text-gray-700">Email Address</label>
+                                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Email Address</label>
                                             <div className="relative">
                                                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                                 <input
                                                     type="email"
                                                     value={user.email}
                                                     disabled
-                                                    className="w-full pl-10 pr-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl text-sm text-gray-500 cursor-not-allowed"
+                                                    className="w-full pl-10 pr-4 py-2.5 bg-gray-100 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700 rounded-xl text-sm text-gray-500 dark:text-gray-400 cursor-not-allowed"
                                                 />
                                             </div>
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-sm font-semibold text-gray-700">Phone Number</label>
+                                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Phone Number</label>
                                             <div className="relative">
                                                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                                 <input
@@ -210,13 +210,13 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                                                     value={phone}
                                                     onChange={(e) => setPhone(e.target.value)}
                                                     placeholder="Optional"
-                                                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                                                    className="theme-input w-full pl-10 pr-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-900/40 focus:border-transparent outline-none transition-all"
                                                 />
                                             </div>
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-sm font-semibold text-gray-700">Account Role</label>
-                                            <div className="px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl text-sm text-gray-500 first-letter:uppercase">
+                                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Account Role</label>
+                                            <div className="px-4 py-2.5 bg-gray-100 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700 rounded-xl text-sm text-gray-500 dark:text-gray-400 first-letter:uppercase">
                                                 {user.role}
                                             </div>
                                         </div>
@@ -239,27 +239,27 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                         {activeTab === "security" && (
                             <div className="animate-fade-in space-y-6">
                                 <div>
-                                    <h2 className="text-xl font-bold text-gray-900 mb-1">Security Settings</h2>
-                                    <p className="text-sm text-gray-500">Manage your password and account security.</p>
+                                    <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">Security Settings</h2>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Manage your password and account security.</p>
                                 </div>
 
                                 <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-md">
                                     <div className="space-y-1.5">
-                                        <label className="text-sm font-semibold text-gray-700">Current Password</label>
+                                        <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Current Password</label>
                                         <div className="relative">
                                             <input
                                                 type={showCurrentPassword ? "text" : "password"}
                                                 value={currentPassword}
                                                 onChange={(e) => setCurrentPassword(e.target.value)}
                                                 placeholder="Enter current password"
-                                                className="w-full px-4 py-2.5 pr-11 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                                                className="theme-input w-full px-4 py-2.5 pr-11 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-900/40 focus:border-transparent outline-none transition-all"
                                                 required
                                                 autoComplete="current-password"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:text-gray-400 focus:outline-none transition-colors"
                                                 aria-label={showCurrentPassword ? "Hide password" : "Show password"}
                                             >
                                                 {showCurrentPassword ? (
@@ -271,21 +271,21 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                                         </div>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-sm font-semibold text-gray-700">New Password</label>
+                                        <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">New Password</label>
                                         <div className="relative">
                                             <input
                                                 type={showNewPassword ? "text" : "password"}
                                                 value={newPassword}
                                                 onChange={(e) => setNewPassword(e.target.value)}
                                                 placeholder="Min 6 characters"
-                                                className="w-full px-4 py-2.5 pr-11 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                                                className="theme-input w-full px-4 py-2.5 pr-11 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-900/40 focus:border-transparent outline-none transition-all"
                                                 required
                                                 autoComplete="new-password"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => setShowNewPassword(!showNewPassword)}
-                                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:text-gray-400 focus:outline-none transition-colors"
                                                 aria-label={showNewPassword ? "Hide password" : "Show password"}
                                             >
                                                 {showNewPassword ? (
@@ -297,21 +297,21 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                                         </div>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-sm font-semibold text-gray-700">Confirm New Password</label>
+                                        <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Confirm New Password</label>
                                         <div className="relative">
                                             <input
                                                 type={showConfirmPassword ? "text" : "password"}
                                                 value={confirmPassword}
                                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                                 placeholder="Repeat new password"
-                                                className="w-full px-4 py-2.5 pr-11 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                                                className="theme-input w-full px-4 py-2.5 pr-11 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-900/40 focus:border-transparent outline-none transition-all"
                                                 required
                                                 autoComplete="new-password"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:text-gray-400 focus:outline-none transition-colors"
                                                 aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                                             >
                                                 {showConfirmPassword ? (
@@ -339,15 +339,15 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                         {activeTab === "preferences" && (
                             <div className="animate-fade-in space-y-6">
                                 <div>
-                                    <h2 className="text-xl font-bold text-gray-900 mb-1">Account Preferences</h2>
-                                    <p className="text-sm text-gray-500">Manage how you interact with the platform.</p>
+                                    <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">Account Preferences</h2>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Manage how you interact with the platform.</p>
                                 </div>
 
                                 <div className="space-y-4">
-                                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-surface-border">
                                         <div>
-                                            <p className="font-semibold text-gray-900">Email Notifications</p>
-                                            <p className="text-xs text-gray-500">Get important updates like payment approval.</p>
+                                            <p className="font-semibold text-gray-900 dark:text-gray-100">Email Notifications</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">Get important updates like payment approval.</p>
                                         </div>
                                         <button
                                             type="button"
@@ -377,10 +377,10 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                                             />
                                         </button>
                                     </div>
-                                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-surface-border">
                                         <div>
-                                            <p className="font-semibold text-gray-900">Push Notifications</p>
-                                            <p className="text-xs text-gray-500">Alerts when new quizzes are uploaded.</p>
+                                            <p className="font-semibold text-gray-900 dark:text-gray-100">Push Notifications</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">Alerts when new quizzes are uploaded.</p>
                                         </div>
                                         <div className="w-12 h-6 bg-gray-300 rounded-full relative cursor-not-allowed">
                                             <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full" />

@@ -31,9 +31,11 @@ export default function ReportQuestionModal({
 
   useEffect(() => {
     if (open) {
-      setSubmitting(false);
-      setError(null);
-      setSuccess(false);
+      setTimeout(() => {
+        setSubmitting(false);
+        setError(null);
+        setSuccess(false);
+      }, 0);
     }
   }, [open]);
 
@@ -71,11 +73,11 @@ export default function ReportQuestionModal({
         onClick={handleClose}
         aria-hidden={submitting}
       />
-      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-scale-in">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/80">
+      <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-surface-border dark:border-slate-800 overflow-hidden animate-scale-in">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border dark:border-slate-800 bg-gray-50/80 dark:bg-slate-950/80">
           <div className="flex items-center gap-2">
             <Flag className="w-4 h-4 text-rose-500" />
-            <h2 className="text-sm font-black uppercase tracking-widest text-gray-900">
+            <h2 className="text-sm font-black uppercase tracking-widest text-gray-900 dark:text-white">
               Report Q{questionNumber}
             </h2>
           </div>
@@ -83,28 +85,28 @@ export default function ReportQuestionModal({
             type="button"
             onClick={handleClose}
             disabled={submitting}
-            className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-40 disabled:pointer-events-none"
+            className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-700 dark:text-gray-300 dark:hover:text-slate-200 disabled:opacity-40 disabled:pointer-events-none"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {success ? (
-          <div className="p-8 text-center">
-            <p className="text-emerald-600 font-bold">Thanks! We&apos;ll review this question.</p>
+          <div className="p-8 text-center bg-white dark:bg-slate-900">
+            <p className="text-emerald-600 dark:text-emerald-400 font-bold">Thanks! We&apos;ll review this question.</p>
           </div>
         ) : (
           <form
             onSubmit={handleSubmit}
-            className={`p-6 space-y-5 ${submitting ? "pointer-events-none opacity-70" : ""}`}
+            className={`p-6 space-y-5 bg-white dark:bg-slate-900 ${submitting ? "pointer-events-none opacity-70" : ""}`}
             aria-busy={submitting}
           >
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-slate-400">
               Tell us what&apos;s wrong. Your report includes this quiz and your account email automatically.
             </p>
 
             <fieldset className="space-y-2" disabled={submitting}>
-              <legend className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">
+              <legend className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2">
                 Issue type
               </legend>
               {CATEGORIES.map((c) => (
@@ -114,8 +116,8 @@ export default function ReportQuestionModal({
                     submitting ? "cursor-not-allowed" : "cursor-pointer"
                   } ${
                     category === c.value
-                      ? "border-rose-300 bg-rose-50 text-rose-900"
-                      : "border-gray-100 hover:bg-gray-50"
+                      ? "border-rose-300 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/20 text-rose-900 dark:text-rose-300"
+                      : "border-surface-border dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 text-gray-700 dark:text-slate-300"
                   }`}
                 >
                   <input
@@ -133,7 +135,7 @@ export default function ReportQuestionModal({
             </fieldset>
 
             <div>
-              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
                 Details (optional)
               </label>
               <textarea
@@ -142,12 +144,12 @@ export default function ReportQuestionModal({
                 rows={3}
                 placeholder="Describe the issue..."
                 disabled={submitting}
-                className="mt-2 w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/30 disabled:bg-gray-50 disabled:cursor-not-allowed"
+                className="mt-2 w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-800 bg-surface-input dark:bg-slate-950 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/30 disabled:bg-gray-50 dark:disabled:bg-slate-900 disabled:cursor-not-allowed"
               />
             </div>
 
             {error && (
-              <p className="text-sm text-red-600 font-medium">{error}</p>
+              <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
             )}
 
             <div className="flex gap-3 pt-2">
@@ -155,7 +157,7 @@ export default function ReportQuestionModal({
                 type="button"
                 onClick={handleClose}
                 disabled={submitting}
-                className="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-800 text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>

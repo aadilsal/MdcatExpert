@@ -18,12 +18,12 @@ function formatDate(ts: number) {
 export default async function AdminBlogPage() {
   const token = await convexAuthNextjsToken();
   if (!token) {
-    return <div className="p-10 text-center text-gray-500">Unauthorized</div>;
+    return <div className="p-10 text-center text-gray-500 dark:text-gray-400">Unauthorized</div>;
   }
 
   const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
   if (!me || me.role !== "admin") {
-    return <div className="p-10 text-center text-gray-500">Forbidden</div>;
+    return <div className="p-10 text-center text-gray-500 dark:text-gray-400">Forbidden</div>;
   }
 
   const posts = await fetchQuery(api.blogPosts.listAllForAdmin, {}, { token });
@@ -49,9 +49,9 @@ export default async function AdminBlogPage() {
       </div>
 
       {posts.length === 0 ? (
-        <div className="text-center py-20 rounded-2xl bg-gray-50 border border-gray-100">
+        <div className="text-center py-20 rounded-2xl bg-gray-50 border border-surface-border">
           <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 font-medium mb-6">No blog posts yet.</p>
+          <p className="text-gray-500 dark:text-gray-400 font-medium mb-6">No blog posts yet.</p>
           <Link
             href="/admin/blog/new"
             className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white font-black text-sm rounded-xl"
@@ -61,10 +61,10 @@ export default async function AdminBlogPage() {
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-surface rounded-2xl border border-surface-border shadow-sm overflow-hidden">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50/50">
+              <tr className="border-b border-surface-border bg-gray-50/50">
                 <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Title</th>
                 <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest hidden sm:table-cell">Status</th>
                 <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest hidden md:table-cell">Updated</th>
@@ -73,9 +73,9 @@ export default async function AdminBlogPage() {
             </thead>
             <tbody>
               {posts.map((post) => (
-                <tr key={post._id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                <tr key={post._id} className="border-b border-gray-50 dark:border-slate-800 dark:border-slate-800 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
                   <td className="px-6 py-4">
-                    <p className="font-bold text-gray-900">{post.title}</p>
+                    <p className="font-bold text-gray-900 dark:text-gray-100">{post.title}</p>
                     <p className="text-xs text-gray-400 font-medium mt-0.5">/blog/{post.slug}</p>
                   </td>
                   <td className="px-6 py-4 hidden sm:table-cell">
@@ -89,7 +89,7 @@ export default async function AdminBlogPage() {
                       {post.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500 font-medium hidden md:table-cell">
+                  <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 font-medium hidden md:table-cell">
                     {formatDate(post.updatedAt)}
                   </td>
                   <td className="px-6 py-4">
@@ -106,7 +106,7 @@ export default async function AdminBlogPage() {
                       )}
                       <Link
                         href={`/admin/blog/${post._id}/edit`}
-                        className="p-2 text-gray-400 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-all"
+                        className="p-2 text-gray-400 hover:text-gray-900 dark:text-gray-100 rounded-lg hover:bg-gray-100 transition-all"
                         title="Edit"
                       >
                         <Pencil className="w-4 h-4" />

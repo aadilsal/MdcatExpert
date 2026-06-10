@@ -40,7 +40,7 @@ type MdcatLogoProps = {
 
 function BrandName({ textClass }: { textClass: string }) {
   return (
-    <span className={`font-black text-gray-900 tracking-tight whitespace-nowrap ${textClass}`}>
+    <span className={`font-black text-gray-900 dark:text-white tracking-tight whitespace-nowrap ${textClass}`}>
       Mdcat<span className="text-primary-600">Xpert</span>
     </span>
   );

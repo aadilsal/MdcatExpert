@@ -8,13 +8,13 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
     Upload,
-    Loader2,
     CheckCircle,
     Clock,
     CreditCard,
     ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
+import { LoadingButton } from "@/components/loading-button";
 
 function SignupPaymentContent() {
     const router = useRouter();
@@ -129,9 +129,9 @@ function SignupPaymentContent() {
                 >
                     <CheckCircle className="w-12 h-12" />
                 </motion.div>
-                <h1 className="text-4xl font-black text-gray-900 mb-4 tracking-tight italic">Payment Submitted.</h1>
+                <h1 className="text-4xl font-black text-gray-900 dark:text-gray-100 mb-4 tracking-tight italic">Payment Submitted.</h1>
                 <div className="max-w-md mx-auto space-y-4">
-                    <p className="text-gray-500 font-bold italic">
+                    <p className="text-gray-500 dark:text-gray-400 font-bold italic">
                         Your payment screenshot has been received. Our team is verifying your submission.
                     </p>
                     <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-left">
@@ -166,7 +166,7 @@ function SignupPaymentContent() {
     return (
         <div className="min-h-screen bg-linear-to-b from-white to-gray-50 pb-20 pt-10 px-4">
             <div className="max-w-2xl mx-auto">
-                <Link href="/dashboard" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 font-semibold mb-12 transition-colors">
+                <Link href="/dashboard" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-100 font-semibold mb-12 transition-colors">
                     <ArrowLeft className="w-5 h-5" />
                     Back to Dashboard
                 </Link>
@@ -176,15 +176,15 @@ function SignupPaymentContent() {
                         <CreditCard className="w-3.5 h-3.5" />
                         Elite Payment
                     </div>
-                    <h1 className="text-4xl font-black text-gray-900 mb-4 tracking-tight italic">
+                    <h1 className="text-4xl font-black text-gray-900 dark:text-gray-100 mb-4 tracking-tight italic">
                         Complete Your <span className="text-primary-600">Elite Upgrade.</span>
                     </h1>
-                    <p className="text-lg text-gray-600 font-medium">
+                    <p className="text-lg text-gray-600 dark:text-gray-400 font-medium">
                         Upload your payment screenshot to activate Elite access. You'll get free access while we verify your payment (within 24 hours).
                     </p>
                 </div>
 
-                <div className="bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 p-8 sm:p-12">
+                <div className="bg-surface rounded-[2.5rem] shadow-2xl border border-surface-border p-8 sm:p-12">
                     {error && (
                         <div className="mb-8 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700">
                             <p className="text-sm font-semibold">{error}</p>
@@ -193,7 +193,7 @@ function SignupPaymentContent() {
 
                     <div className="space-y-8">
                         <div>
-                            <label className="block text-sm font-bold text-gray-900 mb-4">Payment Screenshot</label>
+                            <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-4">Payment Screenshot</label>
                             <div className="relative">
                                 <input
                                     type="file"
@@ -208,7 +208,7 @@ function SignupPaymentContent() {
                                     className="cursor-pointer rounded-3xl border border-dashed border-gray-200 bg-gray-50 px-5 py-12 text-center hover:border-primary-600 hover:bg-primary-50 transition-all"
                                 >
                                     <Upload className="mx-auto mb-4 w-10 h-10 text-primary-600" />
-                                    <p className="text-sm font-semibold text-gray-700">Choose a screenshot or PDF</p>
+                                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Choose a screenshot or PDF</p>
                                     <p className="text-xs text-gray-400 mt-2">Maximum file size: 5MB</p>
                                 </label>
                             </div>
@@ -216,42 +216,42 @@ function SignupPaymentContent() {
 
                         <div className="grid gap-4 sm:grid-cols-2">
                             <div>
-                                <label className="block text-sm font-bold text-gray-900 mb-2">Transaction ID</label>
+                                <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">Transaction ID</label>
                                 <input
                                     type="text"
                                     value={transactionId}
                                     onChange={(e) => setTransactionId(e.target.value)}
-                                    className="w-full rounded-3xl border border-gray-200 px-4 py-4 text-sm text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                                    className="w-full rounded-3xl border border-gray-200 px-4 py-4 text-sm text-gray-900 dark:text-gray-100 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-900 mb-2">Archive Title</label>
+                                <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">Archive Title</label>
                                 <input
                                     type="text"
                                     value={parsedTitle}
                                     onChange={(e) => setParsedTitle(e.target.value)}
-                                    className="w-full rounded-3xl border border-gray-200 px-4 py-4 text-sm text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                                    className="w-full rounded-3xl border border-gray-200 px-4 py-4 text-sm text-gray-900 dark:text-gray-100 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-900 mb-2">Archive Year</label>
+                                <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">Archive Year</label>
                                 <input
                                     type="text"
                                     value={parsedYear}
                                     onChange={(e) => setParsedYear(e.target.value)}
-                                    className="w-full rounded-3xl border border-gray-200 px-4 py-4 text-sm text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                                    className="w-full rounded-3xl border border-gray-200 px-4 py-4 text-sm text-gray-900 dark:text-gray-100 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100"
                                 />
                             </div>
                         </div>
 
-                        <button
+                        <LoadingButton
                             type="button"
                             onClick={handleSubmitPayment}
-                            disabled={uploading}
+                            loading={uploading}
                             className="w-full inline-flex items-center justify-center gap-3 rounded-3xl bg-gray-900 px-8 py-5 text-sm font-black uppercase tracking-[0.2em] text-white shadow-2xl shadow-gray-900/20 hover:bg-black transition-all disabled:cursor-not-allowed disabled:bg-gray-400"
                         >
-                            {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Submit Payment"}
-                        </button>
+                            Submit Payment
+                        </LoadingButton>
                     </div>
                 </div>
             </div>

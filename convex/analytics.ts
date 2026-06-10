@@ -12,6 +12,11 @@ const ALLOWED_EVENTS = new Set([
   "quiz_completed",
   "payment_submitted",
   "question_reported",
+  "copilot_session_started",
+  "copilot_message_sent",
+  "copilot_upload_completed",
+  "copilot_paywall_hit",
+  "study_source_ingested",
 ]);
 
 const PUBLIC_EVENTS = new Set(["landing_view", "page_view"]);

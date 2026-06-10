@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, BrainCircuit, Lightbulb, Loader2, Target, AlertCircle } from "lucide-react";
+import Link from "next/link";
+import { Sparkles, BrainCircuit, Lightbulb, Loader2, Target, BookOpen } from "lucide-react";
 import { generateAnswerInsight } from "./actions";
 
 interface AIInsight {
@@ -14,9 +15,10 @@ interface AIInsight {
 interface AIInsightCardProps {
     answerId: string;
     initialInsight?: AIInsight | null;
+    questionText?: string;
 }
 
-export default function AIInsightCard({ answerId, initialInsight }: AIInsightCardProps) {
+export default function AIInsightCard({ answerId, initialInsight, questionText }: AIInsightCardProps) {
     const [insight, setInsight] = useState<AIInsight | null>(initialInsight || null);
     const [loading, setLoading] = useState(!initialInsight);
     const [error, setError] = useState(false);
@@ -70,7 +72,7 @@ export default function AIInsightCard({ answerId, initialInsight }: AIInsightCar
                         </div>
                         <div>
                             <h4 className="text-[10px] font-black uppercase tracking-widest text-primary-600 mb-1">Reasoning Pattern</h4>
-                            <p className="text-sm font-bold text-gray-800 leading-relaxed italic">
+                            <p className="text-sm font-bold text-gray-800 dark:text-gray-200 leading-relaxed italic">
                                 &ldquo;{insight.reasoning}&rdquo;
                             </p>
                         </div>
@@ -85,7 +87,7 @@ export default function AIInsightCard({ answerId, initialInsight }: AIInsightCar
                         </div>
                         <div>
                             <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-1">Core Misconception</h4>
-                            <p className="text-sm font-medium text-gray-700 leading-relaxed">
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 leading-relaxed">
                                 {insight.misconception}
                             </p>
                         </div>
@@ -99,6 +101,16 @@ export default function AIInsightCard({ answerId, initialInsight }: AIInsightCar
                             <p className="text-sm font-black italic">{insight.recommendation}</p>
                         </div>
                     </div>
+
+                    {questionText && (
+                        <Link
+                            href={`/copilot/chat/new?mode=explain&q=${encodeURIComponent(`Explain this MDCAT question and why students get it wrong: ${questionText}`)}`}
+                            className="inline-flex items-center gap-2 px-4 py-3 bg-gray-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-colors"
+                        >
+                            <BookOpen className="w-4 h-4" />
+                            Ask Study Copilot
+                        </Link>
+                    )}
                 </div>
             </div>
         </motion.div>

@@ -240,4 +240,113 @@ export default defineSchema({
   })
     .index("by_slug", ["slug"])
     .index("by_status", ["status"]),
+
+  studySources: defineTable({
+    ownerType: v.union(v.literal("platform"), v.literal("user")),
+    userId: v.optional(v.id("users")),
+    storageId: v.optional(v.id("_storage")),
+    rawText: v.optional(v.string()),
+    title: v.string(),
+    subject: v.optional(
+      v.union(
+        v.literal("Biology"),
+        v.literal("Chemistry"),
+        v.literal("Physics"),
+        v.literal("English"),
+        v.literal("General"),
+      ),
+    ),
+    classLevel: v.optional(v.string()),
+    chapter: v.optional(v.string()),
+    topic: v.optional(v.string()),
+    sourceKind: v.union(
+      v.literal("pctb_textbook"),
+      v.literal("admin_upload"),
+      v.literal("student_upload"),
+      v.literal("ai_summary"),
+    ),
+    status: v.union(v.literal("processing"), v.literal("ready"), v.literal("failed")),
+    chunkCount: v.optional(v.number()),
+    pageCount: v.optional(v.number()),
+    fileSize: v.optional(v.number()),
+    contentType: v.optional(v.string()),
+    errorMessage: v.optional(v.string()),
+    isPremiumOnly: v.boolean(),
+    isPublished: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_ownerType", ["ownerType"])
+    .index("by_userId", ["userId"])
+    .index("by_subject", ["subject"])
+    .index("by_status", ["status"])
+    .index("by_sourceKind", ["sourceKind"]),
+
+  ocrPageTexts: defineTable({
+    sourceId: v.id("studySources"),
+    pageNumber: v.number(),
+    text: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_sourceId", ["sourceId"])
+    .index("by_sourceId_pageNumber", ["sourceId", "pageNumber"]),
+
+  documentChunks: defineTable({
+    sourceId: v.id("studySources"),
+    chunkIndex: v.number(),
+    text: v.string(),
+    tokenCount: v.number(),
+    pageNumber: v.optional(v.number()),
+    sectionTitle: v.optional(v.string()),
+    subject: v.optional(v.string()),
+    ownerType: v.union(v.literal("platform"), v.literal("user")),
+    createdAt: v.number(),
+  })
+    .index("by_sourceId", ["sourceId"])
+    .searchIndex("search_text", {
+      searchField: "text",
+      filterFields: ["sourceId"],
+    }),
+
+  copilotSessions: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    sourceIds: v.array(v.id("studySources")),
+    mode: v.union(
+      v.literal("explain"),
+      v.literal("exam"),
+      v.literal("quiz"),
+      v.literal("flashcards"),
+      v.literal("revise"),
+    ),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_userId", ["userId"]),
+
+  copilotMessages: defineTable({
+    sessionId: v.id("copilotSessions"),
+    role: v.union(v.literal("user"), v.literal("assistant")),
+    content: v.string(),
+    citations: v.optional(
+      v.array(
+        v.object({
+          chunkId: v.id("documentChunks"),
+          excerpt: v.string(),
+          pageNumber: v.optional(v.number()),
+          sourceTitle: v.string(),
+          sourceKind: v.string(),
+        }),
+      ),
+    ),
+    createdAt: v.number(),
+  })
+    .index("by_sessionId", ["sessionId"]),
+
+  copilotDailyUsage: defineTable({
+    userId: v.id("users"),
+    dateKey: v.string(),
+    messageCount: v.number(),
+  })
+    .index("by_userId_dateKey", ["userId", "dateKey"]),
 });

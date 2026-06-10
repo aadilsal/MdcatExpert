@@ -18,6 +18,7 @@ import {
     Menu,
     Grid3X3,
     Flag,
+    Loader2,
 } from "lucide-react";
 import { submitQuizAction } from "../actions";
 import { reportQuestionAction } from "../report-actions";
@@ -48,7 +49,7 @@ export default function QuizPage({
     const [reportModalOpen, setReportModalOpen] = useState(false);
 
     const [timePerQuestion, setTimePerQuestion] = useState<Record<string, number>>({});
-    const lastQuestionStartTime = useRef<number>(Date.now());
+    const lastQuestionStartTime = useRef<number>(0);
     const currentIndexRef = useRef(currentIndex);
 
     // Resolve params
@@ -125,7 +126,7 @@ export default function QuizPage({
         const now = Date.now();
         const prevIndex = currentIndexRef.current;
 
-        if (questions[prevIndex]) {
+        if (questions[prevIndex] && lastQuestionStartTime.current > 0) {
             const prevQId = questions[prevIndex].id;
             const spent = Math.floor((now - lastQuestionStartTime.current) / 1000);
             setTimePerQuestion(prev => ({
@@ -231,10 +232,10 @@ export default function QuizPage({
     if (accessDenied) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
-                <div className="text-center p-12 bg-white rounded-4xl border border-amber-100 shadow-xl max-w-lg">
+                <div className="text-center p-12 bg-surface rounded-4xl border border-amber-100 shadow-xl max-w-lg">
                     <AlertCircle className="w-16 h-16 text-amber-400 mx-auto mb-6" />
-                    <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Quiz Locked</h2>
-                    <p className="text-gray-500 mb-8 font-medium">
+                    <h2 className="text-3xl font-black text-gray-900 dark:text-gray-100 mb-2 tracking-tight">Quiz Locked</h2>
+                    <p className="text-gray-500 dark:text-gray-400 mb-8 font-medium">
                         Free accounts include 5 practice quizzes. Upgrade to Elite to unlock the full preparation library.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -246,7 +247,7 @@ export default function QuizPage({
                         </button>
                         <button
                             onClick={() => router.push("/quizzes")}
-                            className="px-8 py-4 bg-gray-100 text-gray-900 font-black rounded-2xl hover:bg-gray-200 transition-all"
+                            className="px-8 py-4 bg-gray-100 text-gray-900 dark:text-gray-100 font-black rounded-2xl hover:bg-gray-200 transition-all"
                         >
                             Browse Quizzes
                         </button>
@@ -259,10 +260,10 @@ export default function QuizPage({
     if (!quiz || questions.length === 0) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
-                <div className="text-center p-12 bg-white rounded-4xl border border-gray-100 shadow-xl">
+                <div className="text-center p-12 bg-surface rounded-4xl border border-surface-border shadow-xl">
                     <AlertCircle className="w-16 h-16 text-primary-200 mx-auto mb-6" />
-                    <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Quiz Empty or Missing</h2>
-                    <p className="text-gray-500 mb-8 font-medium">This quiz doesn&apos;t seem to have any questions currently.</p>
+                    <h2 className="text-3xl font-black text-gray-900 dark:text-gray-100 mb-2 tracking-tight">Quiz Empty or Missing</h2>
+                    <p className="text-gray-500 dark:text-gray-400 mb-8 font-medium">This quiz doesn&apos;t seem to have any questions currently.</p>
                     <button
                         onClick={() => router.push("/quizzes")}
                         className="px-8 py-4 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition-all shadow-xl shadow-primary-600/20 active:scale-95"
@@ -278,32 +279,32 @@ export default function QuizPage({
     const currentQuestion = questions[currentIndex];
 
     return (
-        <div className={`relative min-h-screen flex flex-col ${zenMode ? "bg-[#09090b] text-white" : "bg-gray-50/50"} transition-colors duration-500`}>
+        <div className={`relative min-h-screen flex flex-col ${zenMode ? "bg-[#09090b] text-white" : "bg-gray-50/50 dark:bg-slate-950 text-gray-900 dark:text-gray-100"} transition-colors duration-500`}>
 
             {/* Professional EdTech Header */}
-            <header className={`sticky top-0 z-40 w-full border-b transition-all duration-500 ${zenMode ? "bg-black/50 backdrop-blur-xl border-white/10" : "bg-white border-gray-100 shadow-sm"
+            <header className={`sticky top-0 z-40 w-full border-b transition-all duration-500 ${zenMode ? "bg-black/50 backdrop-blur-xl border-white/10" : "bg-white dark:bg-slate-900 border-surface-border dark:border-slate-800/80 shadow-xs"
                 }`}>
                 <div className="max-w-400 mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3 sm:gap-6">
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className={`p-2 rounded-lg transition-colors ${zenMode ? "hover:bg-white/10 text-white" : "hover:bg-gray-100 text-gray-600"}`}
+                            className={`p-2 rounded-lg transition-colors ${zenMode ? "hover:bg-white/10 text-white" : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-400"}`}
                         >
                             <Menu className="w-5 h-5" />
                         </button>
-                        <div className="h-6 w-px bg-gray-200 hidden sm:block" />
+                        <div className="h-6 w-px bg-gray-200 dark:bg-slate-800 hidden sm:block" />
                         <div className="max-w-30 sm:max-w-none truncate">
-                            <h1 className={`font-black tracking-tight text-[10px] sm:text-sm uppercase truncate ${zenMode ? "text-white" : "text-gray-900"}`}>
+                            <h1 className={`font-black tracking-tight text-[10px] sm:text-sm uppercase truncate ${zenMode ? "text-white" : "text-gray-900 dark:text-white"}`}>
                                 {quiz.title}
                             </h1>
-                            <p className={`text-[8px] sm:text-[10px] font-bold uppercase tracking-widest ${zenMode ? "text-white/40" : "text-gray-400"}`}>
+                            <p className={`text-[8px] sm:text-[10px] font-bold uppercase tracking-widest ${zenMode ? "text-white/40" : "text-gray-400 dark:text-gray-500"}`}>
                                 {answeredCount}/{questions.length} <span className="hidden sm:inline">Progress</span>
                             </p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-2 sm:gap-8">
-                        <div className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl transition-all ${zenMode ? "bg-white/5 border border-white/10 text-primary-400" : "bg-primary-50 text-primary-700 font-bold"
+                        <div className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl transition-all ${zenMode ? "bg-white/5 border border-white/10 text-primary-400" : "bg-primary-50 dark:bg-primary-950/40 border border-primary-100/30 text-primary-700 dark:text-primary-300 font-bold"
                             }`}>
                             <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             <span className="font-mono text-xs sm:text-sm tracking-tight">{formatTime(elapsedSeconds)}</span>
@@ -312,14 +313,14 @@ export default function QuizPage({
                         <div className="flex items-center gap-1 sm:gap-2">
                             <button
                                 onClick={() => setZenMode(!zenMode)}
-                                className={`p-2 rounded-lg transition-all ${zenMode ? "bg-white/10 text-white" : "bg-gray-100 text-gray-400 hover:text-primary-600"}`}
+                                className={`p-2 rounded-lg transition-all ${zenMode ? "bg-white/10 text-white" : "bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400"}`}
                                 title="Toggle Focus Mode"
                             >
                                 <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5" />
                             </button>
                             <button
                                 onClick={() => router.push("/quizzes")}
-                                className={`p-2 rounded-lg transition-all ${zenMode ? "bg-red-500/20 text-red-400" : "bg-gray-100 text-gray-400 hover:text-red-600"}`}
+                                className={`p-2 rounded-lg transition-all ${zenMode ? "bg-red-500/20 text-red-400" : "bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400"}`}
                                 title="Exit Session"
                             >
                                 <X className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -356,7 +357,7 @@ export default function QuizPage({
                                 animate={{ x: 0 }}
                                 exit={{ x: "-100%" }}
                                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                                className={`fixed top-0 left-0 h-full w-[280px] sm:w-[320px] z-60 flex flex-col transition-colors duration-500 lg:hidden ${zenMode ? "bg-[#09090b] text-white" : "bg-white"
+                                className={`fixed top-0 left-0 h-full w-[280px] sm:w-[320px] z-60 flex flex-col transition-colors duration-500 lg:hidden ${zenMode ? "bg-[#09090b] text-white" : "bg-white dark:bg-slate-900"
                                     }`}
                             >
                                 <div className="p-6 h-full flex flex-col">
@@ -401,14 +402,14 @@ export default function QuizPage({
                                     </div>
 
                                     {/* Palette Legend */}
-                                    <div className="mt-auto pt-6 space-y-3 border-t border-gray-100">
-                                        <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                    <div className="mt-auto pt-6 space-y-3 border-t border-surface-border dark:border-slate-800">
+                                        <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
                                             <div className="w-3 h-3 rounded bg-emerald-500" /> Answered
                                         </div>
-                                        <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                        <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
                                             <div className="w-3 h-3 rounded bg-amber-500" /> Flagged
                                         </div>
-                                        <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                        <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
                                             <div className="w-3 h-3 rounded bg-primary-600" /> Active
                                         </div>
                                     </div>
@@ -425,7 +426,7 @@ export default function QuizPage({
                             initial={{ width: 0, opacity: 0 }}
                             animate={{ width: 320, opacity: 1 }}
                             exit={{ width: 0, opacity: 0 }}
-                            className={`hidden lg:flex flex-col border-r h-[calc(100vh-68px)] sticky top-[68px] overflow-hidden transition-colors duration-500 ${zenMode ? "bg-black/20 border-white/10 text-white" : "bg-white border-gray-100 shadow-[20px_0_30px_-20px_rgba(0,0,0,0.05)]"
+                            className={`hidden lg:flex flex-col border-r h-[calc(100vh-68px)] sticky top-[68px] overflow-hidden transition-colors duration-500 ${zenMode ? "bg-black/20 border-white/10 text-white" : "bg-white dark:bg-slate-900 border-surface-border dark:border-slate-800/60 shadow-[20px_0_30px_-20px_rgba(0,0,0,0.01)]"
                                 }`}
                         >
                             <div className="p-6">
@@ -471,14 +472,14 @@ export default function QuizPage({
                             </div>
 
                             {/* Palette Legend */}
-                            <div className="mt-auto p-6 space-y-3 bg-gray-50/50 border-t border-gray-100">
-                                <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                            <div className="mt-auto p-6 space-y-3 bg-gray-50/50 dark:bg-slate-950/50 border-t border-surface-border dark:border-slate-800">
+                                <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
                                     <div className="w-3 h-3 rounded bg-emerald-500" /> Answered
                                 </div>
-                                <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
                                     <div className="w-3 h-3 rounded bg-amber-500" /> Flagged
                                 </div>
-                                <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
                                     <div className="w-3 h-3 rounded bg-primary-600" /> Active
                                 </div>
                             </div>
@@ -497,11 +498,11 @@ export default function QuizPage({
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
-                                className={`flex-1 flex flex-col transition-all duration-500 rounded-3xl sm:rounded-4xl overflow-hidden ${zenMode ? "bg-white/5 border border-white/5" : "bg-white border border-gray-100 shadow-xl shadow-gray-200/5 mb-8"
+                                className={`flex-1 flex flex-col transition-all duration-500 rounded-3xl sm:rounded-4xl overflow-hidden ${zenMode ? "bg-white/5 border border-white/5" : "bg-white dark:bg-slate-900 border border-surface-border dark:border-slate-800/60 shadow-xl shadow-gray-200/5 dark:shadow-none mb-8"
                                     }`}
                             >
                                 {/* Card Header */}
-                                <div className={`px-5 sm:px-8 py-4 sm:py-6 flex items-center justify-between border-b ${zenMode ? "border-white/5" : "bg-gray-50/50 border-gray-100"}`}>
+                                <div className={`px-5 sm:px-8 py-4 sm:py-6 flex items-center justify-between border-b ${zenMode ? "border-white/5" : "bg-gray-50/50 dark:bg-slate-950/30 border-surface-border dark:border-slate-800/60"}`}>
                                     <div className="flex items-center gap-3 sm:gap-4">
                                         <span className={`px-2 sm:px-3 py-1 rounded-lg text-[8px] sm:text-[10px] font-black uppercase tracking-widest ${currentQuestion.subject === "Biology" ? "bg-emerald-500/10 text-emerald-500" :
                                             currentQuestion.subject === "Chemistry" ? "bg-purple-500/10 text-purple-500" :
@@ -510,7 +511,7 @@ export default function QuizPage({
                                             }`}>
                                             {currentQuestion.subject}
                                         </span>
-                                        <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] ${zenMode ? "text-white/20" : "text-gray-300"}`}>
+                                        <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] ${zenMode ? "text-white/20" : "text-gray-300 dark:text-slate-500"}`}>
                                             Q{currentIndex + 1}
                                         </span>
                                     </div>
@@ -519,7 +520,7 @@ export default function QuizPage({
                                         <button
                                             type="button"
                                             onClick={() => setReportModalOpen(true)}
-                                            className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${zenMode ? "bg-white/5 text-white/40 hover:bg-rose-500/20 hover:text-rose-300" : "bg-gray-100 text-gray-400 hover:bg-rose-50 hover:text-rose-600"}`}
+                                            className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${zenMode ? "bg-white/5 text-white/40 hover:bg-rose-500/20 hover:text-rose-300" : "bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-600 dark:hover:text-rose-400"}`}
                                         >
                                             <Flag className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                             <span className="hidden sm:inline">Report</span>
@@ -529,7 +530,7 @@ export default function QuizPage({
                                             onClick={() => toggleFlag(currentQuestion.id)}
                                             className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${flaggedQuestions.has(currentQuestion.id)
                                                 ? "bg-amber-500 text-white shadow-lg shadow-amber-500/20"
-                                                : zenMode ? "bg-white/5 text-white/40 hover:bg-white/10" : "bg-gray-100 text-gray-400 hover:bg-amber-50 hover:text-amber-600"
+                                                : zenMode ? "bg-white/5 text-white/40 hover:bg-white/10" : "bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:bg-amber-50 hover:text-amber-600 dark:hover:text-amber-400"
                                                 }`}
                                         >
                                             <Bookmark className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${flaggedQuestions.has(currentQuestion.id) ? "fill-current" : ""}`} />
@@ -541,12 +542,12 @@ export default function QuizPage({
 
                                 {/* Content */}
                                 <div className="p-6 sm:p-12 flex-1">
-                                    <h2 className={`text-lg sm:text-3xl font-bold leading-tight mb-8 sm:mb-12 tracking-tight ${zenMode ? "text-white" : "text-gray-900"}`}>
+                                    <h2 className={`text-lg sm:text-3xl font-bold leading-tight mb-8 sm:mb-12 tracking-tight ${zenMode ? "text-white" : "text-gray-900 dark:text-white"}`}>
                                         {currentQuestion.question_text}
                                     </h2>
 
                                     {currentQuestion.image_url && (
-                                        <div className="mb-8 sm:mb-12 rounded-2xl sm:rounded-3xl overflow-hidden border border-gray-100 bg-black/5 p-4 max-w-2xl mx-auto">
+                                        <div className="mb-8 sm:mb-12 rounded-2xl sm:rounded-3xl overflow-hidden border border-surface-border bg-black/5 p-4 max-w-2xl mx-auto">
                                             <NextImage
                                                 src={currentQuestion.image_url}
                                                 alt="Question Diagram"
@@ -568,14 +569,14 @@ export default function QuizPage({
                                                     onClick={() => selectOption(currentQuestion.id, label)}
                                                     className={`group relative flex items-center gap-4 sm:gap-6 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border-2 transition-all text-left ${isSelected
                                                         ? "bg-primary-600 border-primary-600 shadow-xl shadow-primary-600/20"
-                                                        : zenMode ? "bg-white/5 border-white/5 hover:bg-white/10" : "bg-white border-gray-100 hover:bg-gray-50 hover:border-primary-200"
+                                                        : zenMode ? "bg-white/5 border-white/5 hover:bg-white/10" : "bg-white dark:bg-slate-900 border-surface-border dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800 hover:border-primary-200 dark:hover:border-primary-700"
                                                         }`}
                                                 >
-                                                    <span className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl flex items-center justify-center text-xs sm:text-sm font-black transition-all ${isSelected ? "bg-white text-primary-600" : "bg-gray-100 text-gray-400 group-hover:text-primary-600"
+                                                    <span className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl flex items-center justify-center text-xs sm:text-sm font-black transition-all ${isSelected ? "bg-white text-primary-600" : "bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-400 group-hover:text-primary-600 dark:group-hover:text-primary-400"
                                                         }`}>
                                                         {label}
                                                     </span>
-                                                    <span className={`flex-1 font-bold text-sm sm:text-lg ${isSelected ? "text-white" : zenMode ? "text-white/70" : "text-gray-700"}`}>
+                                                    <span className={`flex-1 font-bold text-sm sm:text-lg ${isSelected ? "text-white" : zenMode ? "text-white/70" : "text-gray-700 dark:text-slate-200"}`}>
                                                         {optionText}
                                                     </span>
                                                     {isSelected && <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white/40" />}
@@ -586,11 +587,11 @@ export default function QuizPage({
                                 </div>
 
                                 {/* Integrated Bottom Action Bar */}
-                                <div className={`px-6 sm:px-8 py-5 sm:py-6 flex items-center justify-between border-t gap-4 ${zenMode ? "border-white/5" : "bg-gray-50/30 border-gray-100"}`}>
+                                <div className={`px-6 sm:px-8 py-5 sm:py-6 flex items-center justify-between border-t gap-4 ${zenMode ? "border-white/5" : "bg-gray-50/30 dark:bg-slate-950/20 border-surface-border dark:border-slate-800/60"}`}>
                                     <button
                                         onClick={() => setCurrentIndex(i => Math.max(0, i - 1))}
                                         disabled={currentIndex === 0}
-                                        className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${zenMode ? "hover:bg-white/10 text-white disabled:opacity-20" : "bg-white border border-gray-200 text-gray-600 hover:border-gray-900 disabled:opacity-30 shadow-sm"
+                                        className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${zenMode ? "hover:bg-white/10 text-white disabled:opacity-20" : "bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-800 text-gray-600 dark:text-gray-300 hover:border-gray-900 dark:hover:border-white disabled:opacity-30 shadow-sm"
                                             }`}
                                     >
                                         <ChevronLeft className="w-4 h-4" />
@@ -656,7 +657,7 @@ export default function QuizPage({
                             initial={{ scale: 0.9, y: 100 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 100 }}
-                            className="bg-white rounded-t-[3rem] sm:rounded-[3rem] p-8 sm:p-10 max-w-md w-full shadow-2xl text-gray-900"
+                            className="bg-surface rounded-t-[3rem] sm:rounded-[3rem] p-8 sm:p-10 max-w-md w-full shadow-2xl text-gray-900 dark:text-gray-100"
                         >
                             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-primary-50 text-primary-600 rounded-3xl sm:rounded-4xl flex items-center justify-center mx-auto mb-6">
                                 <Send className="w-8 h-8 sm:w-10 sm:h-10" />
@@ -677,14 +678,16 @@ export default function QuizPage({
                             <div className="grid grid-cols-2 gap-4">
                                 <button
                                     onClick={() => setShowConfirm(false)}
-                                    className="px-6 py-4 bg-gray-100 text-gray-500 font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-gray-200 transition-all"
+                                    className="px-6 py-4 bg-gray-100 text-gray-500 dark:text-gray-400 font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-gray-200 transition-all"
                                 >
                                     Continue
                                 </button>
                                 <button
                                     onClick={handleSubmit}
-                                    className="px-6 py-4 bg-primary-600 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl shadow-xl shadow-primary-600/20 hover:bg-primary-700 transition-all"
+                                    disabled={submitting}
+                                    className="px-6 py-4 bg-primary-600 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl shadow-xl shadow-primary-600/20 hover:bg-primary-700 transition-all disabled:opacity-50 inline-flex items-center justify-center gap-2"
                                 >
+                                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                                     Submit Now
                                 </button>
                             </div>

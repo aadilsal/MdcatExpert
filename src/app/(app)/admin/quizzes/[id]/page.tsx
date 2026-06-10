@@ -45,7 +45,7 @@ export default async function AdminQuizDetailPage({
         }));
 
     return (
-        <Suspense fallback={<div className="p-10 text-center text-gray-500">Loading…</div>}>
+        <Suspense fallback={<div className="p-10 text-center text-gray-500 dark:text-gray-400">Loading…</div>}>
             <QuizEditorClient
                 quizId={String(quiz._id)}
                 quizTitle={quiz.title}

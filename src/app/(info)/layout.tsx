@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import BlogNavLinkClient from "./blog-nav-link";
 import MdcatLogo from "@/components/mdcat-logo";
+import ThemeToggle from "@/components/landing/theme-toggle";
 
 export default function InfoLayout({
   children,
@@ -9,8 +10,8 @@ export default function InfoLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <header className="border-b border-gray-100 bg-white/80 backdrop-blur-xl sticky top-0 z-50">
+    <div className="min-h-screen bg-white dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col transition-colors duration-350">
+      <header className="border-b border-gray-100 dark:border-slate-800 bg-white/80 dark:bg-slate-950/85 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4 sm:gap-6 min-w-0">
             <Link href="/" className="flex items-center gap-2 group shrink-0">
@@ -25,6 +26,7 @@ export default function InfoLayout({
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <BlogNavLinkClient />
+            <ThemeToggle />
             <Link
               href="/login"
               className="px-4 py-1.5 text-xs font-black text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/20"
@@ -39,9 +41,9 @@ export default function InfoLayout({
         <div className="max-w-3xl mx-auto px-6 sm:px-8">{children}</div>
       </main>
 
-      <footer className="bg-gray-50 border-t border-gray-100 py-12">
+      <footer className="bg-gray-50 dark:bg-slate-900/40 border-t border-gray-100 dark:border-slate-800/60 py-12">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <p className="text-sm text-gray-400 font-medium">
+          <p className="text-sm text-gray-400 dark:text-slate-500 font-medium">
             © {new Date().getFullYear()} MdcatXpert. Empowering future medical professionals.
           </p>
         </div>

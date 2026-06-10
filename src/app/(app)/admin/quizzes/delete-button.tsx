@@ -43,7 +43,7 @@ export function DeleteQuizButton({
                 </button>
                 <button
                     onClick={() => setShowConfirm(false)}
-                    className="px-3 py-2 rounded-lg bg-gray-100 text-gray-600 text-xs font-medium hover:bg-gray-200 transition-colors"
+                    className="px-3 py-2 rounded-lg bg-gray-100 text-gray-600 dark:text-gray-400 text-xs font-medium hover:bg-gray-200 transition-colors"
                 >
                     Cancel
                 </button>

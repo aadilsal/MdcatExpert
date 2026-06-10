@@ -10,7 +10,7 @@ export default function AppGroupLoading() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="rounded-xl bg-white border border-gray-100 p-5">
+            <div key={i} className="rounded-xl bg-surface border border-surface-border p-5">
               <div className="flex items-start justify-between mb-3">
                 <div className="h-4 w-28 rounded-full bg-gray-100" />
                 <div className="h-10 w-10 rounded-xl bg-gray-100" />
@@ -26,7 +26,7 @@ export default function AppGroupLoading() {
           {Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
-              className="bg-white rounded-lg border border-gray-100 p-4"
+              className="bg-surface rounded-lg border border-surface-border p-4"
             >
               <div className="flex items-center justify-between">
                 <div className="space-y-2">

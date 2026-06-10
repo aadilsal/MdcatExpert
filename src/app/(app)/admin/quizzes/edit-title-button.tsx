@@ -67,7 +67,7 @@ export function EditQuizTitleButton({
                         setTitle(initialTitle);
                         setEditing(false);
                     }}
-                    className="p-2 rounded-lg bg-gray-100 text-gray-600"
+                    className="p-2 rounded-lg bg-gray-100 text-gray-600 dark:text-gray-400"
                 >
                     <X className="w-4 h-4" />
                 </button>
@@ -77,7 +77,7 @@ export function EditQuizTitleButton({
 
     return (
         <div className="flex items-start gap-2 mb-3 group/title">
-            <h3 className="font-semibold text-gray-900 text-lg flex-1">{initialTitle}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-lg flex-1">{initialTitle}</h3>
             <button
                 type="button"
                 onClick={() => setEditing(true)}

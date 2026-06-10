@@ -44,7 +44,7 @@ function KpiCard({
     label,
     value,
     hint,
-    color = "text-gray-900",
+    color = "text-gray-900 dark:text-gray-100",
 }: {
     label: string;
     value: string | number;
@@ -52,7 +52,7 @@ function KpiCard({
     color?: string;
 }) {
     return (
-        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+        <div className="bg-surface rounded-3xl p-6 border border-surface-border shadow-sm dark:shadow-none">
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{label}</p>
             <p className={`text-3xl font-black italic tracking-tighter ${color}`}>{value}</p>
             {hint && <p className="text-xs text-gray-400 mt-2 font-medium">{hint}</p>}
@@ -137,8 +137,8 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                         onClick={() => setTab(t.id)}
                         className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold transition-all ${
                             tab === t.id
-                                ? "bg-gray-900 text-white shadow-lg"
-                                : "bg-white text-gray-500 border border-gray-100 hover:border-gray-200"
+                                ? "bg-gray-900 dark:bg-primary-600 text-white shadow-lg"
+                                : "bg-surface text-gray-500 dark:text-gray-400 border border-surface-border hover:border-surface-border-strong dark:hover:border-slate-600"
                         }`}
                     >
                         <t.icon className="w-4 h-4" />
@@ -211,8 +211,8 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                         />
                     </div>
 
-                    <div className="bg-white rounded-4xl border border-gray-100 p-6 shadow-sm">
-                        <h2 className="text-lg font-black text-gray-900 mb-6">Signups, attempts & revenue</h2>
+                    <div className="bg-surface rounded-4xl border border-surface-border p-6 shadow-sm">
+                        <h2 className="text-lg font-black text-gray-900 dark:text-gray-100 mb-6">Signups, attempts & revenue</h2>
                         <div className="h-80">
                             <ResponsiveContainer width="100%" height="100%">
                                 <LineChart data={combinedTrend}>
@@ -251,7 +251,7 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                             label="Admin dashboard views"
                             value={traffic.adminAnalyticsViews}
                             hint={`${traffic.adminAnalyticsUniqueSessions} unique sessions`}
-                            color="text-gray-900"
+                            color="text-gray-900 dark:text-gray-100"
                         />
                         <KpiCard
                             label="Paywall hits"
@@ -261,8 +261,8 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                         />
                     </div>
 
-                    <div className="bg-white rounded-4xl border border-gray-100 p-6 shadow-sm">
-                        <h2 className="text-lg font-black text-gray-900 mb-6">Page views & homepage traffic</h2>
+                    <div className="bg-surface rounded-4xl border border-surface-border p-6 shadow-sm">
+                        <h2 className="text-lg font-black text-gray-900 dark:text-gray-100 mb-6">Page views & homepage traffic</h2>
                         <div className="h-80">
                             <ResponsiveContainer width="100%" height="100%">
                                 <LineChart
@@ -288,14 +288,14 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                         </p>
                     </div>
 
-                    <div className="bg-white rounded-4xl border border-gray-100 overflow-hidden">
-                        <div className="p-6 border-b border-gray-50">
+                    <div className="bg-surface rounded-4xl border border-surface-border overflow-hidden">
+                        <div className="p-6 border-b border-gray-50 dark:border-slate-800 dark:border-slate-800">
                             <h2 className="text-lg font-black">Top pages (last {data.periodDays} days)</h2>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-50">
+                                    <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-50 dark:border-slate-800 dark:border-slate-800">
                                         <th className="p-4">Path</th>
                                         <th className="p-4">Views</th>
                                         <th className="p-4">Unique sessions</th>
@@ -310,7 +310,7 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                                         </tr>
                                     ) : (
                                         traffic.topPages.map((p) => (
-                                            <tr key={p.path} className="border-b border-gray-50 hover:bg-gray-50/50">
+                                            <tr key={p.path} className="border-b border-gray-50 dark:border-slate-800 dark:border-slate-800 hover:bg-gray-50/50">
                                                 <td className="p-4 font-mono text-xs font-bold">{p.path}</td>
                                                 <td className="p-4 font-black text-sky-600">{p.views}</td>
                                                 <td className="p-4">{p.uniqueSessions}</td>
@@ -331,7 +331,7 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                         <KpiCard label="New (7d)" value={overview.newSignups7d} color="text-primary-600" />
                         <KpiCard label="Growth (30d)" value={growthDisplay} color="text-emerald-600" />
                     </div>
-                    <div className="bg-white rounded-4xl border border-gray-100 p-6">
+                    <div className="bg-surface rounded-4xl border border-surface-border p-6">
                         <h2 className="text-lg font-black mb-4">Daily signups</h2>
                         <div className="h-64">
                             <ResponsiveContainer width="100%" height="100%">
@@ -345,14 +345,14 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                             </ResponsiveContainer>
                         </div>
                     </div>
-                    <div className="bg-white rounded-4xl border border-gray-100 overflow-hidden">
-                        <div className="p-6 border-b border-gray-50">
+                    <div className="bg-surface rounded-4xl border border-surface-border overflow-hidden">
+                        <div className="p-6 border-b border-gray-50 dark:border-slate-800 dark:border-slate-800">
                             <h2 className="text-lg font-black">Promo codes</h2>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-50">
+                                    <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-50 dark:border-slate-800 dark:border-slate-800">
                                         <th className="p-4">Code</th>
                                         <th className="p-4">Used</th>
                                         <th className="p-4">Max</th>
@@ -369,14 +369,14 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                                         </tr>
                                     ) : (
                                         promos.map((p) => (
-                                            <tr key={p.code} className="border-b border-gray-50 hover:bg-gray-50/50">
+                                            <tr key={p.code} className="border-b border-gray-50 dark:border-slate-800 dark:border-slate-800 hover:bg-gray-50/50">
                                                 <td className="p-4 font-bold">{p.code}</td>
                                                 <td className="p-4">{p.usedCount}</td>
                                                 <td className="p-4">{p.maxUses}</td>
                                                 <td className="p-4">{p.utilizationPct}%</td>
                                                 <td className="p-4">
                                                     <span
-                                                        className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase ${p.isActive ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"}`}
+                                                        className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase ${p.isActive ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500 dark:text-gray-400"}`}
                                                     >
                                                         {p.isActive ? "Active" : "Inactive"}
                                                     </span>
@@ -401,7 +401,7 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                         <KpiCard label="Inactive 14d+" value={alerts.inactiveStudents14d} color="text-amber-600" />
                     </div>
                     <div className="grid lg:grid-cols-2 gap-6">
-                        <div className="bg-white rounded-4xl border border-gray-100 p-6">
+                        <div className="bg-surface rounded-4xl border border-surface-border p-6">
                             <h2 className="text-lg font-black mb-4">By subject</h2>
                             <div className="h-64">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -415,7 +415,7 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                                 </ResponsiveContainer>
                             </div>
                         </div>
-                        <div className="bg-white rounded-4xl border border-gray-100 p-6">
+                        <div className="bg-surface rounded-4xl border border-surface-border p-6">
                             <h2 className="text-lg font-black mb-4">By year</h2>
                             <div className="h-64">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -430,14 +430,14 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                             </div>
                         </div>
                     </div>
-                    <div className="bg-white rounded-4xl border border-gray-100 overflow-hidden">
-                        <div className="p-6 border-b border-gray-50 flex items-center gap-2">
+                    <div className="bg-surface rounded-4xl border border-surface-border overflow-hidden">
+                        <div className="p-6 border-b border-gray-50 dark:border-slate-800 dark:border-slate-800 flex items-center gap-2">
                             <Target className="w-5 h-5 text-primary-600" />
                             <h2 className="text-lg font-black">Top quizzes</h2>
                         </div>
                         <table className="w-full text-sm">
                             <thead>
-                                <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-50">
+                                <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-50 dark:border-slate-800 dark:border-slate-800">
                                     <th className="p-4">Title</th>
                                     <th className="p-4">Year</th>
                                     <th className="p-4">Subject</th>
@@ -446,7 +446,7 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                             </thead>
                             <tbody>
                                 {engagement.topQuizzes.map((q) => (
-                                    <tr key={q.quizId} className="border-b border-gray-50">
+                                    <tr key={q.quizId} className="border-b border-gray-50 dark:border-slate-800 dark:border-slate-800">
                                         <td className="p-4 font-bold">{q.title}</td>
                                         <td className="p-4">{q.year}</td>
                                         <td className="p-4">{q.subject}</td>
@@ -467,7 +467,7 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                         <KpiCard label="Rejection rate" value={`${payments.rejectionRate}%`} />
                         <KpiCard label="Pending > 48h" value={payments.pendingOlderThan48h} color="text-amber-600" />
                     </div>
-                    <div className="bg-white rounded-4xl border border-gray-100 p-6">
+                    <div className="bg-surface rounded-4xl border border-surface-border p-6">
                         <h2 className="text-lg font-black mb-4">Daily revenue</h2>
                         <div className="h-64">
                             <ResponsiveContainer width="100%" height="100%">
@@ -481,7 +481,7 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                             </ResponsiveContainer>
                         </div>
                     </div>
-                    <div className="bg-white rounded-4xl border border-gray-100 p-6">
+                    <div className="bg-surface rounded-4xl border border-surface-border p-6">
                         <h2 className="text-lg font-black mb-4">Conversion funnel (period)</h2>
                         <div className="h-72">
                             <ResponsiveContainer width="100%" height="100%">
@@ -521,14 +521,14 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                             hint="Premium at month start, not active now"
                         />
                     </div>
-                    <div className="bg-white rounded-4xl border border-gray-100 overflow-hidden">
-                        <div className="p-6 border-b border-gray-50">
+                    <div className="bg-surface rounded-4xl border border-surface-border overflow-hidden">
+                        <div className="p-6 border-b border-gray-50 dark:border-slate-800 dark:border-slate-800">
                             <h2 className="text-lg font-black">Weekly signup cohorts (% with attempt)</h2>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-50">
+                                    <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-50 dark:border-slate-800 dark:border-slate-800">
                                         <th className="p-4">Week</th>
                                         <th className="p-4">Signups</th>
                                         <th className="p-4">Wk 0</th>
@@ -539,7 +539,7 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                                 </thead>
                                 <tbody>
                                     {retentionCohorts.map((c) => (
-                                        <tr key={c.week} className="border-b border-gray-50">
+                                        <tr key={c.week} className="border-b border-gray-50 dark:border-slate-800 dark:border-slate-800">
                                             <td className="p-4 font-bold">{c.week}</td>
                                             <td className="p-4">{c.signups}</td>
                                             <td className="p-4">{c.week0}%</td>
@@ -552,7 +552,7 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                             </table>
                         </div>
                     </div>
-                    <div className="bg-white rounded-4xl border border-gray-100 p-6">
+                    <div className="bg-surface rounded-4xl border border-surface-border p-6">
                         <h2 className="text-lg font-black mb-4">Daily active users (attempts)</h2>
                         <div className="h-64">
                             <ResponsiveContainer width="100%" height="100%">
@@ -571,13 +571,13 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
 
             {tab === "content" && (
                 <div className="space-y-8">
-                    <div className="bg-white rounded-4xl border border-gray-100 overflow-hidden">
-                        <div className="p-6 border-b border-gray-50">
+                    <div className="bg-surface rounded-4xl border border-surface-border overflow-hidden">
+                        <div className="p-6 border-b border-gray-50 dark:border-slate-800 dark:border-slate-800">
                             <h2 className="text-lg font-black">Hardest questions (min 20 answers)</h2>
                         </div>
                         <table className="w-full text-sm">
                             <thead>
-                                <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-50">
+                                <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-50 dark:border-slate-800 dark:border-slate-800">
                                     <th className="p-4">Question</th>
                                     <th className="p-4">Subject</th>
                                     <th className="p-4">Correct %</th>
@@ -593,7 +593,7 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                                     </tr>
                                 ) : (
                                     content.hardestQuestions.map((q) => (
-                                        <tr key={q.questionId} className="border-b border-gray-50">
+                                        <tr key={q.questionId} className="border-b border-gray-50 dark:border-slate-800 dark:border-slate-800">
                                             <td className="p-4 font-medium max-w-md truncate">{q.questionText}</td>
                                             <td className="p-4">{q.subject}</td>
                                             <td className="p-4 font-black text-red-600">{q.correctPct}%</td>
@@ -605,11 +605,11 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                         </table>
                     </div>
                     {engagement.quizzesWithZeroAttempts.length > 0 && (
-                        <div className="bg-white rounded-4xl border border-gray-100 overflow-hidden">
-                            <div className="p-6 border-b border-gray-50">
+                        <div className="bg-surface rounded-4xl border border-surface-border overflow-hidden">
+                            <div className="p-6 border-b border-gray-50 dark:border-slate-800 dark:border-slate-800">
                                 <h2 className="text-lg font-black">Quizzes with zero attempts</h2>
                             </div>
-                            <ul className="divide-y divide-gray-50">
+                            <ul className="divide-y divide-gray-50 dark:divide-slate-800 dark:divide-slate-800">
                                 {engagement.quizzesWithZeroAttempts.map((q) => (
                                     <li key={q.quizId} className="p-4 flex justify-between text-sm">
                                         <span className="font-bold">{q.title}</span>

@@ -96,7 +96,7 @@ export default function StudentTable({ users }: StudentTableProps) {
     return (
         <div className="space-y-6">
             {/* Search and Filters */}
-            <div className="bg-white rounded-4xl border border-gray-100 p-6 shadow-xl shadow-gray-200/20">
+            <div className="bg-surface rounded-4xl border border-surface-border p-6 shadow-xl shadow-gray-200/20 dark:shadow-none">
                 <div className="flex flex-col sm:flex-row gap-4">
                     <div className="relative flex-1">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -105,13 +105,13 @@ export default function StudentTable({ users }: StudentTableProps) {
                             placeholder="Search students by name or email..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-12 pr-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-white focus:border-primary-500 transition-all font-bold italic"
+                            className="w-full pl-12 pr-6 py-4 rounded-2xl bg-gray-50 border border-surface-border text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-surface focus:border-primary-500 transition-all font-bold italic"
                         />
                     </div>
                     <select
                         value={filter}
                         onChange={(e) => setFilter(e.target.value)}
-                        className="px-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 text-gray-700 font-bold focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-white focus:border-primary-500 transition-all appearance-none"
+                        className="px-6 py-4 rounded-2xl bg-gray-50 border border-surface-border text-gray-700 dark:text-gray-300 font-bold focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-surface focus:border-primary-500 transition-all appearance-none"
                     >
                         <option value="all">All Users</option>
                         <option value="student">Students Only</option>
@@ -123,11 +123,11 @@ export default function StudentTable({ users }: StudentTableProps) {
             </div>
 
             {/* Students Table */}
-            <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/20 overflow-hidden">
+            <div className="bg-surface rounded-[2.5rem] border border-surface-border shadow-xl shadow-gray-200/20 dark:shadow-none overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-gray-50/50 border-b border-gray-100">
+                            <tr className="bg-gray-50/50 border-b border-surface-border">
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">User Profile</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Joined Date</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Current Role</th>
@@ -137,10 +137,10 @@ export default function StudentTable({ users }: StudentTableProps) {
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Action</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-gray-50 dark:divide-slate-800 dark:divide-slate-800">
                             {filteredUsers.length > 0 ? (
                                 filteredUsers.map((user) => (
-                                    <tr key={user.id} className="hover:bg-gray-50/50 transition-colors group">
+                                    <tr key={user.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors group">
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-4">
                                                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xl shadow-inner ${user.role === "admin"
@@ -150,7 +150,7 @@ export default function StudentTable({ users }: StudentTableProps) {
                                                     {user.name.charAt(0).toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <p className="font-black text-gray-900 group-hover:text-primary-600 transition-colors tracking-tight">{user.name}</p>
+                                                    <p className="font-black text-gray-900 dark:text-gray-100 group-hover:text-primary-600 transition-colors tracking-tight">{user.name}</p>
                                                     <div className="flex items-center gap-1.5 text-xs text-gray-400 font-bold">
                                                         <Mail className="w-3 h-3" />
                                                         {user.email}
@@ -159,7 +159,7 @@ export default function StudentTable({ users }: StudentTableProps) {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <div className="flex items-center gap-2 text-sm text-gray-500 font-bold italic">
+                                            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 font-bold italic">
                                                 <Calendar className="w-4 h-4 opacity-50" />
                                                 {new Date(user.created_at).toLocaleDateString()}
                                             </div>
@@ -179,7 +179,7 @@ export default function StudentTable({ users }: StudentTableProps) {
                                             <div className="flex justify-center">
                                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${user.subscription_type === "premium"
                                                         ? "bg-purple-50 border-purple-200 text-purple-600"
-                                                        : "bg-gray-50 border-gray-200 text-gray-600"
+                                                        : "bg-gray-50 border-gray-200 text-gray-600 dark:text-gray-400"
                                                     }`}>
                                                     {user.subscription_type}
                                                 </span>
@@ -228,7 +228,7 @@ export default function StudentTable({ users }: StudentTableProps) {
                                                     onClick={() => handleRoleChange(user.id, user.role)}
                                                     disabled={updatingUserId === user.id}
                                                     className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${user.role === "admin"
-                                                            ? "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                                                            ? "bg-gray-100 text-gray-500 dark:text-gray-400 hover:bg-gray-200"
                                                             : "bg-primary-600 text-white hover:bg-primary-700 shadow-lg shadow-primary-600/20"
                                                         } disabled:opacity-50`}
                                                 >
@@ -248,7 +248,7 @@ export default function StudentTable({ users }: StudentTableProps) {
                                         <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 opacity-50">
                                             <Users className="w-8 h-8 text-gray-300" />
                                         </div>
-                                        <h3 className="font-black text-gray-900 tracking-tight italic">No users matching search.</h3>
+                                        <h3 className="font-black text-gray-900 dark:text-gray-100 tracking-tight italic">No users matching search.</h3>
                                         <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">Refine your query and execute again</p>
                                     </td>
                                 </tr>

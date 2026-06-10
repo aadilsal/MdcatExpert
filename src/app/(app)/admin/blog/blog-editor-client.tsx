@@ -143,8 +143,8 @@ export default function BlogEditorClient({ postId, initial }: BlogEditorClientPr
       </div>
 
       {!postId && (
-        <div className="p-6 rounded-2xl bg-primary-50 border border-primary-100 space-y-4">
-          <div className="flex items-center gap-2 text-primary-700 font-black text-sm uppercase tracking-widest">
+        <div className="p-6 rounded-2xl bg-primary-50 dark:bg-primary-950/30 border border-primary-100 dark:border-primary-900/50 space-y-4">
+          <div className="flex items-center gap-2 text-primary-700 dark:text-primary-300 font-black text-sm uppercase tracking-widest">
             <Sparkles className="w-4 h-4" />
             AI Draft Generator
           </div>
@@ -154,7 +154,7 @@ export default function BlogEditorClient({ postId, initial }: BlogEditorClientPr
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="e.g. MDCAT Biology Cell Structure important topics"
-              className="flex-1 px-4 py-3 rounded-xl border border-primary-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="theme-input flex-1 px-4 py-3 rounded-xl border border-primary-200 dark:border-primary-800 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-900/40"
             />
             <button
               type="button"
@@ -185,14 +185,14 @@ export default function BlogEditorClient({ postId, initial }: BlogEditorClientPr
         </div>
       )}
 
-      <div className="space-y-6 bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 shadow-sm">
+      <div className="space-y-6 bg-surface rounded-2xl border border-surface-border p-6 sm:p-8 shadow-sm">
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="space-y-2 sm:col-span-2">
             <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Title</span>
             <input
               value={form.title}
               onChange={(e) => update({ title: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="theme-input w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-900/40"
             />
           </label>
           <label className="space-y-2">
@@ -201,7 +201,7 @@ export default function BlogEditorClient({ postId, initial }: BlogEditorClientPr
               value={form.slug}
               onChange={(e) => update({ slug: e.target.value })}
               placeholder="auto-from-title"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="theme-input w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-900/40"
             />
           </label>
           <label className="space-y-2">
@@ -210,7 +210,7 @@ export default function BlogEditorClient({ postId, initial }: BlogEditorClientPr
               value={form.tags}
               onChange={(e) => update({ tags: e.target.value })}
               placeholder="biology, mdcat-2026, study-tips"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="theme-input w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-900/40"
             />
           </label>
           <label className="space-y-2 sm:col-span-2">
@@ -219,7 +219,7 @@ export default function BlogEditorClient({ postId, initial }: BlogEditorClientPr
               value={form.excerpt}
               onChange={(e) => update({ excerpt: e.target.value })}
               rows={2}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+              className="theme-input w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-900/40 resize-none"
             />
           </label>
           <label className="space-y-2">
@@ -227,7 +227,7 @@ export default function BlogEditorClient({ postId, initial }: BlogEditorClientPr
             <input
               value={form.metaTitle}
               onChange={(e) => update({ metaTitle: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="theme-input w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-900/40"
             />
           </label>
           <label className="space-y-2">
@@ -235,7 +235,7 @@ export default function BlogEditorClient({ postId, initial }: BlogEditorClientPr
             <input
               value={form.metaDescription}
               onChange={(e) => update({ metaDescription: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="theme-input w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-900/40"
             />
           </label>
           <label className="space-y-2 sm:col-span-2">
@@ -247,17 +247,17 @@ export default function BlogEditorClient({ postId, initial }: BlogEditorClientPr
               value={form.content}
               onChange={(e) => update({ content: e.target.value })}
               rows={20}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm font-mono leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary-500 resize-y min-h-[320px]"
+              className="theme-input w-full px-4 py-3 rounded-xl text-sm font-mono leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-900/40 resize-y min-h-[320px]"
             />
           </label>
         </div>
 
-        <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-100">
+        <div className="flex flex-wrap gap-3 pt-4 border-t border-surface-border">
           <button
             type="button"
             onClick={() => handleSave("draft")}
             disabled={saving}
-            className="inline-flex items-center gap-2 px-6 py-3 border-2 border-gray-900 text-gray-900 font-black text-sm rounded-xl hover:bg-gray-900 hover:text-white disabled:opacity-50 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 border-2 border-gray-900 text-gray-900 dark:text-gray-100 font-black text-sm rounded-xl hover:bg-gray-900 hover:text-white disabled:opacity-50 transition-all"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Save Draft

@@ -227,3 +227,54 @@ export const deleteQuiz = mutation({
     await ctx.db.delete(quizId);
   },
 });
+
+export const getLandingQuestions = query({
+  args: {},
+  handler: async (ctx) => {
+    const subjects = ["Biology", "Chemistry", "Physics"] as const;
+    const sampleQuestions = [];
+
+    for (const subject of subjects) {
+      const q = await ctx.db
+        .query("questions")
+        .withIndex("by_subject", (q) => q.eq("subject", subject))
+        .first();
+      if (q) {
+        sampleQuestions.push({
+          _id: q._id,
+          questionText: q.questionText,
+          optionA: q.optionA,
+          optionB: q.optionB,
+          optionC: q.optionC,
+          optionD: q.optionD,
+          correctOption: q.correctOption,
+          subject: q.subject,
+          explanation: q.explanation || "Detailed explanation provided in full version.",
+        });
+      }
+    }
+
+    if (sampleQuestions.length < 3) {
+      const allQ = await ctx.db.query("questions").take(10);
+      for (const q of allQ) {
+        if (sampleQuestions.length >= 3) break;
+        if (!sampleQuestions.some((sq) => sq._id === q._id)) {
+          sampleQuestions.push({
+            _id: q._id,
+            questionText: q.questionText,
+            optionA: q.optionA,
+            optionB: q.optionB,
+            optionC: q.optionC,
+            optionD: q.optionD,
+            correctOption: q.correctOption,
+            subject: q.subject,
+            explanation: q.explanation || "Detailed explanation provided in full version.",
+          });
+        }
+      }
+    }
+
+    return sampleQuestions;
+  },
+});
+

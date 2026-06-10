@@ -118,7 +118,7 @@ export default async function AdminStudentsPage() {
                 ].map((stat, idx) => (
                     <div
                         key={idx}
-                        className="bg-white rounded-4xl p-8 border border-gray-100 shadow-xl shadow-gray-200/20 group hover:border-primary-100 transition-all"
+                        className="bg-surface rounded-4xl p-8 border border-surface-border shadow-xl shadow-gray-200/20 dark:shadow-none group hover:border-primary-100 transition-all"
                     >
                         <div className="flex items-center justify-between">
                             <div>

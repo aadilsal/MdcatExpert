@@ -20,6 +20,7 @@ import {
     PolarAngleAxis,
     PolarRadiusAxis,
 } from "recharts";
+import Link from "next/link";
 import {
     Target,
     Award,
@@ -29,6 +30,7 @@ import {
     BarChart3,
     AlertTriangle,
     Shield,
+    BookOpen,
 } from "lucide-react";
 
 interface AnalyticsClientProps {
@@ -100,37 +102,37 @@ export default function AnalyticsClient({
                         label: "Overall Accuracy",
                         value: `${stats.overallAccuracy}%`,
                         icon: Target,
-                        bgLight: "bg-blue-50",
-                        textColor: "text-blue-700",
+                        bgLight: "bg-blue-50 dark:bg-blue-950/20",
+                        textColor: "text-blue-700 dark:text-blue-400",
                     },
                     {
                         label: "Best Score",
                         value: `${stats.bestScore}%`,
                         icon: Award,
-                        bgLight: "bg-emerald-50",
-                        textColor: "text-emerald-700",
+                        bgLight: "bg-emerald-50 dark:bg-emerald-950/20",
+                        textColor: "text-emerald-700 dark:text-emerald-400",
                     },
                     {
                         label: "Avg Time",
                         value: formatTime(stats.avgTime),
                         icon: Clock,
-                        bgLight: "bg-purple-50",
-                        textColor: "text-purple-700",
+                        bgLight: "bg-purple-50 dark:bg-purple-950/20",
+                        textColor: "text-purple-700 dark:text-purple-400",
                     },
                     {
                         label: "Questions Solved",
                         value: stats.totalAnswered.toString(),
                         icon: Zap,
-                        bgLight: "bg-orange-50",
-                        textColor: "text-orange-700",
+                        bgLight: "bg-orange-50 dark:bg-orange-950/20",
+                        textColor: "text-orange-700 dark:text-orange-400",
                     },
                 ].map((stat) => (
                     <div
                         key={stat.label}
-                        className="bg-white rounded-xl border border-gray-100 p-5 shadow-card hover:shadow-card-hover transition-all duration-300 group"
+                        className="bg-surface rounded-xl border border-surface-border p-5 shadow-card hover:shadow-card-hover dark:shadow-none dark:hover:shadow-none transition-all duration-300 group"
                     >
                         <div className="flex items-start justify-between mb-2">
-                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 {stat.label}
                             </p>
                             <div
@@ -148,9 +150,9 @@ export default function AnalyticsClient({
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Score Trend - Line Chart */}
-                <div className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+                <div className="bg-surface rounded-xl border border-surface-border shadow-card dark:shadow-none overflow-hidden">
+                    <div className="px-6 py-4 border-b border-surface-border dark:border-slate-800/60 flex items-center justify-between">
+                        <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <TrendingUp className="w-5 h-5 text-primary-600" />
                             Progress Over Time
                         </h2>
@@ -159,7 +161,7 @@ export default function AnalyticsClient({
                         {scoreTrend.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
                                 <LineChart data={scoreTrend}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-gray-100 dark:stroke-slate-800" stroke="currentColor" />
                                     <XAxis
                                         dataKey="date"
                                         axisLine={false}
@@ -178,6 +180,8 @@ export default function AnalyticsClient({
                                         contentStyle={{
                                             borderRadius: "12px",
                                             border: "none",
+                                            backgroundColor: "var(--tooltip-bg, #fff)",
+                                            color: "var(--tooltip-text, #0f172a)",
                                             boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
                                         }}
                                     />
@@ -185,9 +189,9 @@ export default function AnalyticsClient({
                                         type="monotone"
                                         dataKey="pct"
                                         name="Accuracy"
-                                        stroke="#2563eb"
+                                        stroke="#10b981"
                                         strokeWidth={3}
-                                        dot={{ r: 4, fill: "#2563eb", strokeWidth: 2, stroke: "#fff" }}
+                                        dot={{ r: 4, fill: "#10b981", strokeWidth: 2, stroke: "#fff" }}
                                         activeDot={{ r: 6, strokeWidth: 0 }}
                                     />
                                 </LineChart>
@@ -202,9 +206,9 @@ export default function AnalyticsClient({
                 </div>
 
                 {/* Accuracy Breakdown - Pie Chart */}
-                <div className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-100">
-                        <h2 className="font-semibold text-gray-900">Overall Accuracy</h2>
+                <div className="bg-surface rounded-xl border border-surface-border shadow-card dark:shadow-none overflow-hidden">
+                    <div className="px-6 py-4 border-b border-surface-border dark:border-slate-800/60">
+                        <h2 className="font-semibold text-gray-900 dark:text-white">Overall Accuracy</h2>
                     </div>
                     <div className="p-6 h-72 flex flex-col sm:flex-row items-center justify-center gap-8">
                         <div className="w-48 h-48 relative">
@@ -225,8 +229,8 @@ export default function AnalyticsClient({
                                 </PieChart>
                             </ResponsiveContainer>
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="text-3xl font-bold text-gray-900">{stats.overallAccuracy}%</span>
-                                <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Accuracy</span>
+                                <span className="text-3xl font-bold text-gray-900 dark:text-white">{stats.overallAccuracy}%</span>
+                                <span className="text-[10px] text-gray-400 dark:text-slate-500 uppercase font-bold tracking-wider">Accuracy</span>
                             </div>
                         </div>
                         <div className="space-y-4">
@@ -234,8 +238,8 @@ export default function AnalyticsClient({
                                 <div key={item.name} className="flex items-center gap-3">
                                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
                                     <div>
-                                        <p className="text-xs text-gray-400 font-medium uppercase">{item.name}</p>
-                                        <p className="text-lg font-bold text-gray-900">{item.value} <span className="text-xs font-normal text-gray-400">questions</span></p>
+                                        <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase">{item.name}</p>
+                                        <p className="text-lg font-bold text-gray-900 dark:text-white">{item.value} <span className="text-xs font-normal text-gray-400 dark:text-gray-500">questions</span></p>
                                     </div>
                                 </div>
                             ))}
@@ -244,9 +248,9 @@ export default function AnalyticsClient({
                 </div>
 
                 {/* Subject Performance - Bar Chart */}
-                <div className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-100">
-                        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+                <div className="bg-surface rounded-xl border border-surface-border shadow-card dark:shadow-none overflow-hidden">
+                    <div className="px-6 py-4 border-b border-surface-border dark:border-slate-800/60">
+                        <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <BarChart3 className="w-5 h-5 text-primary-600" />
                             Subject Performance
                         </h2>
@@ -255,14 +259,14 @@ export default function AnalyticsClient({
                         {subjectData.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={subjectData} layout="vertical">
-                                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} className="stroke-gray-100 dark:stroke-slate-800" stroke="currentColor" />
                                     <XAxis type="number" domain={[0, 100]} hide />
                                     <YAxis
                                         dataKey="subject"
                                         type="category"
                                         axisLine={false}
                                         tickLine={false}
-                                        tick={{ fontSize: 12, fontWeight: 600, fill: "#374151" }}
+                                        tick={{ fontSize: 12, fontWeight: 600, fill: "var(--tooltip-text, #374151)" }}
                                         width={80}
                                     />
                                     <Tooltip
@@ -271,6 +275,8 @@ export default function AnalyticsClient({
                                         contentStyle={{
                                             borderRadius: "12px",
                                             border: "none",
+                                            backgroundColor: "var(--tooltip-bg, #fff)",
+                                            color: "var(--tooltip-text, #0f172a)",
                                             boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
                                         }}
                                     />
@@ -291,9 +297,9 @@ export default function AnalyticsClient({
                 </div>
 
                 {/* Time Analysis - Line Chart */}
-                <div className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+                <div className="bg-surface rounded-xl border border-surface-border shadow-card dark:shadow-none overflow-hidden">
+                    <div className="px-6 py-4 border-b border-surface-border dark:border-slate-800/60 flex items-center justify-between">
+                        <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Clock className="w-5 h-5 text-primary-600" />
                             Time Spent per Quiz
                         </h2>
@@ -302,7 +308,7 @@ export default function AnalyticsClient({
                         {scoreTrend.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
                                 <LineChart data={scoreTrend}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-gray-100 dark:stroke-slate-800" stroke="currentColor" />
                                     <XAxis
                                         dataKey="date"
                                         axisLine={false}
@@ -321,6 +327,8 @@ export default function AnalyticsClient({
                                         contentStyle={{
                                             borderRadius: "12px",
                                             border: "none",
+                                            backgroundColor: "var(--tooltip-bg, #fff)",
+                                            color: "var(--tooltip-text, #0f172a)",
                                             boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
                                         }}
                                     />
@@ -345,9 +353,9 @@ export default function AnalyticsClient({
                 </div>
 
                 {/* AI Weakness Radar */}
-                <div className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden lg:col-span-2">
-                    <div className="px-6 py-4 border-b border-gray-100">
-                        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+                <div className="bg-surface rounded-xl border border-surface-border shadow-card dark:shadow-none overflow-hidden lg:col-span-2">
+                    <div className="px-6 py-4 border-b border-surface-border dark:border-slate-800/60">
+                        <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Target className="w-5 h-5 text-primary-600" />
                             Elite Weakness Radar
                         </h2>
@@ -356,20 +364,22 @@ export default function AnalyticsClient({
                         {aiRadar?.radar_data && aiRadar.radar_data.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
                                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={aiRadar.radar_data}>
-                                    <PolarGrid stroke="#e5e7eb" />
-                                    <PolarAngleAxis dataKey="subject" tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 600 }} />
+                                    <PolarGrid className="stroke-gray-200 dark:stroke-slate-800" stroke="currentColor" />
+                                    <PolarAngleAxis dataKey="subject" tick={{ fill: "var(--tooltip-text, #6b7280)", fontSize: 12, fontWeight: 600 }} />
                                     <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: "#9ca3af", fontSize: 10 }} />
                                     <Radar
                                         name="Skill Level"
                                         dataKey="score"
-                                        stroke="#2563eb"
-                                        fill="#3b82f6"
+                                        stroke="#10b981"
+                                        fill="#10b981"
                                         fillOpacity={0.5}
                                     />
                                     <Tooltip
                                         contentStyle={{
                                             borderRadius: "12px",
                                             border: "none",
+                                            backgroundColor: "var(--tooltip-bg, #fff)",
+                                            color: "var(--tooltip-text, #0f172a)",
                                             boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
                                         }}
                                     />
@@ -387,43 +397,50 @@ export default function AnalyticsClient({
 
             {/* Insights Card */}
             {scoreTrend.length > 0 && weakestSubject && strongestSubject && (
-                <div className="bg-linear-to-br from-primary-50 to-blue-50 rounded-xl border border-primary-100 p-6 shadow-card">
-                    <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Zap className="w-5 h-5 text-primary-600" />
+                <div className="bg-linear-to-br from-primary-50/50 to-blue-50/50 dark:from-primary-950/20 dark:to-blue-950/10 rounded-xl border border-primary-100 dark:border-primary-900/30 p-6 shadow-card dark:shadow-none">
+                    <h2 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <Zap className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                         AI-Powered Insights
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 border border-primary-100/50 flex gap-4">
-                            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
-                                <Award className="w-5 h-5 text-green-600" />
+                        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-xl p-5 border border-primary-100/50 dark:border-slate-800 flex gap-4">
+                            <div className="w-10 h-10 bg-green-100 dark:bg-green-950/40 rounded-lg flex items-center justify-center shrink-0">
+                                <Award className="w-5 h-5 text-green-600 dark:text-green-400" />
                             </div>
                             <div>
-                                <p className="text-sm font-bold text-gray-900 mb-1">Strongest: {strongestSubject.subject}</p>
-                                <p className="text-xs text-gray-600 leading-relaxed">
+                                <p className="text-sm font-bold text-gray-900 dark:text-white mb-1">Strongest: {strongestSubject.subject}</p>
+                                <p className="text-xs text-gray-600 dark:text-slate-300 leading-relaxed">
                                     You&apos;re dominating {strongestSubject.subject} with {strongestSubject.pct}% accuracy. Use this confidence to tackle more challenging topics.
                                 </p>
                             </div>
                         </div>
 
-                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 border border-primary-100/50 flex gap-4">
-                            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center shrink-0">
-                                <AlertTriangle className="w-5 h-5 text-red-600" />
+                        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-xl p-5 border border-primary-100/50 dark:border-slate-800 flex gap-4">
+                            <div className="w-10 h-10 bg-red-100 dark:bg-red-950/40 rounded-lg flex items-center justify-center shrink-0">
+                                <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
                             </div>
                             <div>
-                                <p className="text-sm font-bold text-gray-900 mb-1">Focus Item: {weakestSubject.subject}</p>
-                                <p className="text-xs text-gray-600 leading-relaxed">
+                                <p className="text-sm font-bold text-gray-900 dark:text-white mb-1">Focus Item: {weakestSubject.subject}</p>
+                                <p className="text-xs text-gray-600 dark:text-slate-300 leading-relaxed">
                                     Currently at {weakestSubject.pct}% accuracy in {weakestSubject.subject}. Devote 30 mins daily to reviewing quiz archives in this subject.
                                 </p>
+                                <Link
+                                    href={`/copilot?subject=${encodeURIComponent(weakestSubject.subject)}`}
+                                    className="inline-flex items-center gap-1.5 mt-3 text-xs font-bold text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
+                                >
+                                    <BookOpen className="w-3.5 h-3.5" />
+                                    Study in Copilot
+                                </Link>
                             </div>
                         </div>
 
-                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 border border-primary-100/50 flex gap-4">
-                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
-                                <TrendingUp className="w-5 h-5 text-blue-600" />
+                        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-xl p-5 border border-primary-100/50 dark:border-slate-800 flex gap-4">
+                            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-950/40 rounded-lg flex items-center justify-center shrink-0">
+                                <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                             </div>
                             <div>
-                                <p className="text-sm font-bold text-gray-900 mb-1">Elite Advice</p>
-                                <p className="text-xs text-gray-600 leading-relaxed">
+                                <p className="text-sm font-bold text-gray-900 dark:text-white mb-1">Elite Advice</p>
+                                <p className="text-xs text-gray-600 dark:text-slate-300 leading-relaxed">
                                     {aiMistakes?.insights?.[0] || (scoreTrend.length > 1 && scoreTrend[scoreTrend.length - 1].pct > scoreTrend[scoreTrend.length - 2].pct
                                         ? "Your accuracy is improving! Keep up the momentum for the final exam."
                                         : "Consistency is key. Try to take 1 quiz every day to keep your brain sharp.")}

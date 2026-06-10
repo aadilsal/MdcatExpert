@@ -87,22 +87,22 @@ export default async function BlogPostPage({ params }: Props) {
         Back to Blog
       </Link>
 
-      <header className="space-y-6 border-b border-gray-100 pb-10">
+      <header className="space-y-6 border-b border-gray-100 dark:border-slate-800 pb-10">
         <div className="flex flex-wrap items-center gap-3">
           {post.tags.map((tag) => (
             <span
               key={tag}
-              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary-50 text-primary-700 text-[10px] font-black uppercase tracking-widest"
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary-50 dark:bg-primary-950/35 text-primary-700 dark:text-primary-300 text-[10px] font-black uppercase tracking-widest"
             >
               <Tag className="w-3 h-3" />
               {tag}
             </span>
           ))}
         </div>
-        <h1 className="text-3xl sm:text-5xl font-black text-gray-900 tracking-tight leading-tight">
+        <h1 className="text-3xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
           {post.title}
         </h1>
-        <p className="text-xl text-gray-500 font-medium leading-relaxed">{post.excerpt}</p>
+        <p className="text-xl text-gray-500 dark:text-gray-400 font-medium leading-relaxed">{post.excerpt}</p>
         <time
           dateTime={
             post.publishedAt
@@ -118,7 +118,7 @@ export default async function BlogPostPage({ params }: Props) {
 
       <BlogContent content={post.content} />
 
-      <footer className="pt-10 border-t border-gray-100">
+      <footer className="pt-10 border-t border-gray-100 dark:border-slate-800">
         <div className="rounded-3xl bg-primary-600 p-8 sm:p-12 text-white text-center space-y-4">
           <h2 className="text-2xl font-black">Ready to practice?</h2>
           <p className="text-primary-100 font-medium max-w-md mx-auto">

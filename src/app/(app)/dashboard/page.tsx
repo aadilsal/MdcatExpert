@@ -127,40 +127,40 @@ export default async function StudentDashboardPage() {
                         value: totalAttempts.toString(),
                         subtitle: "quizzes taken",
                         icon: Target,
-                        bgLight: "bg-blue-50",
-                        textColor: "text-blue-700",
+                        bgLight: "bg-blue-50 dark:bg-blue-950/40",
+                        textColor: "text-blue-700 dark:text-blue-400",
                     },
                     {
                         label: "Average Score",
                         value: totalAttempts > 0 ? `${avgScore}%` : "—",
                         subtitle: "overall accuracy",
                         icon: TrendingUp,
-                        bgLight: "bg-emerald-50",
-                        textColor: "text-emerald-700",
+                        bgLight: "bg-emerald-50 dark:bg-emerald-950/40",
+                        textColor: "text-emerald-700 dark:text-emerald-400",
                     },
                     {
                         label: "Best Score",
                         value: totalAttempts > 0 ? `${bestScore}%` : "—",
                         subtitle: "highest accuracy",
                         icon: Award,
-                        bgLight: "bg-purple-50",
-                        textColor: "text-purple-700",
+                        bgLight: "bg-purple-50 dark:bg-purple-950/40",
+                        textColor: "text-purple-700 dark:text-purple-400",
                     },
                     {
                         label: "Weakest Subject",
                         value: weakestSubject,
                         subtitle: totalAttempts > 0 ? `${Math.round(weakestPct)}% accuracy` : "needs data",
                         icon: AlertTriangle,
-                        bgLight: "bg-amber-50",
-                        textColor: "text-amber-700",
+                        bgLight: "bg-amber-50 dark:bg-amber-950/40",
+                        textColor: "text-amber-700 dark:text-amber-400",
                     },
                 ].map((stat) => (
                     <div
                         key={stat.label}
-                        className="bg-white rounded-xl border border-gray-100 p-5 shadow-card hover:shadow-card-hover transition-all duration-300 group"
+                        className="bg-surface rounded-xl border border-surface-border p-5 shadow-card hover:shadow-card-hover dark:shadow-none dark:hover:shadow-none transition-all duration-300 group"
                     >
                         <div className="flex items-start justify-between mb-3">
-                            <p className="text-sm font-medium text-gray-500">{stat.label}</p>
+                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{stat.label}</p>
                             <div
                                 className={`w-10 h-10 rounded-xl ${stat.bgLight} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
                             >
@@ -174,9 +174,9 @@ export default async function StudentDashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                        <h2 className="font-semibold text-gray-900">Recent Attempts</h2>
+                <div className="lg:col-span-2 bg-surface rounded-xl border border-surface-border shadow-card dark:shadow-none overflow-hidden">
+                    <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between">
+                        <h2 className="font-semibold text-gray-900 dark:text-gray-100">Recent Attempts</h2>
                         {attempts.length > 5 && (
                             <span className="text-sm text-gray-400">Showing latest 5</span>
                         )}
@@ -187,8 +187,8 @@ export default async function StudentDashboardPage() {
                             <div className="w-16 h-16 bg-linear-to-br from-gray-100 to-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                 <FileText className="w-8 h-8 text-gray-300" />
                             </div>
-                            <h3 className="font-semibold text-gray-900 mb-1">No attempts yet</h3>
-                            <p className="text-sm text-gray-500 mb-5 max-w-xs mx-auto">
+                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">No attempts yet</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 max-w-xs mx-auto">
                                 Start practicing by taking your first MDCAT quiz.
                             </p>
                             <Link
@@ -200,7 +200,7 @@ export default async function StudentDashboardPage() {
                             </Link>
                         </div>
                     ) : (
-                        <div className="divide-y divide-gray-50">
+                        <div className="divide-y divide-gray-50 dark:divide-slate-800 dark:divide-slate-800">
                             {attempts.slice(0, 5).map((attempt) => {
                                 const totalQ = attempt.paper?.totalQuestions ?? 0;
                                 const pct =
@@ -210,7 +210,7 @@ export default async function StudentDashboardPage() {
                                     <Link
                                         key={attempt._id}
                                         href={`/results/${attempt._id}`}
-                                        className="flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-4 hover:bg-gray-50/50 transition-colors group"
+                                        className="flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-4 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors group"
                                     >
                                         <div
                                             className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${pct >= 70 ? "bg-green-100" : pct >= 50 ? "bg-amber-100" : "bg-red-100"}`}
@@ -220,7 +220,7 @@ export default async function StudentDashboardPage() {
                                             />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-gray-900 truncate">{title}</p>
+                                            <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{title}</p>
                                             <div className="flex items-center gap-3 text-xs text-gray-400 mt-0.5">
                                                 <span className="flex items-center gap-1">
                                                     <Calendar className="w-3 h-3" />
@@ -240,7 +240,7 @@ export default async function StudentDashboardPage() {
                                             </p>
                                             <p className="text-xs text-gray-400">{totalQ ? `${pct}%` : "—"}</p>
                                         </div>
-                                        <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors shrink-0" />
+                                        <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 dark:text-gray-400 transition-colors shrink-0" />
                                     </Link>
                                 );
                             })}
@@ -248,9 +248,9 @@ export default async function StudentDashboardPage() {
                     )}
                 </div>
 
-                <div className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-100">
-                        <h2 className="font-semibold text-gray-900">Subject Accuracy</h2>
+                <div className="bg-surface rounded-xl border border-surface-border shadow-card dark:shadow-none overflow-hidden">
+                    <div className="px-6 py-4 border-b border-surface-border">
+                        <h2 className="font-semibold text-gray-900 dark:text-gray-100">Subject Accuracy</h2>
                     </div>
                     <div className="p-5 space-y-4">
                         {["Biology", "Chemistry", "Physics", "English"].map((subject) => {
@@ -262,7 +262,7 @@ export default async function StudentDashboardPage() {
                             return (
                                 <div key={subject}>
                                     <div className="flex items-center justify-between text-sm mb-1.5">
-                                        <span className="font-medium text-gray-700 flex items-center gap-1.5">
+                                        <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
                                             {subject}
                                             {isWeakest && (
                                                 <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-bold uppercase">

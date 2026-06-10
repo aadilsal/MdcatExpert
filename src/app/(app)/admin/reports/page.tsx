@@ -194,8 +194,8 @@ export default function AdminReportsPage() {
                         }}
                         className={`px-4 py-2 rounded-xl text-sm font-bold capitalize transition-colors ${
                             filter === s
-                                ? "bg-gray-900 text-white"
-                                : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                                ? "bg-gray-900 dark:bg-primary-600 text-white"
+                                : "bg-surface border border-surface-border text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800/50"
                         }`}
                     >
                         {s}
@@ -210,7 +210,7 @@ export default function AdminReportsPage() {
                             <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
                         </div>
                     ) : reports.length === 0 ? (
-                        <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-500">
+                        <div className="bg-surface rounded-xl border border-surface-border p-12 text-center text-gray-500 dark:text-gray-400">
                             No {filter} reports.
                         </div>
                     ) : (
@@ -219,7 +219,7 @@ export default function AdminReportsPage() {
                                 key={r.id}
                                 type="button"
                                 onClick={() => loadDetail(r.id)}
-                                className={`w-full text-left bg-white rounded-xl border p-5 shadow-card transition-all hover:shadow-card-hover ${
+                                className={`w-full text-left bg-surface rounded-xl border p-5 shadow-card transition-all hover:shadow-card-hover ${
                                     selectedId === r.id
                                         ? "border-rose-300 ring-2 ring-rose-500/20"
                                         : "border-gray-100"
@@ -227,14 +227,14 @@ export default function AdminReportsPage() {
                             >
                                 <div className="flex items-start justify-between gap-3">
                                     <div>
-                                        <p className="font-semibold text-gray-900">
+                                        <p className="font-semibold text-gray-900 dark:text-gray-100">
                                             {r.quiz_title} · Q{r.question_order}
                                         </p>
-                                        <p className="text-xs text-gray-500 mt-1">
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                             {CATEGORY_LABELS[r.category] ?? r.category} · {r.user_email}
                                         </p>
                                         {r.comment && (
-                                            <p className="text-sm text-gray-600 mt-2 line-clamp-2 italic">
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2 italic">
                                                 &ldquo;{r.comment}&rdquo;
                                             </p>
                                         )}
@@ -248,7 +248,7 @@ export default function AdminReportsPage() {
                     )}
                 </div>
 
-                <div className="bg-white rounded-xl border border-gray-100 shadow-card p-6 min-h-[400px]">
+                <div className="bg-surface rounded-xl border border-surface-border shadow-card p-6 min-h-[400px]">
                     {!selectedId ? (
                         <p className="text-gray-400 text-center py-20 text-sm">
                             Select a report to review and edit the question.
@@ -260,13 +260,13 @@ export default function AdminReportsPage() {
                     ) : (
                         <div className="space-y-6">
                             {selectedReport && (
-                                <div className="pb-4 border-b border-gray-100 space-y-2">
+                                <div className="pb-4 border-b border-surface-border space-y-2">
                                     <p className="text-sm">
-                                        <span className="font-bold text-gray-500">Reporter:</span>{" "}
+                                        <span className="font-bold text-gray-500 dark:text-gray-400">Reporter:</span>{" "}
                                         {selectedReport.user_email}
                                     </p>
                                     <p className="text-sm">
-                                        <span className="font-bold text-gray-500">Quiz:</span>{" "}
+                                        <span className="font-bold text-gray-500 dark:text-gray-400">Quiz:</span>{" "}
                                         {selectedReport.quiz_title}
                                     </p>
                                     <Link
@@ -282,12 +282,12 @@ export default function AdminReportsPage() {
                             {question && (
                                 <>
                                     <div className="flex items-center justify-between">
-                                        <h3 className="font-semibold text-gray-900">Question</h3>
+                                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">Question</h3>
                                         {!editing ? (
                                             <button
                                                 type="button"
                                                 onClick={() => setEditing(true)}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50"
                                             >
                                                 <Edit3 className="w-4 h-4" />
                                                 Edit
@@ -358,7 +358,7 @@ export default function AdminReportsPage() {
                                         </div>
                                     ) : (
                                         <div className="space-y-2 text-sm">
-                                            <p className="font-medium text-gray-900">
+                                            <p className="font-medium text-gray-900 dark:text-gray-100">
                                                 {question.question_text}
                                             </p>
                                             {(["A", "B", "C", "D"] as const).map((l) => (
@@ -367,7 +367,7 @@ export default function AdminReportsPage() {
                                                     className={
                                                         question.correct_option === l
                                                             ? "text-emerald-700 font-medium"
-                                                            : "text-gray-600"
+                                                            : "text-gray-600 dark:text-gray-400"
                                                     }
                                                 >
                                                     {l}){" "}
@@ -382,7 +382,7 @@ export default function AdminReportsPage() {
                                     )}
 
                                     {filter === "open" && (
-                                        <div className="flex gap-2 pt-4 border-t border-gray-100">
+                                        <div className="flex gap-2 pt-4 border-t border-surface-border">
                                             <button
                                                 type="button"
                                                 onClick={() => handleReportAction("resolve")}
@@ -396,7 +396,7 @@ export default function AdminReportsPage() {
                                                 type="button"
                                                 onClick={() => handleReportAction("dismiss")}
                                                 disabled={actionLoading}
-                                                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 text-gray-700 text-sm font-medium disabled:opacity-50"
+                                                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 text-gray-700 dark:text-gray-300 text-sm font-medium disabled:opacity-50"
                                             >
                                                 <XCircle className="w-4 h-4" />
                                                 Dismiss

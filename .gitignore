@@ -19,6 +19,7 @@ out/
 build/
 
 # misc
+scripts/.cache/
 .DS_Store
 *.pem
 

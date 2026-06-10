@@ -1,17 +1,19 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme inline {
-  /* Brand Colors */
-  --color-primary-50: #EFF6FF;
-  --color-primary-100: #DBEAFE;
-  --color-primary-200: #BFDBFE;
-  --color-primary-300: #93C5FD;
-  --color-primary-400: #60A5FA;
-  --color-primary-500: #3B82F6;
-  --color-primary-600: #1D4ED8;
-  --color-primary-700: #1E40AF;
-  --color-primary-800: #1E3A8A;
-  --color-primary-900: #1E3A5F;
+  /* Brand Colors (medical emerald green based on logo #064E3B) */
+  --color-primary-50: #ecfdf5;
+  --color-primary-100: #d1fae5;
+  --color-primary-200: #a7f3d0;
+  --color-primary-300: #6ee7b7;
+  --color-primary-400: #34d399;
+  --color-primary-500: #10b981;
+  --color-primary-600: #059669;
+  --color-primary-700: #047857;
+  --color-primary-800: #065f46;
+  --color-primary-900: #064e3b;
 
   --color-gray-50: #F9FAFB;
   --color-gray-100: #F3F4F6;
@@ -135,19 +137,88 @@
   }
 }
 
+/* Theme surface tokens — switch automatically with html.dark */
+:root {
+  --surface-bg: #ffffff;
+  --surface-muted: #f9fafb;
+  --surface-inset: #f3f4f6;
+  --surface-border: #f3f4f6;
+  --surface-border-strong: #e5e7eb;
+  --surface-input: #ffffff;
+}
+
+html.dark {
+  --surface-bg: #0f172a;
+  --surface-muted: #1e293b;
+  --surface-inset: #334155;
+  --surface-border: rgb(51 65 85 / 0.6);
+  --surface-border-strong: #334155;
+  --surface-input: #020617;
+}
+
+@theme inline {
+  --color-surface: var(--surface-bg);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-inset: var(--surface-inset);
+  --color-surface-border: var(--surface-border);
+  --color-surface-border-strong: var(--surface-border-strong);
+  --color-surface-input: var(--surface-input);
+}
+
+@layer components {
+  .theme-card {
+    background-color: var(--surface-bg);
+    border: 1px solid var(--surface-border);
+    box-shadow: var(--shadow-card);
+    color: inherit;
+  }
+
+  html.dark .theme-card {
+    box-shadow: none;
+  }
+
+  .theme-input {
+    background-color: var(--surface-input);
+    border: 1px solid var(--surface-border-strong);
+    color: var(--color-gray-900);
+  }
+
+  html.dark .theme-input {
+    color: var(--color-gray-100);
+  }
+
+  .theme-panel-header {
+    border-bottom: 1px solid var(--surface-border);
+  }
+
+  .theme-divide > * + * {
+    border-top: 1px solid var(--surface-border);
+  }
+}
+
 /* Base styles */
 * {
   box-sizing: border-box;
 }
 
 body {
-  background: linear-gradient(135deg, #f0f5ff 0%, #f9fafb 40%, #f0f7ff 70%, #f5f8ff 100%);
+  background: linear-gradient(135deg, #e6f7f0 0%, #fafbfc 45%, #ecfdf5 75%, #f4fbf7 100%);
   background-attachment: fixed;
   color: var(--color-gray-900);
   font-family: var(--font-sans);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  --tooltip-bg: #ffffff;
+  --tooltip-text: #0f172a;
+}
+
+html.dark body {
+  background: linear-gradient(135deg, #061512 0%, #090e17 40%, #041c16 75%, #050d12 100%);
+  color: var(--color-gray-100);
+  --tooltip-bg: #111827;
+  --tooltip-text: #f8fafc;
 }
 
 /* Scrollbar */
@@ -176,4 +247,34 @@ body {
 .focus-ring:focus-visible {
   box-shadow: 0 0 0 2px white, 0 0 0 4px var(--color-primary-500);
   border-radius: 8px;
+}
+
+/* Premium utility classes */
+.glass-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(229, 231, 235, 0.4);
+}
+
+html.dark .glass-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-card-dark {
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+html.dark .focus-ring:focus-visible {
+  box-shadow: 0 0 0 2px var(--surface-bg), 0 0 0 4px var(--color-primary-500);
+}
+
+.text-gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary-600) 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

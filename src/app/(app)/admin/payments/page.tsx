@@ -12,6 +12,7 @@ import {
     Loader2,
 } from "lucide-react";
 import { approvePaymentAction, rejectPaymentAction } from "@/app/(app)/admin/payments/actions";
+import { LoadingButton } from "@/components/loading-button";
 
 interface PaymentRequest {
     id: string;
@@ -34,6 +35,7 @@ export default function AdminPaymentsPage() {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<"pending" | "approved" | "rejected">("pending");
     const [viewingImage, setViewingImage] = useState<string | null>(null);
+    const [actionLoading, setActionLoading] = useState<string | null>(null);
 
     const fetchRequests = useCallback(async () => {
         setLoading(true);
@@ -77,12 +79,15 @@ export default function AdminPaymentsPage() {
 
         if (!confirmResult.isConfirmed) return;
 
+        setActionLoading(`${id}:approve`);
         try {
             await approvePaymentAction(id, userId, reason);
             setRequests(prev => prev.filter(r => r.id !== id));
             Swal.fire({ icon: "success", title: "Approved", text: "Premium access granted." });
         } catch {
             Swal.fire({ icon: "error", title: "Approval failed", text: "Could not approve payment." });
+        } finally {
+            setActionLoading(null);
         }
     };
 
@@ -109,12 +114,15 @@ export default function AdminPaymentsPage() {
 
         if (!confirmResult.isConfirmed) return;
 
+        setActionLoading(`${id}:reject`);
         try {
             await rejectPaymentAction(id, userId, reason);
             setRequests(prev => prev.filter(r => r.id !== id));
             Swal.fire({ icon: "success", title: "Rejected", text: "Payment request rejected." });
         } catch {
             Swal.fire({ icon: "error", title: "Rejection failed", text: "Could not reject payment." });
+        } finally {
+            setActionLoading(null);
         }
     };
 
@@ -140,7 +148,7 @@ export default function AdminPaymentsPage() {
                             <button
                                 key={s}
                                 onClick={() => setFilter(s)}
-                                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === s ? "bg-white text-black shadow-lg" : "text-white/40 hover:text-white"}`}
+                                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === s ? "bg-surface text-black shadow-lg" : "text-white/40 hover:text-white"}`}
                             >
                                 {s}
                             </button>
@@ -156,7 +164,7 @@ export default function AdminPaymentsPage() {
                     <p className="text-gray-400 font-black uppercase tracking-widest text-xs italic">Syncing Revenue Cluster...</p>
                 </div>
             ) : requests.length === 0 ? (
-                <div className="text-center py-20 bg-white rounded-4xl border border-gray-100 italic font-bold text-gray-400">
+                <div className="text-center py-20 bg-surface rounded-4xl border border-surface-border italic font-bold text-gray-400">
                     No {filter} requests found.
                 </div>
             ) : (
@@ -166,27 +174,27 @@ export default function AdminPaymentsPage() {
                             key={req.id}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-white rounded-4xl p-8 border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col lg:flex-row lg:items-center justify-between gap-8"
+                            className="bg-surface rounded-4xl p-8 border border-surface-border shadow-xl shadow-gray-200/20 dark:shadow-none flex flex-col lg:flex-row lg:items-center justify-between gap-8"
                         >
                             <div className="flex gap-6 items-center">
-                                <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0 border border-gray-100">
+                                <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0 border border-surface-border">
                                     <Clock className="w-8 h-8 text-gray-300" />
                                 </div>
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2">
-                                        <h3 className="text-xl font-black text-gray-900 tracking-tight italic">{req.user_email}</h3>
+                                        <h3 className="text-xl font-black text-gray-900 dark:text-gray-100 tracking-tight italic">{req.user_email}</h3>
                                         <span className="text-[10px] font-black bg-primary-50 text-primary-600 px-2 py-0.5 rounded-md uppercase tracking-widest">ID: {req.transaction_id}</span>
                                     </div>
                                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
                                         Amount: Rs. {req.amount} • {new Date(req.created_at).toLocaleDateString()}
                                     </p>
                                     {(req.archive_title || req.archive_year) && (
-                                        <p className="text-[10px] text-gray-500 italic">
+                                        <p className="text-[10px] text-gray-500 dark:text-gray-400 italic">
                                             Archive: {req.archive_title || "Unknown"}{req.archive_year ? ` (${req.archive_year})` : ""}
                                         </p>
                                     )}
                                     {req.review_reason && (
-                                        <p className="text-[10px] text-gray-500 italic">Last note: {req.review_reason}</p>
+                                        <p className="text-[10px] text-gray-500 dark:text-gray-400 italic">Last note: {req.review_reason}</p>
                                     )}
                                 </div>
                             </div>
@@ -194,25 +202,30 @@ export default function AdminPaymentsPage() {
                             <div className="flex items-center gap-4">
                                 <button
                                     onClick={() => setViewingImage(req.screenshot_url)}
-                                    className="px-6 py-4 bg-gray-50 text-gray-500 font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-gray-100 border border-gray-100 transition-all flex items-center gap-2"
+                                    className="px-6 py-4 bg-gray-50 text-gray-500 dark:text-gray-400 font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-gray-100 border border-surface-border transition-all flex items-center gap-2"
                                 >
                                     <Eye className="w-4 h-4" /> View Proof
                                 </button>
 
                                 {filter === "pending" && (
                                     <>
-                                        <button
+                                        <LoadingButton
                                             onClick={() => handleReject(req.id, req.user_id)}
-                                            className="p-4 bg-red-50 text-red-500 rounded-2xl hover:bg-red-100 border border-red-100 transition-all"
+                                            loading={actionLoading === `${req.id}:reject`}
+                                            disabled={actionLoading !== null}
+                                            loadingChildren=""
+                                            className="p-4 bg-red-50 text-red-500 rounded-2xl hover:bg-red-100 border border-red-100 transition-all disabled:opacity-50"
                                         >
                                             <XCircle className="w-6 h-6" />
-                                        </button>
-                                        <button
+                                        </LoadingButton>
+                                        <LoadingButton
                                             onClick={() => handleApprove(req.id, req.user_id)}
-                                            className="px-8 py-4 bg-emerald-600 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-emerald-700 shadow-xl shadow-emerald-600/20 transition-all flex items-center gap-2"
+                                            loading={actionLoading === `${req.id}:approve`}
+                                            disabled={actionLoading !== null}
+                                            className="px-8 py-4 bg-emerald-600 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-emerald-700 shadow-xl shadow-emerald-600/20 transition-all flex items-center gap-2 disabled:opacity-50"
                                         >
                                             <CheckCircle className="w-4 h-4" /> Approve & Activate
-                                        </button>
+                                        </LoadingButton>
                                     </>
                                 )}
                             </div>

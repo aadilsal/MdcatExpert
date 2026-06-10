@@ -9,6 +9,11 @@ export const ANALYTICS_EVENTS = {
   QUIZ_COMPLETED: "quiz_completed",
   PAYMENT_SUBMITTED: "payment_submitted",
   QUESTION_REPORTED: "question_reported",
+  COPILOT_SESSION_STARTED: "copilot_session_started",
+  COPILOT_MESSAGE_SENT: "copilot_message_sent",
+  COPILOT_UPLOAD_COMPLETED: "copilot_upload_completed",
+  COPILOT_PAYWALL_HIT: "copilot_paywall_hit",
+  STUDY_SOURCE_INGESTED: "study_source_ingested",
 } as const;
 
 export type AnalyticsEventName =

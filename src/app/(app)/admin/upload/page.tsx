@@ -184,7 +184,7 @@ export default function AdminUploadPage() {
                     <button
                         key={mode}
                         onClick={() => { setUploadMode(mode as 'xlsx' | 'pdf'); setFile(null); setResult(null); }}
-                        className={`px-6 py-2 rounded-full font-black uppercase tracking-widest text-xs transition-all ${uploadMode === mode ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        className={`px-6 py-2 rounded-full font-black uppercase tracking-widest text-xs transition-all ${uploadMode === mode ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-600 dark:text-gray-400 hover:bg-gray-200'}`}
                     >
                         {mode === 'xlsx' ? 'Upload XLSX' : 'Upload PDF'}
                     </button>
@@ -238,11 +238,11 @@ export default function AdminUploadPage() {
                 {/* Main Form Area */}
                 <div className="lg:col-span-8 space-y-8">
                     {/* Step 1: Meta-Data */}
-                    <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl shadow-gray-200/20 relative overflow-hidden group">
+                    <div className="bg-surface rounded-[2.5rem] p-8 border border-surface-border shadow-xl shadow-gray-200/20 dark:shadow-none relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/5 rounded-full blur-3xl group-hover:bg-primary-500/10 transition-colors" />
                         <div className="relative mb-8">
                             <p className="text-[10px] font-black text-primary-500 uppercase tracking-[0.2em] mb-1">Step 01</p>
-                            <h2 className="text-2xl font-black text-gray-900 tracking-tight italic">Dataset Definition.</h2>
+                            <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100 tracking-tight italic">Dataset Definition.</h2>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
@@ -255,7 +255,7 @@ export default function AdminUploadPage() {
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
                                     placeholder="Leave blank to use Title column, sheet name, or file name"
-                                    className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-white focus:border-primary-500 transition-all font-bold text-gray-900 italic"
+                                    className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-surface-border placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-surface focus:border-primary-500 transition-all font-bold text-gray-900 dark:text-gray-100 italic"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -265,17 +265,17 @@ export default function AdminUploadPage() {
                                     value={year}
                                     onChange={(e) => setYear(e.target.value)}
                                     placeholder="2024"
-                                    className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-white focus:border-primary-500 transition-all font-bold text-gray-900 italic"
+                                    className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-surface-border placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-surface focus:border-primary-500 transition-all font-bold text-gray-900 dark:text-gray-100 italic"
                                 />
                             </div>
                         </div>
                     </div>
 
                     {/* Step 2: Payload Injection */}
-                    <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl shadow-gray-200/20 relative overflow-hidden group">
+                    <div className="bg-surface rounded-[2.5rem] p-8 border border-surface-border shadow-xl shadow-gray-200/20 dark:shadow-none relative overflow-hidden group">
                         <div className="relative mb-8">
                             <p className="text-[10px] font-black text-primary-500 uppercase tracking-[0.2em] mb-1">Step 02</p>
-                            <h2 className="text-2xl font-black text-gray-900 tracking-tight italic">Payload Injection.</h2>
+                            <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100 tracking-tight italic">Payload Injection.</h2>
                         </div>
 
                         <div
@@ -288,7 +288,7 @@ export default function AdminUploadPage() {
                                 ? "border-primary-500 bg-primary-500/5 scale-[1.01]"
                                 : file
                                     ? "border-emerald-500 bg-emerald-50"
-                                    : "border-gray-100 bg-gray-50/50 hover:border-primary-300 hover:bg-white hover:scale-[1.01]"
+                                    : "border-surface-border bg-gray-50/50 hover:border-primary-300 hover:bg-surface hover:scale-[1.01]"
                                 }`}
                         >
                             <div className={`absolute inset-0 bg-primary-600/5 opacity-0 group-hover/drop:opacity-100 transition-opacity rounded-4xl pointer-events-none`} />
@@ -301,7 +301,7 @@ export default function AdminUploadPage() {
                                         <FileSpreadsheet className="w-10 h-10" />
                                     </div>
                                     <div className="text-center w-full">
-                                        <p className="text-xl font-black text-gray-900 truncate bg-emerald-100/50 px-4 py-1 rounded-full italic">{file.name}</p>
+                                        <p className="text-xl font-black text-gray-900 dark:text-gray-100 truncate bg-emerald-100/50 px-4 py-1 rounded-full italic">{file.name}</p>
                                         <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mt-2 bg-emerald-500/10 inline-block px-3 py-1 rounded-full border border-emerald-500/10">
                                             {(file.size / 1024).toFixed(1)} KB PAYLOAD
                                         </p>
@@ -315,10 +315,10 @@ export default function AdminUploadPage() {
                                 </motion.div>
                             ) : (
                                 <div className="space-y-4">
-                                    <div className="w-20 h-20 bg-white rounded-3xl border border-gray-100 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-gray-100 transition-transform group-hover/drop:scale-110 group-hover/drop:rotate-6">
+                                    <div className="w-20 h-20 bg-surface rounded-3xl border border-surface-border flex items-center justify-center mx-auto mb-6 shadow-xl shadow-gray-100 transition-transform group-hover/drop:scale-110 group-hover/drop:rotate-6">
                                         <FileSpreadsheet className="w-10 h-10 text-primary-500" />
                                     </div>
-                                    <h3 className="text-2xl font-black text-gray-900 tracking-tight italic">Drag & Drop Dataset.</h3>
+                                    <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100 tracking-tight italic">Drag & Drop Dataset.</h3>
                                     <p className="text-gray-400 font-bold uppercase tracking-widest text-[9px]">{uploadMode === 'pdf' ? 'PDF (scanned/print) accepted' : 'Standard .XLSX Protocol Only'}</p>
                                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/20">
                                         Browse Modules
@@ -350,10 +350,10 @@ export default function AdminUploadPage() {
                 {/* Tactical Sidebar */}
                 <div className="lg:col-span-4 space-y-8">
                     {/* Format Checklist */}
-                    <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl shadow-gray-200/20">
+                    <div className="bg-surface rounded-[2.5rem] p-8 border border-surface-border shadow-xl shadow-gray-200/20 dark:shadow-none">
                         <div className="flex items-center gap-2 mb-6">
                             <Info className="w-5 h-5 text-primary-600" />
-                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">Protocol Matrix</h3>
+                            <h3 className="text-sm font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">Protocol Matrix</h3>
                         </div>
                         <div className="space-y-3">
                             {[
@@ -363,9 +363,9 @@ export default function AdminUploadPage() {
                                 "Subject Classifier (or name the tab Physics, etc.)",
                                 "Title (optional, same on each row)",
                             ].map((col, i) => (
-                                <div key={col} className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50/50 border border-gray-100 group hover:border-primary-200 transition-colors">
+                                <div key={col} className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50/50 border border-surface-border group hover:border-primary-200 transition-colors">
                                     <span className="text-[10px] font-black text-primary-300 italic">0{i + 1}</span>
-                                    <span className="text-xs font-bold text-gray-700">{col}</span>
+                                    <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{col}</span>
                                 </div>
                             ))}
                         </div>

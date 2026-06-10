@@ -143,7 +143,7 @@ export default async function ResultsPage({
 
                     <div className="relative group">
                         <div className="absolute inset-0 bg-white/20 blur-3xl rounded-full scale-150 group-hover:bg-white/30 transition-all duration-700" />
-                        <div className="relative flex items-baseline gap-2 bg-white text-gray-900 rounded-[2.5rem] px-12 py-8 shadow-2xl shadow-black/20 border-4 border-white/20">
+                        <div className="relative flex items-baseline gap-2 bg-surface text-gray-900 dark:text-gray-100 rounded-[2.5rem] px-12 py-8 shadow-2xl shadow-black/20 border-4 border-white/20">
                             <span className="text-7xl font-black italic">{correctCount}</span>
                             <span className="text-3xl text-gray-400 font-bold">/ {totalQuestions}</span>
                         </div>
@@ -173,14 +173,14 @@ export default async function ResultsPage({
             {/* Subject Tactical Breakdown */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div className="lg:col-span-12">
-                    <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl shadow-gray-200/20">
+                    <div className="bg-surface rounded-[3rem] p-10 border border-surface-border shadow-xl shadow-gray-200/20 dark:shadow-none">
                         <div className="flex items-center justify-between mb-10">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-2xl bg-primary-900 text-white flex items-center justify-center font-black">
                                     <Gauge className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <h2 className="text-2xl font-black tracking-tight text-gray-900">Tactical Performance</h2>
+                                    <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-gray-100">Tactical Performance</h2>
                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Cross-Subject Diagnostic</p>
                                 </div>
                             </div>
@@ -197,15 +197,15 @@ export default async function ResultsPage({
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-3 h-3 rounded-full ${colors.bar} ${colors.glow}`} />
-                                                <span className="text-lg font-black italic text-gray-900">{subject}</span>
+                                                <span className="text-lg font-black italic text-gray-900 dark:text-gray-100">{subject}</span>
                                             </div>
                                             <div className="flex items-center gap-4">
                                                 <div className="text-right">
                                                     <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Density</p>
-                                                    <p className="font-black text-gray-900">{Math.round(avgSubjectTime)}s/q</p>
+                                                    <p className="font-black text-gray-900 dark:text-gray-100">{Math.round(avgSubjectTime)}s/q</p>
                                                 </div>
                                                 <div className="h-6 w-px bg-gray-100" />
-                                                <span className="text-2xl font-black text-gray-900 italic">{pct}%</span>
+                                                <span className="text-2xl font-black text-gray-900 dark:text-gray-100 italic">{pct}%</span>
                                             </div>
                                         </div>
                                         <div className="h-4 bg-gray-100 rounded-full overflow-hidden p-1 shadow-inner">
@@ -232,7 +232,7 @@ export default async function ResultsPage({
                         <History className="w-5 h-5 text-primary-400" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-black tracking-tight text-gray-900">Analysis Trace</h2>
+                        <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-gray-100">Analysis Trace</h2>
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Question-by-Question Diagnostic</p>
                     </div>
                 </div>
@@ -258,7 +258,7 @@ export default async function ResultsPage({
                         return (
                             <div
                                 key={answer.id}
-                                className={`group bg-white rounded-[2.5rem] border transition-all duration-500 overflow-hidden ${isMistake ? "border-red-100 shadow-xl shadow-red-500/5 hover:border-red-200" : "border-gray-100 hover:border-emerald-200"}`}
+                                className={`group bg-surface rounded-[2.5rem] border transition-all duration-500 overflow-hidden ${isMistake ? "border-red-100 shadow-xl shadow-red-500/5 hover:border-red-200" : "border-surface-border hover:border-emerald-200"}`}
                             >
                                 {/* Compact Card Header */}
                                 <div className={`px-10 py-6 flex items-center justify-between border-b ${isMistake ? "bg-red-50/30 border-red-50" : "bg-emerald-50/30 border-emerald-50"}`}>
@@ -270,7 +270,7 @@ export default async function ResultsPage({
                                             <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Execution Metric</span>
                                             <div className="flex items-center gap-2">
                                                 <Clock className={`w-3.5 h-3.5 ${isMistake ? "text-red-400" : "text-emerald-400"}`} />
-                                                <span className="text-sm font-black italic text-gray-900">{answer.time_spent}s</span>
+                                                <span className="text-sm font-black italic text-gray-900 dark:text-gray-100">{answer.time_spent}s</span>
                                                 <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${timeStatus === "Slow" ? "bg-red-100 text-red-600" :
                                                     timeStatus === "Fast" ? "bg-amber-100 text-amber-600" : "bg-emerald-100 text-emerald-600"
                                                     }`}>
@@ -283,7 +283,7 @@ export default async function ResultsPage({
                                 </div>
 
                                 <div className="p-10">
-                                    <h3 className="text-xl sm:text-2xl font-bold leading-tight text-gray-900 mb-8 italic">
+                                    <h3 className="text-xl sm:text-2xl font-bold leading-tight text-gray-900 dark:text-gray-100 mb-8 italic">
                                         {question.question_text}
                                     </h3>
 
@@ -304,11 +304,11 @@ export default async function ResultsPage({
                                                     key={label}
                                                     className={`flex items-center gap-6 px-6 py-4 rounded-2xl border-2 transition-all ${isCorrect ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-900" :
                                                         isSelected && !isCorrect ? "bg-red-500/5 border-red-500/20 text-red-900" :
-                                                            "bg-gray-50 border-gray-100 text-gray-500 opacity-60"
+                                                            "bg-gray-50 border-surface-border text-gray-500 dark:text-gray-400 opacity-60"
                                                         }`}
                                                 >
                                                     <span className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black shrink-0 ${isCorrect ? "bg-emerald-500 text-white" :
-                                                        isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500"
+                                                        isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500 dark:text-gray-400"
                                                         }`}>
                                                         {label}
                                                     </span>
@@ -325,6 +325,7 @@ export default async function ResultsPage({
                                         <AIInsightCard
                                             answerId={answer.id}
                                             initialInsight={answer.ai_analysis}
+                                            questionText={question.question_text}
                                         />
                                     )}
                                 </div>
@@ -338,7 +339,7 @@ export default async function ResultsPage({
             <div className="flex items-center justify-center gap-8 py-12">
                 <Link
                     href="/quizzes"
-                    className="flex items-center gap-3 px-10 py-5 bg-white border-2 border-gray-100 text-gray-900 font-black uppercase tracking-widest text-xs rounded-3xl hover:bg-gray-50 hover:border-gray-900 transition-all active:scale-95 shadow-xl shadow-gray-200/20"
+                    className="flex items-center gap-3 px-10 py-5 bg-surface border-2 border-surface-border text-gray-900 dark:text-gray-100 font-black uppercase tracking-widest text-xs rounded-3xl hover:bg-gray-50 hover:border-gray-900 transition-all active:scale-95 shadow-xl shadow-gray-200/20 dark:shadow-none"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     Archive

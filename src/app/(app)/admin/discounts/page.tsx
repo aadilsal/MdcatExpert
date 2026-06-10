@@ -9,12 +9,12 @@ export const dynamic = "force-dynamic";
 export default async function AdminDiscountsPage() {
   const token = await convexAuthNextjsToken();
   if (!token) {
-    return <div className="p-10 text-center text-gray-500">Unauthorized</div>;
+    return <div className="p-10 text-center text-gray-500 dark:text-gray-400">Unauthorized</div>;
   }
 
   const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
   if (!me || me.role !== "admin") {
-    return <div className="p-10 text-center text-gray-500">Forbidden</div>;
+    return <div className="p-10 text-center text-gray-500 dark:text-gray-400">Forbidden</div>;
   }
 
   const promoCodes = (await fetchQuery(api.users.getPromoCodes, {}, { token })) || [];
@@ -41,13 +41,13 @@ export default async function AdminDiscountsPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.4fr_0.9fr]">
-        <section className="rounded-3xl bg-white border border-gray-100 shadow-xl p-8">
+        <section className="rounded-3xl bg-surface border border-surface-border shadow-xl p-8">
           <div className="flex items-center justify-between gap-4 mb-8">
             <div>
-              <h2 className="text-xl font-semibold text-slate-900">Existing Discounts</h2>
-              <p className="mt-1 text-sm text-slate-500">Review promo codes and toggle availability.</p>
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Existing Discounts</h2>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Review promo codes and toggle availability.</p>
             </div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
+            <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
               <Ticket className="w-4 h-4" />
               {promoCodes.filter((promo) => promo.isActive).length} active
             </div>
@@ -56,7 +56,7 @@ export default async function AdminDiscountsPage() {
           <div className="overflow-x-auto">
             <table className="min-w-full text-left border-separate border-spacing-y-3">
               <thead>
-                <tr className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                <tr className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                   <th className="px-4 py-3">Code</th>
                   <th className="px-4 py-3">Uses</th>
                   <th className="px-4 py-3">Status</th>
@@ -67,22 +67,22 @@ export default async function AdminDiscountsPage() {
               <tbody>
                 {promoCodes.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-sm text-slate-500">
+                    <td colSpan={5} className="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-400">
                       No discount codes created yet.
                     </td>
                   </tr>
                 ) : (
                   promoCodes.map((promo) => (
-                    <tr key={promo._id} className="bg-slate-50 rounded-3xl shadow-sm">
-                      <td className="px-4 py-4 font-semibold text-slate-900">{promo.code}</td>
-                      <td className="px-4 py-4 text-sm text-slate-600">{promo.usedCount}/{promo.maxUses}</td>
+                    <tr key={promo._id} className="bg-slate-50 dark:bg-slate-800/50 rounded-3xl shadow-sm">
+                      <td className="px-4 py-4 font-semibold text-slate-900 dark:text-slate-100">{promo.code}</td>
+                      <td className="px-4 py-4 text-sm text-slate-600 dark:text-slate-400">{promo.usedCount}/{promo.maxUses}</td>
                       <td className="px-4 py-4">
-                        <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase ${promo.isActive ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
+                        <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase ${promo.isActive ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400" : "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400"}`}>
                           {promo.isActive ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                           {promo.isActive ? "Active" : "Inactive"}
                         </span>
                       </td>
-                      <td className="px-4 py-4 text-sm text-slate-500">{new Date(promo.createdAt).toLocaleDateString()}</td>
+                      <td className="px-4 py-4 text-sm text-slate-500 dark:text-slate-400">{new Date(promo.createdAt).toLocaleDateString()}</td>
                       <td className="px-4 py-4 text-right">
                         <TogglePromoForm promoId={promo._id} isActive={promo.isActive} />
                       </td>
@@ -94,14 +94,14 @@ export default async function AdminDiscountsPage() {
           </div>
         </section>
 
-        <section className="rounded-3xl bg-white border border-gray-100 shadow-xl p-8">
+        <section className="rounded-3xl bg-surface border border-surface-border shadow-xl p-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="rounded-2xl bg-primary-600/10 p-3 text-primary-600">
               <Plus className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-slate-900">Create New Code</h2>
-              <p className="text-sm text-slate-500">Add a promo code for premium signup access.</p>
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Create New Code</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Add a promo code for premium signup access.</p>
             </div>
           </div>
 

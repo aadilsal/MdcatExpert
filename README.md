@@ -10,15 +10,18 @@ MDCAT preparation platform for Pakistan — past papers as interactive quizzes, 
 - Take timed quizzes and view detailed results
 - Dashboard and subject analytics
 - Premium upgrade flow (payment screenshot + admin approval)
+- **Study Copilot** — RAG chat with your own notes and the MDCAT library (cited answers)
 - Promo codes at signup
 
 **Admins** (`role: admin` on your user in Convex)
 
 - Upload question banks from `.xlsx` (review → publish workflow)
 - Manage quizzes, students, payments, and discount codes
+- **Study Library** — upload textbooks, notes, and AI summaries for Copilot RAG
 
-**AI** (see [docs/AI_FEATURES_PLAN.md](docs/AI_FEATURES_PLAN.md))
+**AI** (see [docs/AI_FEATURES_PLAN.md](docs/AI_FEATURES_PLAN.md), [docs/STUDY_COPILOT.md](docs/STUDY_COPILOT.md))
 
+- Study Copilot RAG (Groq chat + Convex full-text search)
 - Mistake analyzer, weakness radar, and related insights (Groq)
 
 ## Tech stack
@@ -56,7 +59,7 @@ Typical variables:
 | -------- | ------- |
 | `NEXT_PUBLIC_CONVEX_URL` | Convex deployment URL (from `npx convex dev`) |
 | `CONVEX_DEPLOYMENT` | Convex deployment name |
-| `GROQ_API_KEY` | AI features |
+| `GROQ_API_KEY` | AI chat, insights, and Study Copilot generation |
 | `RESEND_API_KEY` | Transactional email (Next.js) |
 | `RESEND_FROM_EMAIL` | Sender address for Resend (Next.js and Convex) |
 | `AUTH_RESEND_KEY` | Password reset OTP emails (**Convex** dashboard env; can match `RESEND_API_KEY`) |

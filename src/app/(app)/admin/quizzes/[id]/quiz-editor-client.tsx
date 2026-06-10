@@ -173,13 +173,13 @@ export default function QuizEditorClient({
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-card">
-                <h2 className="font-semibold text-gray-900 mb-4">Subject Breakdown</h2>
+            <div className="bg-surface rounded-xl border border-surface-border p-6 shadow-card">
+                <h2 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">Subject Breakdown</h2>
                 <div className="flex flex-wrap gap-3">
                     {Object.entries(subjectCounts).map(([subject, count]) => (
                         <div
                             key={subject}
-                            className={`px-4 py-2 rounded-xl text-sm font-medium ${subjectColors[subject] || "bg-gray-100 text-gray-700"}`}
+                            className={`px-4 py-2 rounded-xl text-sm font-medium ${subjectColors[subject] || "bg-gray-100 text-gray-700 dark:text-gray-300"}`}
                         >
                             {subject}: {count} questions
                         </div>
@@ -188,7 +188,7 @@ export default function QuizEditorClient({
             </div>
 
             <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                     Questions ({questions.length})
                 </h2>
                 <div className="space-y-4">
@@ -199,19 +199,19 @@ export default function QuizEditorClient({
                             <div
                                 key={question.id}
                                 ref={isHighlighted ? highlightRef : undefined}
-                                className={`bg-white rounded-xl border shadow-card overflow-hidden transition-all ${
+                                className={`bg-surface rounded-xl border shadow-card dark:shadow-none overflow-hidden transition-all ${
                                     isHighlighted
                                         ? "border-rose-300 ring-2 ring-rose-500/20"
                                         : "border-gray-100"
                                 }`}
                             >
-                                <div className="px-5 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+                                <div className="px-5 py-3 bg-gray-50 border-b border-surface-border flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <span className="w-8 h-8 bg-primary-100 text-primary-700 rounded-lg flex items-center justify-center text-sm font-bold">
                                             {idx + 1}
                                         </span>
                                         <span
-                                            className={`px-2.5 py-0.5 rounded-md text-xs font-medium ${subjectColors[question.subject] || "bg-gray-100 text-gray-700"}`}
+                                            className={`px-2.5 py-0.5 rounded-md text-xs font-medium ${subjectColors[question.subject] || "bg-gray-100 text-gray-700 dark:text-gray-300"}`}
                                         >
                                             {question.subject}
                                         </span>
@@ -241,7 +241,7 @@ export default function QuizEditorClient({
                                             <button
                                                 type="button"
                                                 onClick={() => startEdit(question)}
-                                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50"
+                                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50"
                                             >
                                                 <Edit3 className="w-3.5 h-3.5" />
                                                 Edit
@@ -299,7 +299,7 @@ export default function QuizEditorClient({
                                         </div>
                                     ) : (
                                         <>
-                                            <p className="text-gray-900 font-medium mb-4">
+                                            <p className="text-gray-900 dark:text-gray-100 font-medium mb-4">
                                                 {question.question_text}
                                             </p>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -315,14 +315,14 @@ export default function QuizEditorClient({
                                                             className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm ${
                                                                 isCorrect
                                                                     ? "bg-green-50 border border-green-200 text-green-800"
-                                                                    : "bg-gray-50 border border-gray-100 text-gray-700"
+                                                                    : "bg-gray-50 border border-surface-border text-gray-700 dark:text-gray-300"
                                                             }`}
                                                         >
                                                             <span
                                                                 className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold shrink-0 ${
                                                                     isCorrect
                                                                         ? "bg-green-200 text-green-800"
-                                                                        : "bg-gray-200 text-gray-600"
+                                                                        : "bg-gray-200 text-gray-600 dark:text-gray-400"
                                                                 }`}
                                                             >
                                                                 {label}
