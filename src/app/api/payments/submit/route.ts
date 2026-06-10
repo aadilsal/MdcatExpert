@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../convex/_generated/api";
-import { sendEmailNotification } from "@/lib/resend";
+import { adminEmail, sendEmailNotification } from "@/lib/resend";
 import { formatUserError } from "@/lib/format-user-error";
 
 export async function POST(request: Request) {
@@ -54,6 +54,22 @@ export async function POST(request: Request) {
         text: "We received your payment proof. Our team will review it shortly.",
       });
     }
+
+    await sendEmailNotification({
+      to: adminEmail,
+      subject: `MDCAT Xpert: New payment to review — ${user.email ?? "unknown"}`,
+      text: [
+        "A student submitted a payment proof for review.",
+        "",
+        `User: ${user.name ?? "—"} (${user.email ?? "—"})`,
+        `Transaction ID: ${transactionId}`,
+        `Amount: ${amount}`,
+        archiveTitle ? `Archive: ${archiveTitle}${archiveYear ? ` (${archiveYear})` : ""}` : "",
+        `Screenshot: ${screenshotUrl}`,
+      ]
+        .filter(Boolean)
+        .join("\n"),
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

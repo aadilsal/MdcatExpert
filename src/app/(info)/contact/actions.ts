@@ -1,9 +1,7 @@
 "use server";
 
-import { Resend } from "resend";
 import { z } from "zod";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { adminEmail, getResendConfigError, sendEmailNotification } from "@/lib/resend";
 
 const contactSchema = z.object({
     firstName: z.string().min(2, "First name is required"),
@@ -37,24 +35,34 @@ export async function sendContactEmail(prevState: ContactState | null, formData:
     }
 
     try {
-        // 2. Send Email
-        const { error } = await resend.emails.send({
-            from: "MdcatXpert <onboarding@resend.dev>", // Note: For sandbox, only verified emails/onboarding email works
-            to: ["support@mdcatxpert.com"], // Point to the support email
-            subject: `Contact Form: ${data.subject} from ${data.firstName} ${data.lastName}`,
+        const configError = getResendConfigError();
+        if (configError) {
+            console.error("Contact form:", configError);
+            return { error: "Email is not configured on the server. Please try again later." };
+        }
+
+        const result = await sendEmailNotification({
+            to: adminEmail,
             replyTo: data.email,
+            subject: `Contact Form: ${data.subject} from ${data.firstName} ${data.lastName}`,
+            text: [
+                `Name: ${data.firstName} ${data.lastName}`,
+                `Email: ${data.email}`,
+                `Subject: ${data.subject}`,
+                "",
+                data.message,
+            ].join("\n"),
             html: `
                 <h2>New Contact Form Submission</h2>
                 <p><strong>Name:</strong> ${data.firstName} ${data.lastName}</p>
-                <p><strong>Email:</strong> ${data.email}</p>
+                <p><strong>Email:</strong> <a href="mailto:${data.email}">${data.email}</a></p>
                 <p><strong>Subject:</strong> ${data.subject}</p>
                 <p><strong>Message:</strong></p>
                 <p>${data.message.replace(/\n/g, "<br/>")}</p>
             `,
         });
 
-        if (error) {
-            console.error("Resend error:", error);
+        if (result.error) {
             return { error: "Failed to send email. Please try again later." };
         }
 

@@ -1,6 +1,19 @@
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
 import { internalAction, internalMutation, internalQuery } from "./_generated/server";
+
+type PctbImportResult =
+  | { title: string; status: "failed"; error: string }
+  | { title: string; status: "skipped"; sourceId: Id<"studySources">; reason: "already_exists" }
+  | {
+      title: string;
+      status: "imported";
+      sourceId: Id<"studySources">;
+      skipped: boolean;
+      bytes: number;
+      sourceUrl: string;
+    };
 
 const ALLOWED_HOSTS = [
   "pctb.punjab.gov.pk",
@@ -212,7 +225,7 @@ export const importPctbBook = internalAction({
     subject: subjectValidator,
     classLevel: v.string(),
   },
-  handler: async (ctx, { urls, url, title, subject, classLevel }) => {
+  handler: async (ctx, { urls, url, title, subject, classLevel }): Promise<PctbImportResult> => {
     const downloadUrls = urls ?? (url ? [url] : []);
     if (downloadUrls.length === 0) {
       return { title, status: "failed" as const, error: "No download URLs provided" };
@@ -277,10 +290,13 @@ export const seedAllPctbBooks = internalAction({
 /** Import all books sequentially in one run (use for manual CLI seed). */
 export const seedAllPctbBooksNow = internalAction({
   args: {},
-  handler: async (ctx) => {
-    const results = [];
+  handler: async (ctx): Promise<PctbImportResult[]> => {
+    const results: PctbImportResult[] = [];
     for (const book of PCTB_MANIFEST) {
-      const result = await ctx.runAction(internal.seedLibrary.importPctbBook, book);
+      const result: PctbImportResult = await ctx.runAction(
+        internal.seedLibrary.importPctbBook,
+        book,
+      );
       results.push(result);
     }
     return results;
