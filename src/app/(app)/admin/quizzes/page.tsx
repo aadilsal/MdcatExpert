@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { DeleteQuizButton } from "./delete-button";
 import { EditQuizTitleButton } from "./edit-title-button";
+import { EditQuizYearButton } from "./edit-year-button";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../convex/_generated/api";
@@ -151,9 +152,10 @@ export default async function AdminQuizzesPage() {
                                     <div className="w-12 h-12 bg-linear-to-br from-primary-100 to-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                                         <FileText className="w-6 h-6 text-primary-600" />
                                     </div>
-                                    <span className="px-2.5 py-1 bg-primary-50 text-primary-700 rounded-lg text-xs font-semibold">
-                                        {quiz.year}
-                                    </span>
+                                    <EditQuizYearButton
+                                        quizId={String(quiz._id)}
+                                        initialYear={quiz.year}
+                                    />
                                 </div>
 
                                 <EditQuizTitleButton
@@ -180,7 +182,7 @@ export default async function AdminQuizzesPage() {
                                 <div className="flex items-center gap-2 pt-3 border-t border-surface-border">
                                     <Link
                                         href={`/admin/quizzes/${quiz._id}`}
-                                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gray-50 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-100 transition-colors"
+                                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-gray-100 text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
                                     >
                                         <Eye className="w-4 h-4" />
                                         Manage

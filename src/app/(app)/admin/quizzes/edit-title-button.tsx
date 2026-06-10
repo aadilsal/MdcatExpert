@@ -46,7 +46,7 @@ export function EditQuizTitleButton({
                 <input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+                    className="theme-input flex-1 px-3 py-2 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500/30 dark:focus:ring-primary-900/40"
                     autoFocus
                 />
                 <button
@@ -67,7 +67,7 @@ export function EditQuizTitleButton({
                         setTitle(initialTitle);
                         setEditing(false);
                     }}
-                    className="p-2 rounded-lg bg-gray-100 text-gray-600 dark:text-gray-400"
+                    className="p-2 rounded-lg bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300"
                 >
                     <X className="w-4 h-4" />
                 </button>
@@ -82,7 +82,7 @@ export function EditQuizTitleButton({
                 type="button"
                 onClick={() => setEditing(true)}
                 title="Edit quiz title"
-                className="p-1.5 rounded-lg text-gray-400 opacity-0 group-hover/title:opacity-100 hover:bg-gray-100 hover:text-primary-600 transition-all"
+                className="p-1.5 rounded-lg text-gray-400 opacity-0 group-hover/title:opacity-100 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-primary-600 dark:hover:text-primary-400 transition-all"
             >
                 <Pencil className="w-4 h-4" />
             </button>

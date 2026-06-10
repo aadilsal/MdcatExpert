@@ -205,17 +205,6 @@ export default function LandingClient({
           style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
           className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 text-center"
         >
-          {/* Diagnostic Pill */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/70 dark:bg-slate-900/60 backdrop-blur-md border border-primary-100 dark:border-slate-800 text-primary-700 dark:text-primary-300 text-xs font-black uppercase tracking-widest mb-10 shadow-xs hover:border-primary-200 dark:hover:border-slate-700 transition-colors"
-          >
-            <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
-            Elite AI Weakness Radar 2026 Active
-          </motion.div>
-
           {/* Heading */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}

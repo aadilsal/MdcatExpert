@@ -184,7 +184,7 @@ export default function AdminUploadPage() {
                     <button
                         key={mode}
                         onClick={() => { setUploadMode(mode as 'xlsx' | 'pdf'); setFile(null); setResult(null); }}
-                        className={`px-6 py-2 rounded-full font-black uppercase tracking-widest text-xs transition-all ${uploadMode === mode ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-600 dark:text-gray-400 hover:bg-gray-200'}`}
+                        className={`px-6 py-2 rounded-full font-black uppercase tracking-widest text-xs transition-all ${uploadMode === mode ? 'bg-primary-600 text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700'}`}
                     >
                         {mode === 'xlsx' ? 'Upload XLSX' : 'Upload PDF'}
                     </button>
@@ -208,10 +208,10 @@ export default function AdminUploadPage() {
                             {result.success ? <CheckCircle className="w-8 h-8" /> : <AlertCircle className="w-8 h-8" />}
                         </div>
                         <div className="flex-1 space-y-2">
-                            <h3 className={`text-2xl font-black tracking-tight ${result.success ? "text-emerald-900" : "text-red-900"}`}>
+                            <h3 className={`text-2xl font-black tracking-tight ${result.success ? "text-emerald-900 dark:text-emerald-200" : "text-red-900 dark:text-red-200"}`}>
                                 {result.success ? "Ingestion Successful." : "Ingestion Failed."}
                             </h3>
-                            <p className={`font-bold ${result.success ? "text-emerald-800" : "text-red-800"}`}>
+                            <p className={`font-bold ${result.success ? "text-emerald-800 dark:text-emerald-300" : "text-red-800 dark:text-red-300"}`}>
                                 {result.success
                                     ? `${result.total_inserted} questions successfully committed to clusters.`
                                     : result.error
@@ -221,7 +221,7 @@ export default function AdminUploadPage() {
                             {result.success && (
                                 <button
                                     onClick={() => router.push("/admin/quizzes")}
-                                    className="inline-flex items-center gap-2 mt-2 text-emerald-700 font-black uppercase tracking-widest text-[10px] hover:text-emerald-900 transition-colors"
+                                    className="inline-flex items-center gap-2 mt-2 text-emerald-700 dark:text-emerald-400 font-black uppercase tracking-widest text-[10px] hover:text-emerald-900 dark:hover:text-emerald-300 transition-colors"
                                 >
                                     Proceed to Repository <ChevronRight className="w-3 h-3" />
                                 </button>
@@ -255,7 +255,7 @@ export default function AdminUploadPage() {
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
                                     placeholder="Leave blank to use Title column, sheet name, or file name"
-                                    className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-surface-border placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-surface focus:border-primary-500 transition-all font-bold text-gray-900 dark:text-gray-100 italic"
+                                    className="theme-input w-full px-6 py-4 rounded-2xl placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-4 focus:ring-primary-500/5 dark:focus:ring-primary-900/30 focus:border-primary-500 transition-all font-bold italic"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -265,7 +265,7 @@ export default function AdminUploadPage() {
                                     value={year}
                                     onChange={(e) => setYear(e.target.value)}
                                     placeholder="2024"
-                                    className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-surface-border placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-surface focus:border-primary-500 transition-all font-bold text-gray-900 dark:text-gray-100 italic"
+                                    className="theme-input w-full px-6 py-4 rounded-2xl placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-4 focus:ring-primary-500/5 dark:focus:ring-primary-900/30 focus:border-primary-500 transition-all font-bold italic"
                                 />
                             </div>
                         </div>
@@ -285,10 +285,10 @@ export default function AdminUploadPage() {
                             onDrop={handleDrop}
                             onClick={() => fileInputRef.current?.click()}
                             className={`relative border-2 border-dashed rounded-4xl p-12 text-center transition-all duration-500 cursor-pointer group/drop ${dragActive
-                                ? "border-primary-500 bg-primary-500/5 scale-[1.01]"
+                                ? "border-primary-500 bg-primary-500/5 dark:bg-primary-500/10 scale-[1.01]"
                                 : file
-                                    ? "border-emerald-500 bg-emerald-50"
-                                    : "border-surface-border bg-gray-50/50 hover:border-primary-300 hover:bg-surface hover:scale-[1.01]"
+                                    ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30"
+                                    : "border-surface-border bg-gray-50/50 dark:bg-slate-800/30 hover:border-primary-300 dark:hover:border-primary-700 hover:bg-surface hover:scale-[1.01]"
                                 }`}
                         >
                             <div className={`absolute inset-0 bg-primary-600/5 opacity-0 group-hover/drop:opacity-100 transition-opacity rounded-4xl pointer-events-none`} />
@@ -301,14 +301,14 @@ export default function AdminUploadPage() {
                                         <FileSpreadsheet className="w-10 h-10" />
                                     </div>
                                     <div className="text-center w-full">
-                                        <p className="text-xl font-black text-gray-900 dark:text-gray-100 truncate bg-emerald-100/50 px-4 py-1 rounded-full italic">{file.name}</p>
+                                        <p className="text-xl font-black text-emerald-900 dark:text-emerald-100 truncate bg-emerald-100/50 dark:bg-emerald-900/40 px-4 py-1 rounded-full italic">{file.name}</p>
                                         <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mt-2 bg-emerald-500/10 inline-block px-3 py-1 rounded-full border border-emerald-500/10">
                                             {(file.size / 1024).toFixed(1)} KB PAYLOAD
                                         </p>
                                     </div>
                                     <button
                                         onClick={(e) => { e.stopPropagation(); setFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
-                                        className="mt-2 p-2 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all font-bold uppercase text-[9px] tracking-widest flex items-center gap-2"
+                                        className="mt-2 p-2 rounded-xl text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all font-bold uppercase text-[9px] tracking-widest flex items-center gap-2"
                                     >
                                         <X className="w-4 h-4" /> Eject File
                                     </button>
@@ -363,7 +363,7 @@ export default function AdminUploadPage() {
                                 "Subject Classifier (or name the tab Physics, etc.)",
                                 "Title (optional, same on each row)",
                             ].map((col, i) => (
-                                <div key={col} className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50/50 border border-surface-border group hover:border-primary-200 transition-colors">
+                                <div key={col} className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50/50 dark:bg-slate-800/40 border border-surface-border group hover:border-primary-200 dark:hover:border-primary-800 transition-colors">
                                     <span className="text-[10px] font-black text-primary-300 italic">0{i + 1}</span>
                                     <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{col}</span>
                                 </div>
