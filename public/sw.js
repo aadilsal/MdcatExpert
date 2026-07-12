@@ -36,6 +36,10 @@ self.addEventListener("activate", (event) => {
 
 // Fetch Event
 self.addEventListener("fetch", (event) => {
+  if (!event.request.url.startsWith("http")) {
+    return;
+  }
+
   // Only cache GET requests and bypass api endpoints or hot reload streams
   if (
     event.request.method !== "GET" || 
