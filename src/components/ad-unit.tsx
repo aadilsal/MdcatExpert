@@ -32,7 +32,7 @@ export default function AdUnit({ slot = "default-slot", format = "auto", respons
             <ins
                 className="adsbygoogle block"
                 style={{ display: "block", textAlign: "center" }}
-                data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" // Place owner AdSense ID here
+                data-ad-client="ca-pub-5338952676839362" // Place owner AdSense ID here
                 data-ad-slot={slot}
                 data-ad-format={format}
                 data-full-width-responsive={responsive ? "true" : "false"}
