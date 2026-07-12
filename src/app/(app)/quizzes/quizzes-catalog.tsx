@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import type { Doc } from "../../../../convex/_generated/dataModel";
 import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics-events";
+import PremiumFeatureModal from "@/components/premium-feature-modal";
+import AdUnit from "@/components/ad-unit";
 
 type QuizRow = Doc<"quizzes">;
 
@@ -34,6 +36,13 @@ export function QuizzesCatalog({
     const router = useRouter();
     const [filter, setFilter] = useState("");
     const unlockedSet = useMemo(() => new Set(unlockedQuizIds), [unlockedQuizIds]);
+    const [selectedLockFeature, setSelectedLockFeature] = useState<{
+        open: boolean;
+        title: string;
+        outcome: string;
+        desc: string;
+        why: string;
+    } | null>(null);
 
     const filteredQuizzes = useMemo(() => {
         const q = filter.trim().toLowerCase();
@@ -142,7 +151,13 @@ export function QuizzesCatalog({
                                                 quizId,
                                                 source: "catalog",
                                             });
-                                            router.push("/upgrade?reason=premium_content");
+                                            setSelectedLockFeature({
+                                                open: true,
+                                                title: `Locked Quiz: ${quiz.title}`,
+                                                outcome: "Unlock 20+ Years of Verified Past Papers",
+                                                desc: "Gain unrestricted access to all yearly past papers and premium question banks. Get detailed AI explanations, weakness analytics, and difficulty analysis for every question.",
+                                                why: "92% of high-scoring MDCAT candidates solve 15+ years of past papers during their final weeks to master exam patterns."
+                                            });
                                         }
                                     }}
                                     className={`group relative bg-surface rounded-4xl border border-surface-border p-8 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col ${isLocked ? "grayscale-[0.5] opacity-90" : "hover:shadow-primary-600/10 hover:border-primary-200"}`}
@@ -220,6 +235,12 @@ export function QuizzesCatalog({
                 )}
             </div>
 
+            {!isPremiumUser && (
+                <div className="w-full mt-4 mb-8">
+                    <AdUnit slot="catalog-bottom" />
+                </div>
+            )}
+
             <div className="grid md:grid-cols-2 gap-8 pt-8">
                 <div className="bg-emerald-50 rounded-4xl p-8 border border-emerald-100/50 flex items-center gap-6 group hover:-translate-y-1 transition-all">
                     <div className="w-16 h-16 bg-surface rounded-2xl flex items-center justify-center text-emerald-600 shadow-lg shadow-emerald-500/5 transition-transform group-hover:scale-110">
@@ -244,6 +265,18 @@ export function QuizzesCatalog({
                     </div>
                 </div>
             </div>
+
+            {selectedLockFeature && (
+                <PremiumFeatureModal
+                    open={selectedLockFeature.open}
+                    onClose={() => setSelectedLockFeature(null)}
+                    featureName={selectedLockFeature.title}
+                    outcomeText={selectedLockFeature.outcome}
+                    descriptionText={selectedLockFeature.desc}
+                    whyStudentsUseIt={selectedLockFeature.why}
+                    source="quizzes_catalog"
+                />
+            )}
         </>
     );
 }

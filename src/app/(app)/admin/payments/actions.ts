@@ -6,6 +6,7 @@ import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
 import { sendEmailNotification } from "@/lib/resend";
+import { getPremiumActivatedEmailHtml } from "@/lib/email-templates";
 
 export async function approvePaymentAction(requestId: string, userId: string, adminMessage: string) {
     const token = await convexAuthNextjsToken();
@@ -14,7 +15,7 @@ export async function approvePaymentAction(requestId: string, userId: string, ad
     const me = await fetchQuery(api.users.getCurrentUserProfile, {}, { token });
     if (!me || me.role !== "admin") throw new Error("Forbidden");
 
-    const premiumUntil = new Date(new Date().setFullYear(new Date().getFullYear() + 10)).getTime();
+    const premiumUntil = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).getTime();
 
     await fetchMutation(
         api.payments.approvePaymentRequest,
@@ -26,10 +27,12 @@ export async function approvePaymentAction(requestId: string, userId: string, ad
     if (target?.email) {
         const enabled = (target.emailNotificationsEnabled ?? true) === true;
         if (enabled) {
+            const html = getPremiumActivatedEmailHtml(target.name || "Student");
             await sendEmailNotification({
                 to: target.email,
-                subject: "MDCAT Xpert: Payment approved",
-                text: `Your payment was approved. ${adminMessage ? `Note: ${adminMessage}` : ""}`.trim(),
+                subject: "Premium Activated Successfully",
+                text: `Hello,\n\nYour payment has been verified successfully.\n\nYour Premium membership is now active.\n\nYou can now log in and enjoy:\n• AI Weakness Radar\n• AI Study Planner\n• Predicted MDCAT Score\n• All Past Papers\n• Advanced Analytics\n\nBest of luck in your MDCAT preparation.`,
+                html,
             });
         }
     }

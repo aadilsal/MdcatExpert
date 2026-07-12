@@ -8,6 +8,7 @@ import { UserPlus, Eye, EyeOff, AlertCircle, Mail, Lock, User, Sparkles, Ticket 
 import { useAuthActions } from "@convex-dev/auth/react";
 import { LoadingButton } from "@/components/loading-button";
 import { formatUserError } from "@/lib/format-user-error";
+import { sendWelcomeEmailAction } from "./actions";
 
 export default function SignupPage() {
     const router = useRouter();
@@ -57,8 +58,17 @@ export default function SignupPage() {
                         setError(null);
                         try {
                             const formData = new FormData(e.currentTarget);
+                            const email = formData.get("email") as string;
+                            const name = formData.get("name") as string;
                             formData.set("flow", "signUp");
                             await signIn("password", formData);
+
+                            // Send welcome email in background
+                            try {
+                                await sendWelcomeEmailAction(email, name);
+                            } catch (emailErr) {
+                                console.error("Welcome email failed asynchronously:", emailErr);
+                            }
 
                             const trimmedPromo = promoCode.trim();
                             if (trimmedPromo) {

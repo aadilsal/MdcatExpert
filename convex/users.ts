@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { internalQuery, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { isActivePremiumUser } from "./quizAccess";
 
 export const getUserByEmail = query({
   args: { email: v.string() },
@@ -32,15 +33,100 @@ export const getCurrentUser = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
-    return await ctx.db.get(userId);
+    const user = await ctx.db.get(userId);
+    if (!user) return null;
+    if (user.subscriptionType === "premium" && !isActivePremiumUser(user)) {
+      return {
+        ...user,
+        subscriptionType: "free" as const,
+      };
+    }
+    return user;
   },
 });
+
+function getCurrentWeekId(): string {
+  const d = new Date();
+  const year = d.getFullYear();
+  const oneJan = new Date(year, 0, 1);
+  const numberOfDays = Math.floor((d.getTime() - oneJan.getTime()) / (24 * 60 * 60 * 1000));
+  const week = Math.ceil((d.getDay() + 1 + numberOfDays) / 7);
+  return `${year}-${week}`;
+}
+
+async function getTop3UserIds(ctx: any): Promise<string[]> {
+  const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const recentAttempts = await ctx.db.query("attempts").collect();
+  const weeklyAttempts = recentAttempts.filter((a: any) => a.createdAt >= oneWeekAgo);
+
+  const userStatsMap = new Map<string, number>();
+  for (const attempt of weeklyAttempts) {
+    const uId = String(attempt.userId);
+    const existing = userStatsMap.get(uId) || 0;
+    userStatsMap.set(uId, existing + (attempt.correctAnswers || 0));
+  }
+
+  return Array.from(userStatsMap.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map((entry) => entry[0]);
+}
 
 export const getCurrentUserProfile = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
-    return await ctx.db.get(userId);
+    const user = await ctx.db.get(userId);
+    if (!user) return null;
+
+    const top3 = await getTop3UserIds(ctx);
+    const topperIndex = top3.indexOf(String(userId));
+    const topperRank = topperIndex !== -1 ? topperIndex + 1 : null;
+
+    const isPremium = user.subscriptionType === "premium" && isActivePremiumUser(user);
+
+    return {
+      ...user,
+      subscriptionType: isPremium ? ("premium" as const) : ("free" as const),
+      topperRank,
+      hasClaimedWeeklyReward: user.lastClaimedTopperWeek === getCurrentWeekId(),
+    };
+  },
+});
+
+export const claimTopperReward = mutation({
+  handler: async (ctx) => {
+    const me = await getAuthUserId(ctx);
+    if (!me) {
+      throw new Error("Unauthorized");
+    }
+
+    const user = await ctx.db.get(me);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const top3 = await getTop3UserIds(ctx);
+    const rank = top3.indexOf(String(me)) + 1;
+    if (rank === 0) {
+      throw new Error("Only top 3 weekly scorers can claim topper rewards.");
+    }
+
+    const currentWeek = getCurrentWeekId();
+    if (user.lastClaimedTopperWeek === currentWeek) {
+      throw new Error("You have already claimed your topper reward for this week.");
+    }
+
+    const currentExpiry = user.premiumUntil && user.premiumUntil > Date.now() ? user.premiumUntil : Date.now();
+    const newExpiry = currentExpiry + 30 * 24 * 60 * 60 * 1000;
+
+    await ctx.db.patch(me, {
+      subscriptionType: "premium",
+      premiumUntil: newExpiry,
+      lastClaimedTopperWeek: currentWeek,
+    });
+
+    return { success: true, newExpiry };
   },
 });
 
@@ -234,5 +320,53 @@ export const redeemPromoCode = mutation({
     });
 
     return true;
+  },
+});
+
+export const generateVerificationOtp = mutation({
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Unauthorized");
+    
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = Date.now() + 15 * 60 * 1000; // 15 min expiry
+    
+    await ctx.db.patch(userId, {
+      otpCode: otp,
+      otpExpiry: expiry,
+    });
+    
+    return otp;
+  },
+});
+
+export const verifyOtp = mutation({
+  args: { code: v.string() },
+  handler: async (ctx, { code }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Unauthorized");
+    
+    const user = await ctx.db.get(userId);
+    if (!user) throw new Error("User not found");
+    
+    if (!user.otpCode || !user.otpExpiry) {
+      throw new Error("No active OTP request found.");
+    }
+    
+    if (Date.now() > user.otpExpiry) {
+      throw new Error("Verification code has expired. Please request a new one.");
+    }
+    
+    if (user.otpCode !== code.trim()) {
+      throw new Error("Incorrect verification code.");
+    }
+    
+    await ctx.db.patch(userId, {
+      emailVerificationTime: Date.now(),
+      otpCode: undefined,
+      otpExpiry: undefined,
+    });
+    
+    return { success: true };
   },
 });

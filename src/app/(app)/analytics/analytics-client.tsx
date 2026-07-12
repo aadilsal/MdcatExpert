@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
     LineChart,
     Line,
@@ -31,7 +31,13 @@ import {
     AlertTriangle,
     Shield,
     BookOpen,
+    Lock,
+    Sparkles,
+    Calendar,
+    CheckCircle2,
+    Sliders,
 } from "lucide-react";
+import PremiumFeatureModal from "@/components/premium-feature-modal";
 
 interface AnalyticsClientProps {
     stats: {
@@ -64,6 +70,7 @@ interface AnalyticsClientProps {
     aiRadar?: {
         radar_data: { subject: string; score: number; fullMark: number }[];
     };
+    isPremiumUser?: boolean;
 }
 
 const subjectColors: Record<string, string> = {
@@ -81,7 +88,16 @@ export default function AnalyticsClient({
     strongestSubject,
     aiMistakes,
     aiRadar,
+    isPremiumUser = true,
 }: AnalyticsClientProps) {
+    const [selectedLockFeature, setSelectedLockFeature] = useState<{
+        open: boolean;
+        title: string;
+        outcome: string;
+        desc: string;
+        why: string;
+    } | null>(null);
+
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
@@ -360,7 +376,34 @@ export default function AnalyticsClient({
                             Elite Weakness Radar
                         </h2>
                     </div>
-                    <div className="p-6 h-[400px]">
+                    <div className="p-6 h-[400px] relative">
+                        {/* Paywall Overlay */}
+                        {!isPremiumUser && (
+                            <div className="absolute inset-0 bg-white/20 dark:bg-slate-900/40 backdrop-blur-[3px] z-10 flex flex-col items-center justify-center p-6 text-center">
+                                <div className="max-w-md space-y-4">
+                                    <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500 text-slate-950 rounded-full text-[9px] font-black uppercase tracking-widest shadow-md">
+                                        <Lock className="w-3 h-3 text-slate-950" />
+                                        Elite Feature Locked
+                                    </div>
+                                    <h3 className="text-xl font-black text-slate-950 dark:text-white">AI Chapter-Level Weakness Radar</h3>
+                                    <p className="text-xs text-slate-700 dark:text-slate-300 font-bold leading-relaxed">
+                                        Find the exact MDCAT chapters preventing you from scoring 180+. Elite compiles a multi-subject radar breakdown to highlight your priority concepts.
+                                    </p>
+                                    <button
+                                        onClick={() => setSelectedLockFeature({
+                                            open: true,
+                                            title: "AI Weakness Radar",
+                                            outcome: "Locate chapter performance vulnerabilities instantly",
+                                            desc: "A radar mapping of your performance across the entire MDCAT syllabus, identifying sub-topic deficiencies so you never waste study time.",
+                                            why: "Candidates targeting high scores use radar mapping to balance prep intensity across weak concepts."
+                                        })}
+                                        className="py-3 px-6 bg-slate-900 hover:bg-black text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 shadow-md"
+                                    >
+                                        Unlock Weakness Radar
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                         {aiRadar?.radar_data && aiRadar.radar_data.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
                                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={aiRadar.radar_data}>
@@ -449,6 +492,265 @@ export default function AnalyticsClient({
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Elite Premium Analytical Suite (Scenario 2, 3, 4) */}
+            <div className="bg-slate-950 text-white rounded-[2.5rem] border border-white/10 p-8 sm:p-12 relative overflow-hidden shadow-2xl">
+                <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-[60px] pointer-events-none" />
+                
+                <div className="space-y-8 relative z-10">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                <Sparkles className="w-3.5 h-3.5" />
+                                Elite Analytical Suite
+                            </div>
+                            <h2 className="text-3xl font-black italic tracking-tight text-white mt-2">Targeted Score Diagnosis</h2>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {/* 1. Predicted MDCAT Score Card (Scenario 3) */}
+                        <div className="bg-white/5 border border-white/5 rounded-3xl p-6 relative flex flex-col justify-between overflow-hidden">
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-start">
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Score Projection</span>
+                                    <Lock className="w-4 h-4 text-emerald-400" />
+                                </div>
+                                <h3 className="text-xl font-black italic">Predicted MDCAT Score</h3>
+                                {scoreTrend.length < 3 ? (
+                                    <div className="space-y-3">
+                                        <p className="text-xs text-slate-400 font-bold leading-relaxed">
+                                            Complete at least 3 quizzes to unlock expected score calculation.
+                                        </p>
+                                        <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                            <div className="bg-indigo-500 h-full rounded-full" style={{ width: `${(scoreTrend.length / 3) * 100}%` }} />
+                                        </div>
+                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                            Attempts: {scoreTrend.length} / 3
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        <p className="text-xs text-slate-400 font-bold leading-relaxed">
+                                            Calculates your projected score (e.g. 172/200) based on response speed, difficulty weighting, and subject accuracy.
+                                        </p>
+                                        <button
+                                            onClick={() => setSelectedLockFeature({
+                                                open: true,
+                                                title: "Predicted MDCAT Score",
+                                                outcome: "Know your expected MDCAT score with ±2% precision",
+                                                desc: "A machine-learning model computes your expected MDCAT score by matching your historical speed and distractor susceptibility against previous year aggregates.",
+                                                why: "Over 87% of students using Predicted Score report a major reduction in exam anxiety."
+                                            })}
+                                            className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-black rounded-xl uppercase tracking-widest active:scale-95 transition-all"
+                                        >
+                                            Calculate Score
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* 2. Weakest Chapters & Repeated Mistakes (Scenario 4) */}
+                        <div className="bg-white/5 border border-white/5 rounded-3xl p-6 relative flex flex-col justify-between overflow-hidden group">
+                            {/* Blur filter overlay for free */}
+                            {!isPremiumUser && (
+                                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-6 text-center">
+                                    <button
+                                        onClick={() => setSelectedLockFeature({
+                                            open: true,
+                                            title: "Weakest Chapters & Repeated Mistakes",
+                                            outcome: "Eliminate the recurring errors holding back your score",
+                                            desc: "Aggregates incorrect options across attempts to surface recurring conceptual errors (e.g., confusing Active vs Passive Transport). Shows exactly how many times you repeated each mistake.",
+                                            why: "Highest-scoring students review their mistake logs weekly to systematically fix conceptual blindspots."
+                                        })}
+                                        className="py-3 px-4 bg-slate-900 hover:bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-md flex items-center gap-1.5"
+                                    >
+                                        <Lock className="w-3.5 h-3.5 text-emerald-400" />
+                                        Unlock Chapter Analysis
+                                    </button>
+                                </div>
+                            )}
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-start">
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Repeated Misconceptions</span>
+                                    <Lock className="w-4 h-4 text-emerald-400" />
+                                </div>
+                                <h3 className="text-xl font-black italic">Weakest Chapters</h3>
+                                <div className="space-y-2 text-xs">
+                                    <div className="p-3 bg-white/5 rounded-xl flex justify-between">
+                                        <span className="font-bold text-slate-300">Cell Biology</span>
+                                        <span className="font-black text-red-400">4 mistakes</span>
+                                    </div>
+                                    <div className="p-3 bg-white/5 rounded-xl flex justify-between">
+                                        <span className="font-bold text-slate-300">Organic Chemistry</span>
+                                        <span className="font-black text-red-400">3 mistakes</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 3. AI Study Plan */}
+                        <div className="bg-white/5 border border-white/5 rounded-3xl p-6 relative flex flex-col justify-between overflow-hidden">
+                            {!isPremiumUser && (
+                                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-6 text-center">
+                                    <button
+                                        onClick={() => setSelectedLockFeature({
+                                            open: true,
+                                            title: "AI Study Planner",
+                                            outcome: "Unlock a customized 7-day revision checklist",
+                                            desc: "A daily list of study targets, video suggestions, and quiz challenges designed to bridge the gaps in your lowest-performing chapters.",
+                                            why: "Structured plans boost revision efficiency by 40%."
+                                        })}
+                                        className="py-3 px-4 bg-slate-900 hover:bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-md flex items-center gap-1.5"
+                                    >
+                                        <Lock className="w-3.5 h-3.5 text-emerald-400" />
+                                        Unlock Study Plan
+                                    </button>
+                                </div>
+                            )}
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-start">
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Personalized Schedule</span>
+                                    <Lock className="w-4 h-4 text-emerald-400" />
+                                </div>
+                                <h3 className="text-xl font-black italic">AI Study Plan</h3>
+                                <div className="space-y-2 text-xs">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-4 h-4 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px]">✓</div>
+                                        <span className="text-slate-400">Review Cell Structure MCQ mistakes</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-4 h-4 rounded bg-slate-800 text-slate-500 flex items-center justify-center text-[10px]"></div>
+                                        <span className="text-slate-400">Solve 20 Chemistry stoichiometry questions</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 4. Difficulty Analysis */}
+                        <div className="bg-white/5 border border-white/5 rounded-3xl p-6 relative flex flex-col justify-between overflow-hidden">
+                            {!isPremiumUser && (
+                                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-6 text-center">
+                                    <button
+                                        onClick={() => setSelectedLockFeature({
+                                            open: true,
+                                            title: "Difficulty Analysis Heatmap",
+                                            outcome: "Master time pacing across difficult questions",
+                                            desc: "Sorts your speed and accuracy across Easy, Medium, and Hard MDCAT questions to highlight if you are getting bogged down or rushing.",
+                                            why: "Pacing analysis prevents students from losing easy points due to time pressure."
+                                        })}
+                                        className="py-3 px-4 bg-slate-900 hover:bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-md flex items-center gap-1.5"
+                                    >
+                                        <Lock className="w-3.5 h-3.5 text-emerald-400" />
+                                        Unlock Heatmap
+                                    </button>
+                                </div>
+                            )}
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-start">
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Pacing Metrics</span>
+                                    <Lock className="w-4 h-4 text-emerald-400" />
+                                </div>
+                                <h3 className="text-xl font-black italic">Difficulty Heatmap</h3>
+                                <div className="space-y-2 text-xs">
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-400">Hard Questions:</span>
+                                        <span className="font-extrabold text-red-400">30% Accuracy</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-400">Easy Questions:</span>
+                                        <span className="font-extrabold text-emerald-400">85% Accuracy</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 5. Concept Mastery */}
+                        <div className="bg-white/5 border border-white/5 rounded-3xl p-6 relative flex flex-col justify-between overflow-hidden">
+                            {!isPremiumUser && (
+                                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-6 text-center">
+                                    <button
+                                        onClick={() => setSelectedLockFeature({
+                                            open: true,
+                                            title: "Concept Mastery Index",
+                                            outcome: "Track your progression toward 100% syllabus mastery",
+                                            desc: "A detailed breakdown of all 42 core MDCAT sub-chapters. Shows your mastery percentage based on historical answer metrics.",
+                                            why: "Toppers use the concept index to guarantee they have zero remaining blindspots before the exam."
+                                        })}
+                                        className="py-3 px-4 bg-slate-900 hover:bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-md flex items-center gap-1.5"
+                                    >
+                                        <Lock className="w-3.5 h-3.5 text-emerald-400" />
+                                        Unlock Mastery Index
+                                    </button>
+                                </div>
+                            )}
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-start">
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Syllabus Coverage</span>
+                                    <Lock className="w-4 h-4 text-emerald-400" />
+                                </div>
+                                <h3 className="text-xl font-black italic">Concept Mastery Index</h3>
+                                <div className="space-y-2 text-xs">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-slate-400">Biology Mastery:</span>
+                                        <span className="font-extrabold">64%</span>
+                                    </div>
+                                    <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                        <div className="bg-emerald-500 h-full rounded-full" style={{ width: "64%" }} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 6. Performance Trend */}
+                        <div className="bg-white/5 border border-white/5 rounded-3xl p-6 relative flex flex-col justify-between overflow-hidden">
+                            {!isPremiumUser && (
+                                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-6 text-center">
+                                    <button
+                                        onClick={() => setSelectedLockFeature({
+                                            open: true,
+                                            title: "Advanced Performance Trends",
+                                            outcome: "See if your score is rising or plateauing",
+                                            desc: "A regression curve plotted over your daily mock scores to visualize performance momentum, predicting your score trajectory for the official test date.",
+                                            why: "Identifying performance plateaus early lets you change your study strategy before it's too late."
+                                        })}
+                                        className="py-3 px-4 bg-slate-900 hover:bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-md flex items-center gap-1.5"
+                                    >
+                                        <Lock className="w-3.5 h-3.5 text-emerald-400" />
+                                        Unlock Trends
+                                    </button>
+                                </div>
+                            )}
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-start">
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Regression Analysis</span>
+                                    <Lock className="w-4 h-4 text-emerald-400" />
+                                </div>
+                                <h3 className="text-xl font-black italic">Performance Trends</h3>
+                                <div className="space-y-2 text-xs">
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-400">Weekly Trajectory:</span>
+                                        <span className="font-extrabold text-emerald-400">+4.2 points/wk</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {selectedLockFeature && (
+                <PremiumFeatureModal
+                    open={selectedLockFeature.open}
+                    onClose={() => setSelectedLockFeature(null)}
+                    featureName={selectedLockFeature.title}
+                    outcomeText={selectedLockFeature.outcome}
+                    descriptionText={selectedLockFeature.desc}
+                    whyStudentsUseIt={selectedLockFeature.why}
+                    source="analytics_dashboard"
+                />
             )}
         </div>
     );

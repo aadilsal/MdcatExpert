@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import { assertCanAccessQuiz } from "./quizAccess";
 import { requireAdmin } from "./lib/auth";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 const subjectValidator = v.union(
   v.literal("Biology"),
@@ -275,6 +276,34 @@ export const getLandingQuestions = query({
     }
 
     return sampleQuestions;
+  },
+});
+
+export const ensureMistakesQuiz = mutation({
+  handler: async (ctx) => {
+    const me = await getAuthUserId(ctx);
+    if (!me) {
+      throw new Error("Unauthorized");
+    }
+
+    const existing = await ctx.db
+      .query("quizzes")
+      .filter((q) => q.eq(q.field("title"), "Mistakes Correction Drill"))
+      .first();
+
+    if (existing) {
+      return existing._id;
+    }
+
+    return await ctx.db.insert("quizzes", {
+      title: "Mistakes Correction Drill",
+      year: new Date().getFullYear(),
+      subject: "General",
+      totalQuestions: 0,
+      isPremium: false,
+      createdBy: me,
+      createdAt: Date.now(),
+    });
   },
 });
 

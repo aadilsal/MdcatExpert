@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -19,6 +19,7 @@ import {
     AlertTriangle,
     Newspaper,
     BookOpen,
+    Layers,
 } from "lucide-react";
 import UserDropdown from "./user-dropdown";
 import { fetchMeCached } from "@/lib/me-client-cache";
@@ -30,6 +31,7 @@ const studentNav = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/quizzes", label: "Quizzes", icon: FileText },
     { href: "/copilot", label: "Study Copilot", icon: BookOpen },
+    { href: "/flashcards", label: "Flashcards", icon: Layers },
     { href: "/analytics", label: "Analytics", icon: BarChart3 },
 ];
 
@@ -51,8 +53,9 @@ export default function AppLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
+    const router = useRouter();
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [userData, setUserData] = useState<{ name: string; email: string; role: string } | null>(null);
+    const [userData, setUserData] = useState<{ name: string; email: string; role: string; emailVerificationTime?: number | null } | null>(null);
     const [openReportCount, setOpenReportCount] = useState(0);
 
     useEffect(() => {
@@ -60,6 +63,10 @@ export default function AppLayout({
             try {
                 const row = await fetchMeCached();
                 if (!row) {
+                    return;
+                }
+                if (!row.emailVerificationTime) {
+                    router.replace("/verify");
                     return;
                 }
                 setUserData(row);

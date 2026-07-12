@@ -28,6 +28,7 @@ import type * as documentChunks from "../documentChunks.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as ingestDocument from "../ingestDocument.js";
+import type * as leaderboard from "../leaderboard.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as lib_chunker from "../lib/chunker.js";
 import type * as lib_ocrClient from "../lib/ocrClient.js";
@@ -76,6 +77,7 @@ declare const fullApi: ApiFromModules<{
   files: typeof files;
   http: typeof http;
   ingestDocument: typeof ingestDocument;
+  leaderboard: typeof leaderboard;
   "lib/auth": typeof lib_auth;
   "lib/chunker": typeof lib_chunker;
   "lib/ocrClient": typeof lib_ocrClient;

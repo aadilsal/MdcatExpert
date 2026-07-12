@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import NextImage from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -26,6 +26,7 @@ import { formatUserError } from "@/lib/format-user-error";
 import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics-events";
 import { Quiz, Question } from "@/lib/types";
 import ReportQuestionModal from "@/components/report-question-modal";
+import Swal from "sweetalert2";
 
 export default function QuizPage({
     params,
@@ -36,6 +37,8 @@ export default function QuizPage({
     const [quizId, setQuizId] = useState<string | null>(null);
     const [quiz, setQuiz] = useState<Quiz | null>(null);
     const [questions, setQuestions] = useState<Question[]>([]);
+    const [originalQuestions, setOriginalQuestions] = useState<Question[]>([]);
+    const [selectedLimit, setSelectedLimit] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
@@ -86,10 +89,15 @@ export default function QuizPage({
             const quizData = (json?.quiz ?? null) as Quiz | null;
             const questionsData = (json?.questions ?? []) as Question[];
             if (quizData) setQuiz(quizData);
-            if (Array.isArray(questionsData)) setQuestions(questionsData);
-
-            if (quizData) {
-                trackEvent(ANALYTICS_EVENTS.QUIZ_STARTED, { quizId });
+            if (Array.isArray(questionsData)) {
+                setOriginalQuestions(questionsData);
+                if (questionsData.length <= 10) {
+                    setQuestions(questionsData);
+                    setSelectedLimit(questionsData.length);
+                    if (quizData) {
+                        trackEvent(ANALYTICS_EVENTS.QUIZ_STARTED, { quizId, limit: String(questionsData.length) });
+                    }
+                }
             }
 
             setLoading(false);
@@ -225,6 +233,104 @@ export default function QuizPage({
                     className="w-12 h-12 border-4 border-primary-100 border-t-primary-600 rounded-full"
                 />
                 <p className="text-gray-400 font-black text-xs uppercase tracking-widest">Constructing Question Set...</p>
+            </div>
+        );
+    }
+
+    if (selectedLimit === null) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
+                <motion.div
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="max-w-xl w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/60 rounded-[2rem] p-8 shadow-xl space-y-6"
+                >
+                    <div className="text-center space-y-2">
+                        <span className="px-3 py-1 bg-primary-50 dark:bg-primary-950/40 border border-primary-100 dark:border-primary-900/30 rounded-full text-[9px] font-black text-primary-700 dark:text-primary-300 uppercase tracking-widest">
+                            Practice Setup
+                        </span>
+                        <h2 className="text-3xl font-black italic tracking-tight text-gray-900 dark:text-white">
+                            {quiz?.title || "MDCAT Past Paper"}
+                        </h2>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">
+                            Total Syllabus Coverage: {originalQuestions.length} Questions
+                        </p>
+                    </div>
+
+                    <div className="space-y-4">
+                        <p className="text-xs font-bold text-gray-600 dark:text-gray-400 leading-relaxed text-center">
+                            Long practice sessions can lead to quiz fatigue, reducing active retention. Choose a customized chunk to keep your practice focused.
+                        </p>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            {[10, 25, 50].map((num) => {
+                                if (num >= originalQuestions.length) return null;
+                                return (
+                                    <button
+                                        key={num}
+                                        onClick={() => {
+                                            setQuestions(originalQuestions.slice(0, num));
+                                            setSelectedLimit(num);
+                                            if (quizId) {
+                                                trackEvent(ANALYTICS_EVENTS.QUIZ_STARTED, { quizId, limit: String(num) });
+                                            }
+                                        }}
+                                        className="py-4 border-2 border-gray-100 dark:border-slate-800 hover:border-primary-600 dark:hover:border-primary-400 bg-gray-50/50 dark:bg-slate-950/30 hover:bg-white dark:hover:bg-slate-900 text-gray-700 dark:text-slate-300 rounded-2xl text-xs font-black transition-all active:scale-[0.98]"
+                                    >
+                                        {num} Questions
+                                    </button>
+                                );
+                            })}
+                            <button
+                                onClick={() => {
+                                    setQuestions(originalQuestions);
+                                    setSelectedLimit(originalQuestions.length);
+                                    if (quizId) {
+                                        trackEvent(ANALYTICS_EVENTS.QUIZ_STARTED, { quizId, limit: String(originalQuestions.length) });
+                                    }
+                                }}
+                                className="py-4 border-2 border-gray-100 dark:border-slate-800 hover:border-primary-600 dark:hover:border-primary-400 bg-gray-50/50 dark:bg-slate-950/30 hover:bg-white dark:hover:bg-slate-900 text-gray-700 dark:text-slate-300 rounded-2xl text-xs font-black transition-all active:scale-[0.98] col-span-2"
+                            >
+                                Full Exam ({originalQuestions.length} Questions)
+                            </button>
+                        </div>
+
+                        <div className="border-t border-gray-100 dark:border-slate-800 pt-4 space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Custom count:</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="number"
+                                    min={1}
+                                    max={originalQuestions.length}
+                                    defaultValue={Math.min(10, originalQuestions.length)}
+                                    id="custom-count-input"
+                                    className="flex-1 px-4 py-3 bg-gray-50 dark:bg-slate-950 border border-gray-100 dark:border-slate-800 rounded-xl text-xs font-bold text-gray-900 dark:text-white placeholder:text-gray-300 focus:outline-none"
+                                />
+                                <button
+                                    onClick={() => {
+                                        const val = parseInt((document.getElementById("custom-count-input") as HTMLInputElement)?.value);
+                                        if (isNaN(val) || val < 1 || val > originalQuestions.length) {
+                                            Swal.fire({
+                                                icon: "warning",
+                                                title: "Invalid range",
+                                                text: `Please enter a value between 1 and ${originalQuestions.length}`,
+                                            });
+                                            return;
+                                        }
+                                        setQuestions(originalQuestions.slice(0, val));
+                                        setSelectedLimit(val);
+                                        if (quizId) {
+                                            trackEvent(ANALYTICS_EVENTS.QUIZ_STARTED, { quizId, limit: String(val) });
+                                        }
+                                    }}
+                                    className="px-6 bg-gray-900 hover:bg-black text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 shadow-md"
+                                >
+                                    Solve Custom
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
             </div>
         );
     }
@@ -377,26 +483,18 @@ export default function QuizPage({
                                             const isCurrent = idx === currentIndex;
                                             const isFlagged = flaggedQuestions.has(q.id);
                                             return (
-                                                <button
+                                                <PaletteButton
                                                     key={q.id}
+                                                    index={idx}
+                                                    isCurrent={isCurrent}
+                                                    isFlagged={isFlagged}
+                                                    isAnswered={isAnswered}
+                                                    zenMode={zenMode}
                                                     onClick={() => {
                                                         setCurrentIndex(idx);
                                                         setSidebarOpen(false);
                                                     }}
-                                                    className={`relative w-full aspect-square rounded-lg flex items-center justify-center text-xs font-black transition-all border-2 ${isCurrent
-                                                        ? "border-primary-600 bg-primary-600 text-white"
-                                                        : isFlagged
-                                                            ? "border-amber-400 bg-amber-50 text-amber-700"
-                                                            : isAnswered
-                                                                ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                                                                : zenMode ? "border-white/10 bg-white/5 text-white/40" : "border-gray-50 bg-gray-50 text-gray-400"
-                                                        }`}
-                                                >
-                                                    {idx + 1}
-                                                    {isFlagged && (
-                                                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 border-2 border-white rounded-full" />
-                                                    )}
-                                                </button>
+                                                />
                                             );
                                         })}
                                     </div>
@@ -447,25 +545,15 @@ export default function QuizPage({
                                         const isFlagged = flaggedQuestions.has(q.id);
 
                                         return (
-                                            <button
+                                            <PaletteButton
                                                 key={q.id}
+                                                index={idx}
+                                                isCurrent={isCurrent}
+                                                isFlagged={isFlagged}
+                                                isAnswered={isAnswered}
+                                                zenMode={zenMode}
                                                 onClick={() => setCurrentIndex(idx)}
-                                                className={`relative w-full aspect-square rounded-lg flex items-center justify-center text-xs font-black transition-all border-2 ${isCurrent
-                                                    ? "border-primary-600 bg-primary-600 text-white shadow-lg shadow-primary-600/20"
-                                                    : isFlagged
-                                                        ? "border-amber-400 bg-amber-50 text-amber-700"
-                                                        : isAnswered
-                                                            ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                                                            : zenMode
-                                                                ? "border-white/10 bg-white/5 text-white/40 hover:bg-white/10"
-                                                                : "border-gray-50 bg-gray-50 text-gray-400 hover:border-primary-200 hover:text-primary-600"
-                                                    }`}
-                                            >
-                                                {idx + 1}
-                                                {isFlagged && (
-                                                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 border-2 border-white rounded-full" />
-                                                )}
-                                            </button>
+                                            />
                                         );
                                     })}
                                 </div>
@@ -707,3 +795,42 @@ export default function QuizPage({
         </div>
     );
 }
+
+interface PaletteButtonProps {
+    index: number;
+    isCurrent: boolean;
+    isFlagged: boolean;
+    isAnswered: boolean;
+    zenMode: boolean;
+    onClick: () => void;
+}
+
+const PaletteButton = React.memo(function PaletteButton({
+    index,
+    isCurrent,
+    isFlagged,
+    isAnswered,
+    zenMode,
+    onClick,
+}: PaletteButtonProps) {
+    return (
+        <button
+            onClick={onClick}
+            className={`relative w-full aspect-square rounded-lg flex items-center justify-center text-xs font-black transition-all border-2 ${isCurrent
+                ? "border-primary-600 bg-primary-600 text-white shadow-lg shadow-primary-600/20"
+                : isFlagged
+                    ? "border-amber-400 bg-amber-50 text-amber-700 hover:bg-amber-100"
+                    : isAnswered
+                        ? "border-emerald-500 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                        : zenMode
+                            ? "border-white/10 bg-white/5 text-white/40 hover:bg-white/10"
+                            : "border-gray-50 bg-gray-50 text-gray-400 hover:border-primary-200 hover:text-primary-600 hover:bg-white"
+                }`}
+        >
+            {index + 1}
+            {isFlagged && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 border-2 border-white rounded-full" />
+            )}
+        </button>
+    );
+});

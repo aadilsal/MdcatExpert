@@ -71,6 +71,9 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -85,6 +88,16 @@ export default async function RootLayout({
                   }
                 } catch (e) {}
               })();
+
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                    console.log('PWA Service Worker registered:', reg.scope);
+                  }).catch(function(err) {
+                    console.log('PWA Service worker registration failed:', err);
+                  });
+                });
+              }
             `
           }}
         />

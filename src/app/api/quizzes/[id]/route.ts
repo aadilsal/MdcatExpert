@@ -16,6 +16,31 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     const token = await convexAuthNextjsToken();
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    if (id === "mistakes") {
+      const questions = await fetchQuery(api.attempts.getIncorrectQuestions, {}, { token });
+      const mappedQuiz = {
+        id: "mistakes",
+        title: "Mistakes Correction Drill",
+        year: new Date().getFullYear(),
+        subject: "General",
+        total_questions: questions?.length ?? 0,
+        is_premium: false,
+      };
+      const mappedQuestions = (questions ?? []).map((q: any) => ({
+        id: q?._id,
+        question_text: q?.questionText,
+        option_a: q?.optionA,
+        option_b: q?.optionB,
+        option_c: q?.optionC,
+        option_d: q?.optionD,
+        correct_option: q?.correctOption,
+        subject: q?.subject,
+        explanation: q?.explanation ?? null,
+        image_url: q?.imageUrl ?? null,
+      }));
+      return NextResponse.json({ quiz: mappedQuiz, questions: mappedQuestions });
+    }
+
     const quiz = await fetchQuery(api.quizzes.getQuizById, { quizId: id as Id<"quizzes"> }, { token });
     if (!quiz) return NextResponse.json({ error: "Quiz not found" }, { status: 404 });
 

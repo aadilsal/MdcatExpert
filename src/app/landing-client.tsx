@@ -224,7 +224,7 @@ export default function LandingClient({
             transition={{ delay: 0.35 }}
             className="text-lg sm:text-xl text-gray-500 dark:text-gray-400 leading-relaxed max-w-3xl mx-auto font-medium mb-12"
           >
-            Stop guessing your preparation level. Master the exact patterns of UHS, SZABMU, DUHS & ETEA past papers with targeted AI analysis and live weakness telemetry.
+            Pakistan&apos;s #1 AI prep platform. Master the exact syllabus of UHS, SZABMU, DUHS & ETEA past papers with (1) Bite-Sized practice drills, (2) Personal AI Weakness Radars, and (3) Instant MCQ Explanations.
           </motion.p>
 
           {/* Dual CTAs */}
@@ -489,7 +489,7 @@ export default function LandingClient({
               Flexible Plans for <span className="text-gradient-primary">High-Performance Prep</span>
             </h2>
             <p className="text-gray-500 dark:text-gray-400 font-medium max-w-xl mx-auto text-sm">
-              Start practicing with free diagnostic mockups or unlock unlimited AI support for a lifetime.
+              Start practicing with free diagnostic mockups or unlock unlimited AI support for the full season.
             </p>
           </div>
 
@@ -533,7 +533,7 @@ export default function LandingClient({
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-4xl font-black text-primary-300">Rs. 2500</span>
-                    <span className="text-gray-500 dark:text-gray-400 font-bold text-[10px] uppercase tracking-widest">/ Lifetime Membership</span>
+                    <span className="text-gray-500 dark:text-gray-400 font-bold text-[10px] uppercase tracking-widest">/ Full Season Pass</span>
                   </div>
                   <ul className="space-y-3.5 border-t border-white/5 dark:border-slate-800 pt-6">
                     {["Dynamic AI Weakness Radar", "Instant AI Mistake Analyzer explanations", "Unlimited Study Copilot RAG uploads", "Access to 5,000+ past paper archives", "Instant verification & 24/7 Priority Support"].map(f => (
@@ -548,7 +548,7 @@ export default function LandingClient({
                   href="/signup?goElite=true"
                   className="w-full py-4 text-center text-[10px] font-black uppercase tracking-widest text-white bg-primary-600 rounded-xl hover:bg-primary-500 transition-all mt-8 shadow-xl shadow-primary-600/25 active:scale-95"
                 >
-                  Unlock Lifetime Access
+                  Unlock Full Season Access
                 </Link>
               </div>
             </div>

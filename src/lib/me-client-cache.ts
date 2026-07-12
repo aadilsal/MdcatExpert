@@ -1,4 +1,10 @@
-type MeRow = { name: string; email: string; role: string };
+type MeRow = { 
+    name: string; 
+    email: string; 
+    role: string; 
+    emailVerificationTime?: number | null; 
+    subscriptionType?: string;
+};
 
 let meCache: { value: MeRow; at: number } | null = null;
 const TTL_MS = 8000;
@@ -23,6 +29,8 @@ export async function fetchMeCached(): Promise<MeRow | null> {
             name: payload.user.name || "Student",
             email: payload.user.email || "",
             role: payload.user.role || "student",
+            emailVerificationTime: payload.user.emailVerificationTime || null,
+            subscriptionType: payload.user.subscriptionType || "free",
         };
         meCache = { value, at: Date.now() };
         return value;

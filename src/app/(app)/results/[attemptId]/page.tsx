@@ -15,6 +15,7 @@ import {
     History,
 } from "lucide-react";
 import AIInsightCard from "../ai-insight-card";
+import AdUnit from "@/components/ad-unit";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../convex/_generated/api";
@@ -38,8 +39,11 @@ export default async function ResultsPage({
     const token = await convexAuthNextjsToken();
     if (!token) notFound();
 
-    const attempt = await fetchQuery(api.attempts.getAttemptById, { attemptId: attemptId as Id<"attempts"> }, { token });
-    if (!attempt) notFound();
+    const [attempt, user] = await Promise.all([
+        fetchQuery(api.attempts.getAttemptById, { attemptId: attemptId as Id<"attempts"> }, { token }),
+        fetchQuery(api.users.getCurrentUserProfile, {}, { token }),
+    ]);
+    if (!attempt || !user) notFound();
 
     const [quiz, rawAnswers] = await Promise.all([
         fetchQuery(api.quizzes.getQuizById, { quizId: attempt.quizId }, { token }),
@@ -326,6 +330,7 @@ export default async function ResultsPage({
                                             answerId={answer.id}
                                             initialInsight={answer.ai_analysis}
                                             questionText={question.question_text}
+                                            isPremiumUser={user.subscriptionType === "premium"}
                                         />
                                     )}
                                 </div>
@@ -334,6 +339,12 @@ export default async function ResultsPage({
                     })}
                 </div>
             </div>
+
+            {user.subscriptionType !== "premium" && (
+                <div className="max-w-4xl mx-auto w-full mt-4 px-4 sm:px-8">
+                    <AdUnit slot="results-bottom" />
+                </div>
+            )}
 
             {/* Bottom Tactical Actions */}
             <div className="flex items-center justify-center gap-8 py-12">

@@ -1,6 +1,10 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import SubscriptionStatusBanner from "@/components/subscription-status-banner";
+import DashboardConvertWidgets from "@/components/dashboard-convert-widgets";
+import DailyStreakTracker from "@/components/daily-streak-tracker";
+import LeaderboardWidget from "@/components/leaderboard-widget";
+import TopperRewardBanner from "@/components/topper-reward-banner";
 import {
     Target,
     TrendingUp,
@@ -56,16 +60,20 @@ export default async function StudentDashboardPage() {
         redirect("/login");
     }
 
-    const [attemptsRaw, subjectStats] = await Promise.all([
+    const [attemptsRaw, subjectStats, incorrectQuestions] = await Promise.all([
         fetchQuery(api.attempts.getUserAttempts, { userId: user._id as Id<"users"> }, { token }),
         fetchQuery(api.attempts.getSubjectPerformance, { userId: user._id as Id<"users"> }, { token }),
+        fetchQuery(api.attempts.getIncorrectQuestions, {}, { token }),
     ]);
 
     const attempts = (attemptsRaw ?? []) as Attempt[];
     const subjectStatsList = (subjectStats ?? []) as SubjectPerformance[];
+    const incorrectCount = (incorrectQuestions ?? []).length;
 
     const userName = user.name || "Student";
     const subscriptionType = user.subscriptionType || "free";
+    const topperRank = (user as any).topperRank ?? null;
+    const hasClaimedWeeklyReward = (user as any).hasClaimedWeeklyReward ?? false;
     const premiumUntil = user.premiumUntil ? String(user.premiumUntil) : null;
     const hasPendingPayment = false;
     const pendingPaymentId = null;
@@ -96,16 +104,32 @@ export default async function StudentDashboardPage() {
                 paymentRequestId={pendingPaymentId ?? undefined}
             />
 
-            <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-primary-600 via-primary-700 to-blue-800 p-6 sm:p-8 text-white shadow-lg">
+            <DailyStreakTracker />
+
+            {topperRank !== null && (
+                <TopperRewardBanner
+                    rank={topperRank}
+                    subscriptionType={subscriptionType}
+                    hasClaimed={hasClaimedWeeklyReward}
+                />
+            )}
+
+            <div className={`relative overflow-hidden rounded-2xl p-6 sm:p-8 text-white shadow-lg ${
+                topperRank 
+                    ? "bg-linear-to-br from-amber-500 via-yellow-600 to-orange-700 border-2 border-amber-300/30" 
+                    : "bg-linear-to-br from-primary-600 via-primary-700 to-blue-800"
+            }`}>
                 <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
                 <div className="absolute bottom-0 left-0 w-56 h-56 bg-primary-400/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
                 <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold">
-                            Welcome back, {userName}! 👋
+                        <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+                            Welcome back, {userName}! {topperRank ? "👑" : "👋"}
                         </h1>
                         <p className="mt-2 text-primary-100 max-w-lg">
-                            {totalAttempts > 0
+                            {topperRank 
+                                ? `Outstanding! You are ranked #${topperRank} this week. Elite prep is paying off!`
+                                : totalAttempts > 0
                                 ? `You've completed ${totalAttempts} quiz${totalAttempts !== 1 ? "zes" : ""} so far. Keep it up!`
                                 : "Start practicing to see your performance stats here."}
                         </p>
@@ -119,6 +143,40 @@ export default async function StudentDashboardPage() {
                     </Link>
                 </div>
             </div>
+
+            {incorrectCount > 0 ? (
+                <div className="bg-linear-to-r from-red-500/10 to-rose-500/10 border border-red-500/20 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-red-500 text-white flex items-center justify-center font-bold text-xl shadow-md shrink-0">
+                            🎯
+                        </div>
+                        <div>
+                            <h4 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider">Fix Your Mistakes Drill</h4>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                You have {incorrectCount} unanswered/incorrect question{incorrectCount > 1 ? "s" : ""} in your history. Drill them now to clear your records.
+                            </p>
+                        </div>
+                    </div>
+                    <Link
+                        href="/quiz/mistakes"
+                        className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 shadow-md shadow-red-500/10 shrink-0"
+                    >
+                        Drill Now
+                    </Link>
+                </div>
+            ) : totalAttempts > 0 ? (
+                <div className="bg-linear-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 rounded-2xl p-6 flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold text-xl shadow-md shrink-0">
+                        ✨
+                    </div>
+                    <div>
+                        <h4 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider">All Clear!</h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                            No incorrect questions left in your revision list. Excellent work, future doctor!
+                        </p>
+                    </div>
+                </div>
+            ) : null}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
@@ -248,45 +306,49 @@ export default async function StudentDashboardPage() {
                     )}
                 </div>
 
-                <div className="bg-surface rounded-xl border border-surface-border shadow-card dark:shadow-none overflow-hidden">
-                    <div className="px-6 py-4 border-b border-surface-border">
-                        <h2 className="font-semibold text-gray-900 dark:text-gray-100">Subject Accuracy</h2>
-                    </div>
-                    <div className="p-5 space-y-4">
-                        {["Biology", "Chemistry", "Physics", "English"].map((subject) => {
-                            const stats = subjectStatsList.find((s) => s.subject === subject);
-                            const pct = stats?.accuracy || 0;
-                            const colors = subjectColors[subject];
-                            const isWeakest = subject === weakestSubject && totalAttempts > 0;
+                <div className="space-y-6">
+                    <div className="bg-surface rounded-xl border border-surface-border shadow-card dark:shadow-none overflow-hidden">
+                        <div className="px-6 py-4 border-b border-surface-border">
+                            <h2 className="font-semibold text-gray-900 dark:text-gray-100">Subject Accuracy</h2>
+                        </div>
+                        <div className="p-5 space-y-4">
+                            {["Biology", "Chemistry", "Physics", "English"].map((subject) => {
+                                const stats = subjectStatsList.find((s) => s.subject === subject);
+                                const pct = stats?.accuracy || 0;
+                                const colors = subjectColors[subject];
+                                const isWeakest = subject === weakestSubject && totalAttempts > 0;
 
-                            return (
-                                <div key={subject}>
-                                    <div className="flex items-center justify-between text-sm mb-1.5">
-                                        <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                                            {subject}
-                                            {isWeakest && (
-                                                <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-bold uppercase">
-                                                    Weak
-                                                </span>
-                                            )}
-                                        </span>
-                                        <span className="text-gray-400">{stats ? `${Math.round(pct)}%` : "—"}</span>
+                                return (
+                                    <div key={subject}>
+                                        <div className="flex items-center justify-between text-sm mb-1.5">
+                                            <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                                                {subject}
+                                                {isWeakest && (
+                                                    <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-bold uppercase">
+                                                        Weak
+                                                    </span>
+                                                )}
+                                            </span>
+                                            <span className="text-gray-400">{stats ? `${Math.round(pct)}%` : "—"}</span>
+                                        </div>
+                                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                            <div
+                                                className={`h-full ${colors.bar} rounded-full transition-all duration-700`}
+                                                style={{ width: `${pct}%` }}
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                        <div
-                                            className={`h-full ${colors.bar} rounded-full transition-all duration-700`}
-                                            style={{ width: `${pct}%` }}
-                                        />
-                                    </div>
-                                </div>
-                            );
-                        })}
-                        {totalAttempts === 0 && (
-                            <p className="text-xs text-gray-400 text-center pt-2">
-                                Complete quizzes to see your subject accuracy
-                            </p>
-                        )}
+                                );
+                            })}
+                            {totalAttempts === 0 && (
+                                <p className="text-xs text-gray-400 text-center pt-2">
+                                    Complete quizzes to see your subject accuracy
+                                </p>
+                            )}
+                        </div>
                     </div>
+                    <LeaderboardWidget />
+                    <DashboardConvertWidgets isPremiumUser={subscriptionType === "premium"} />
                 </div>
             </div>
         </div>

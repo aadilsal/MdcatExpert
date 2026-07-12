@@ -17,6 +17,8 @@ const ALLOWED_EVENTS = new Set([
   "copilot_upload_completed",
   "copilot_paywall_hit",
   "study_source_ingested",
+  "ai_mistake_analyzer_use",
+  "premium_cta_click",
 ]);
 
 const PUBLIC_EVENTS = new Set(["landing_view", "page_view"]);

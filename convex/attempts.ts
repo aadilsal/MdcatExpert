@@ -247,3 +247,62 @@ export const setUserAnswerAiAnalysis = mutation({
     return await ctx.db.patch(userAnswerId, { aiAnalysis });
   },
 });
+
+export const getIncorrectQuestions = query({
+  handler: async (ctx) => {
+    const me = await getAuthUserId(ctx);
+    if (!me) {
+      return [];
+    }
+
+    const attempts = await ctx.db
+      .query("attempts")
+      .withIndex("by_userId", (q) => q.eq("userId", me))
+      .collect();
+
+    if (attempts.length === 0) {
+      return [];
+    }
+
+    const sortedAttempts = [...attempts].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    const questionLatestStatus = new Map<string, boolean>();
+
+    for (const attempt of sortedAttempts) {
+      const answers = await ctx.db
+        .query("userAnswers")
+        .withIndex("by_attemptId", (q) => q.eq("attemptId", attempt._id))
+        .collect();
+
+      for (const answer of answers) {
+        const qIdStr = String(answer.questionId);
+        if (!questionLatestStatus.has(qIdStr)) {
+          questionLatestStatus.set(qIdStr, answer.isCorrect);
+        }
+      }
+    }
+
+    const incorrectQuestionIds = [];
+    for (const [qIdStr, isCorrect] of questionLatestStatus.entries()) {
+      if (!isCorrect) {
+        incorrectQuestionIds.push(qIdStr);
+      }
+    }
+
+    if (incorrectQuestionIds.length === 0) {
+      return [];
+    }
+
+    const questions = [];
+    for (const qIdStr of incorrectQuestionIds) {
+      const qId = ctx.db.normalizeId("questions", qIdStr);
+      if (qId) {
+        const q = await ctx.db.get(qId);
+        if (q) {
+          questions.push(q);
+        }
+      }
+    }
+
+    return questions;
+  },
+});

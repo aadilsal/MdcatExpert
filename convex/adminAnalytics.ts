@@ -135,7 +135,7 @@ export const getAdminDashboard = query({
     const ms48h = 48 * 60 * 60 * 1000;
     const periodStart = now - periodDays * MS_DAY;
 
-    const [allUsers, allAttempts, allPayments, allQuizzes, allEvents, allPromos, allUserAnswers] =
+    const [allUsers, allAttempts, allPayments, allQuizzes, allEvents, allPromos, allUserAnswers, allQuestions] =
       await Promise.all([
         ctx.db.query("users").collect(),
         ctx.db.query("attempts").collect(),
@@ -144,6 +144,7 @@ export const getAdminDashboard = query({
         ctx.db.query("analyticsEvents").collect(),
         ctx.db.query("promoCodes").collect(),
         ctx.db.query("userAnswers").collect(),
+        ctx.db.query("questions").collect(),
       ]);
 
     const students = allUsers.filter(isStudent);
@@ -175,6 +176,14 @@ export const getAdminDashboard = query({
       now,
     );
 
+    const wauByLogin = distinctUsersInRange(
+      students
+        .filter((u) => (u.lastLoginAt ?? 0) >= now - ms7)
+        .map((u) => u._id),
+      now - ms7,
+      now,
+    );
+
     const attemptUserIds30d = new Set<string>();
     for (const a of allAttempts) {
       if (a.completedAt >= now - ms30 && studentIds.has(a.userId)) {
@@ -182,6 +191,14 @@ export const getAdminDashboard = query({
       }
     }
     const mauByAttempts = attemptUserIds30d.size;
+
+    const attemptUserIds7d = new Set<string>();
+    for (const a of allAttempts) {
+      if (a.completedAt >= now - ms7 && studentIds.has(a.userId)) {
+        attemptUserIds7d.add(String(a.userId));
+      }
+    }
+    const wauByAttempts = attemptUserIds7d.size;
 
     const dauCounts: number[] = [];
     for (let i = 0; i < 7; i++) {
@@ -515,6 +532,119 @@ export const getAdminDashboard = query({
       topPages: topPagesFromEvents(periodEvents, periodStart),
     };
 
+    // Calculate expanded conversion & activity statistics
+    let totalAccuracySum = 0;
+    let attemptsWithQuestionsCount = 0;
+    for (const a of studentAttempts) {
+      const q = quizById.get(String(a.quizId));
+      const totalQ = q ? q.totalQuestions : (a.correctAnswers + a.wrongAnswers);
+      if (totalQ > 0) {
+        totalAccuracySum += (a.score / totalQ) * 100;
+        attemptsWithQuestionsCount++;
+      }
+    }
+    const avgQuizAccuracy = attemptsWithQuestionsCount > 0 ? Math.round(totalAccuracySum / attemptsWithQuestionsCount) : 0;
+    const avgQuizScore = studentAttempts.length > 0 ? Math.round((studentAttempts.reduce((s, a) => s + a.score, 0) / studentAttempts.length) * 10) / 10 : 0;
+
+    const countStarted = countEvents(periodEvents, "quiz_started", periodStart);
+    const countCompleted = countEvents(periodEvents, "quiz_completed", periodStart);
+    const quizCompletionRate = pct(countCompleted, countStarted);
+
+    const avgTimePerQuiz = studentAttempts.length > 0 ? Math.round(studentAttempts.reduce((s, a) => s + a.timeTaken, 0) / studentAttempts.length) : 0;
+    const avgQuestionsAttempted = studentAttempts.length > 0 ? Math.round((studentAttempts.reduce((s, a) => s + (a.correctAnswers + a.wrongAnswers), 0) / studentAttempts.length) * 10) / 10 : 0;
+
+    const aiMistakeAnalyzerUsage = countEvents(periodEvents, "ai_mistake_analyzer_use", periodStart);
+    const upgradePageViews = countEvents(periodEvents, "upgrade_page_view", periodStart);
+    const premiumCtaClicks = countEvents(periodEvents, "premium_cta_click", periodStart);
+
+    let dashboardVisits = 0;
+    for (const e of periodEvents) {
+      if (e.eventName === "page_view" && e.properties?.path === "/dashboard") {
+        dashboardVisits++;
+      }
+    }
+
+    const paymentRequestsCount = allPayments.length;
+    const premiumActivationsCount = approvedPayments.length;
+    const uniquePageSessions = traffic.pageUniqueSessions || 1;
+    const visitorToPremiumConvRate = pct(premiumActivationsCount, uniquePageSessions);
+
+    // Group failed answers by categorized MDCAT syllabus chapters
+    const questionMap = new Map(allQuestions.map((q) => [String(q._id), q]));
+    
+    function getChapterForQuestion(subject: string, text: string): string {
+      const lower = text.toLowerCase();
+      if (subject === "Biology") {
+        if (lower.includes("cell") || lower.includes("organelle") || lower.includes("mitochondria") || lower.includes("membrane")) return "Cell Biology";
+        if (lower.includes("genetics") || lower.includes("gene") || lower.includes("dna") || lower.includes("chromosome") || lower.includes("allele")) return "Genetics";
+        if (lower.includes("heart") || lower.includes("blood") || lower.includes("kidney") || lower.includes("digest") || lower.includes("nervous") || lower.includes("hormone") || lower.includes("liver")) return "Human Physiology";
+        if (lower.includes("ecosystem") || lower.includes("ecology") || lower.includes("environment") || lower.includes("population")) return "Ecology";
+        if (lower.includes("photosynthesis") || lower.includes("respiration") || lower.includes("atp") || lower.includes("energy")) return "Bioenergetics";
+        return "General Biology";
+      }
+      if (subject === "Chemistry") {
+        if (lower.includes("mole") || lower.includes("stoichiometry") || lower.includes("mass") || lower.includes("avogadro")) return "Stoichiometry";
+        if (lower.includes("atom") || lower.includes("electron") || lower.includes("orbital") || lower.includes("quantum")) return "Atomic Structure";
+        if (lower.includes("equilibrium") || lower.includes("kc") || lower.includes("le chatelier")) return "Chemical Equilibrium";
+        if (lower.includes("organic") || lower.includes("carbon") || lower.includes("alkane") || lower.includes("benzene") || lower.includes("functional group")) return "Organic Chemistry";
+        return "General Chemistry";
+      }
+      if (subject === "Physics") {
+        if (lower.includes("force") || lower.includes("motion") || lower.includes("velocity") || lower.includes("acceleration") || lower.includes("momentum")) return "Force and Motion";
+        if (lower.includes("work") || lower.includes("energy") || lower.includes("power") || lower.includes("potential")) return "Work and Energy";
+        if (lower.includes("wave") || lower.includes("oscillat") || lower.includes("frequency") || lower.includes("sound")) return "Waves and Oscillations";
+        if (lower.includes("charge") || lower.includes("electrostatic") || lower.includes("coulomb")) return "Electrostatics";
+        if (lower.includes("magnetic") || lower.includes("current") || lower.includes("induction") || lower.includes("field")) return "Electromagnetism";
+        return "General Physics";
+      }
+      if (subject === "English") {
+        if (lower.includes("verb") || lower.includes("subject") || lower.includes("agreement") || lower.includes("singular") || lower.includes("plural")) return "Subject-Verb Agreement";
+        if (lower.includes("tense") || lower.includes("pronoun") || lower.includes("past") || lower.includes("present") || lower.includes("future")) return "Tenses and Pronouns";
+        if (lower.includes("vocabulary") || lower.includes("spell") || lower.includes("word") || lower.includes("meaning")) return "Vocabulary and Spelling";
+        return "General English";
+      }
+      return "General Study";
+    }
+
+    const failedChaptersCount = new Map<string, number>();
+    for (const ua of allUserAnswers) {
+      if (ua.isCorrect) continue;
+      const q = questionMap.get(String(ua.questionId));
+      if (!q) continue;
+      const chapter = getChapterForQuestion(q.subject, q.questionText);
+      failedChaptersCount.set(chapter, (failedChaptersCount.get(chapter) ?? 0) + 1);
+    }
+    const mostFailedChapters = [...failedChaptersCount.entries()]
+      .map(([chapter, count]) => ({ chapter, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    // Group top performing students
+    const studentPerformance = new Map<string, { attempts: number; correct: number; total: number }>();
+    for (const a of studentAttempts) {
+      const uid = String(a.userId);
+      const q = quizById.get(String(a.quizId));
+      const totalQ = q ? q.totalQuestions : (a.correctAnswers + a.wrongAnswers);
+      const current = studentPerformance.get(uid) ?? { attempts: 0, correct: 0, total: 0 };
+      current.attempts++;
+      current.correct += a.correctAnswers;
+      current.total += totalQ;
+      studentPerformance.set(uid, current);
+    }
+    const topStudents = [...studentPerformance.entries()]
+      .map(([uid, stats]) => {
+        const u = allUsers.find((user) => String(user._id) === uid);
+        return {
+          userId: uid,
+          name: u?.name ?? "Student",
+          email: u?.email ?? "No Email",
+          attempts: stats.attempts,
+          accuracy: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0,
+        };
+      })
+      .sort((a, b) => b.accuracy - a.accuracy || b.attempts - a.attempts)
+      .slice(0, 10);
+
     return {
       periodDays,
       overview: {
@@ -526,7 +656,9 @@ export const getAdminDashboard = query({
         premiumPenetration,
         freeStudents,
         mauByLogin,
+        wauByLogin,
         mauByAttempts,
+        wauByAttempts,
         dau7dAvg,
         totalAttempts,
         attempts30d,
@@ -541,6 +673,18 @@ export const getAdminDashboard = query({
         activityChurnRate30d,
         premiumChurn30d: premiumChurned,
         premiumChurnRate30d,
+        avgQuizAccuracy,
+        avgQuizScore,
+        quizCompletionRate,
+        avgTimePerQuiz,
+        avgQuestionsAttempted,
+        aiMistakeAnalyzerUsage,
+        upgradePageViews,
+        premiumCtaClicks,
+        dashboardVisits,
+        paymentRequestsCount,
+        premiumActivationsCount,
+        visitorToPremiumConvRate,
       },
       timeSeries: {
         signupsByDay,
@@ -571,6 +715,8 @@ export const getAdminDashboard = query({
         inactiveStudents14d,
       },
       traffic,
+      topStudents,
+      mostFailedChapters,
     };
   },
 });

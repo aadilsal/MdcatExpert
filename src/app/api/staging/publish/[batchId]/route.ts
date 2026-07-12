@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
-import { fetchMutation } from "convex/nextjs";
+import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../../convex/_generated/api";
 import { requireAdminApi } from "@/lib/require-admin-api";
 import { formatUserError } from "@/lib/format-user-error";
+import { sendEmailNotification } from "@/lib/resend";
+import { getNewQuizEmailHtml } from "@/lib/email-templates";
 
 const VALID_SUBJECTS = ["Biology", "Chemistry", "Physics", "English", "General"] as const;
 
@@ -42,6 +44,35 @@ export async function POST(
       },
       { token: auth.token },
     );
+
+    // Dispatch notifications in background without blocking response
+    try {
+      const users = await fetchQuery(api.users.listUsers, {}, { token: auth.token });
+      const activeUsers = (users ?? []).filter(
+        (u) => u.email && (u.emailNotificationsEnabled ?? true) !== false
+      );
+
+      void Promise.allSettled(
+        activeUsers.map(async (u) => {
+          const html = getNewQuizEmailHtml(
+            u.name || "Student",
+            title,
+            subject,
+            year,
+            result.questionCount,
+            result.quizId
+          );
+          await sendEmailNotification({
+            to: u.email!,
+            subject: `New MDCAT Quiz Available: ${title} 📚`,
+            text: `Hello ${u.name || "Student"},\n\nA new practice quiz has been added to MDCAT Xpert: "${title}" (${year} - ${subject}, ${result.questionCount} questions). Log in now to practice!`,
+            html,
+          });
+        })
+      );
+    } catch (emailErr) {
+      console.error("Failed to notify users about new quiz:", emailErr);
+    }
 
     return NextResponse.json({
       success: true,

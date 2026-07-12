@@ -14,6 +14,8 @@ export const ANALYTICS_EVENTS = {
   COPILOT_UPLOAD_COMPLETED: "copilot_upload_completed",
   COPILOT_PAYWALL_HIT: "copilot_paywall_hit",
   STUDY_SOURCE_INGESTED: "study_source_ingested",
+  AI_MISTAKE_ANALYZER_USE: "ai_mistake_analyzer_use",
+  PREMIUM_CTA_CLICK: "premium_cta_click",
 } as const;
 
 export type AnalyticsEventName =

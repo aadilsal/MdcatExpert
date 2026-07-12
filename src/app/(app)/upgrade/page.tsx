@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics-events";
 import { LoadingButton } from "@/components/loading-button";
+import ScoreImprovementCalculator from "@/components/score-improvement-calculator";
 
 function UpgradePageContent() {
     const router = useRouter();
@@ -188,6 +189,12 @@ function UpgradePageContent() {
                 </p>
             </div>
 
+            {step === "pricing" && (
+                <div className="max-w-3xl mx-auto">
+                    <ScoreImprovementCalculator onUnlock={() => setStep("checkout")} />
+                </div>
+            )}
+
             <AnimatePresence mode="wait">
                 {step === "pricing" ? (
                     <motion.div
@@ -221,7 +228,7 @@ function UpgradePageContent() {
                                 <h2 className="text-2xl font-black italic mb-2">Elite.</h2>
                                 <div className="flex items-baseline gap-2 mb-8">
                                     <span className="text-5xl font-black italic text-primary-500">Rs. 2500</span>
-                                    <span className="text-white/40 font-bold uppercase text-[9px] tracking-widest">/ Lifetime Access</span>
+                                    <span className="text-white/40 font-bold uppercase text-[9px] tracking-widest">/ 1-Year Season Pass</span>
                                 </div>
                                 <ul className="space-y-4 mb-10">
                                     {[

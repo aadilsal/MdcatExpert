@@ -129,6 +129,7 @@ export default async function AnalyticsPage() {
                 strongestSubject={strongestSubject}
                 aiMistakes={aiMistakes}
                 aiRadar={aiRadar}
+                isPremiumUser={me.subscriptionType === "premium"}
             />
         </div>
     );

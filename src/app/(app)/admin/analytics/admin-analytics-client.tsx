@@ -12,6 +12,7 @@ import {
     Target,
     BookOpen,
     Globe,
+    Award,
 } from "lucide-react";
 import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics-events";
 import {
@@ -164,6 +165,12 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                             color="text-primary-600"
                         />
                         <KpiCard
+                            label="WAU (attempts)"
+                            value={overview.wauByAttempts}
+                            hint={`Login WAU: ${overview.wauByLogin}`}
+                            color="text-indigo-600"
+                        />
+                        <KpiCard
                             label="Revenue (30d)"
                             value={formatCurrency(overview.revenue30d)}
                             hint={`All time: ${formatCurrency(overview.revenueAllTime)}`}
@@ -172,6 +179,45 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                         <KpiCard label="New signups (30d)" value={overview.newSignups30d} hint={`7d: ${overview.newSignups7d}`} />
                         <KpiCard label="Signup growth" value={growthDisplay} hint="30d vs prior 30d" />
                         <KpiCard label="Total attempts" value={overview.totalAttempts} hint={`30d: ${overview.attempts30d}`} />
+                        <KpiCard
+                            label="Avg Quiz Accuracy"
+                            value={`${overview.avgQuizAccuracy}%`}
+                            hint={`Avg Score: ${overview.avgQuizScore}`}
+                            color="text-emerald-600"
+                        />
+                        <KpiCard
+                            label="Quiz Completion Rate"
+                            value={`${overview.quizCompletionRate}%`}
+                            hint="Started vs Completed"
+                            color="text-pink-600"
+                        />
+                        <KpiCard
+                            label="Avg Time Per Quiz"
+                            value={`${Math.floor(overview.avgTimePerQuiz / 60)}m ${overview.avgTimePerQuiz % 60}s`}
+                            color="text-sky-600"
+                        />
+                        <KpiCard
+                            label="Avg Questions Attempted"
+                            value={overview.avgQuestionsAttempted}
+                            hint="Per attempt"
+                            color="text-amber-600"
+                        />
+                        <KpiCard
+                            label="AI Analyzer Usage"
+                            value={overview.aiMistakeAnalyzerUsage}
+                            color="text-teal-600"
+                        />
+                        <KpiCard
+                            label="Premium CTA Clicks"
+                            value={overview.premiumCtaClicks}
+                            color="text-rose-600"
+                        />
+                        <KpiCard
+                            label="Visitor Conversion"
+                            value={`${overview.visitorToPremiumConvRate}%`}
+                            hint="Unique sessions to premium"
+                            color="text-violet-600"
+                        />
                         <KpiCard
                             label="Activation (7d)"
                             value={`${overview.activationRate7d}%`}
@@ -455,6 +501,74 @@ export default function AdminAnalyticsClient({ data }: { data: AdminDashboardDat
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+
+                    <div className="grid lg:grid-cols-2 gap-6 mt-8">
+                        <div className="bg-surface rounded-4xl border border-surface-border overflow-hidden">
+                            <div className="p-6 border-b border-gray-50 dark:border-slate-800 dark:border-slate-800 flex items-center gap-2">
+                                <AlertTriangle className="w-5 h-5 text-red-500" />
+                                <h2 className="text-lg font-black">Most Failed Chapters</h2>
+                            </div>
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-50 dark:border-slate-800/80">
+                                        <th className="p-4">Chapter</th>
+                                        <th className="p-4">Wrong Attempts</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {(!data.mostFailedChapters || data.mostFailedChapters.length === 0) ? (
+                                        <tr>
+                                            <td colSpan={2} className="p-8 text-center text-gray-400">
+                                                No failed answer data yet
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        data.mostFailedChapters.map((c) => (
+                                            <tr key={c.chapter} className="border-b border-gray-50 dark:border-slate-800/80">
+                                                <td className="p-4 font-bold text-gray-900 dark:text-white">{c.chapter}</td>
+                                                <td className="p-4 font-black text-red-500">{c.count}</td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div className="bg-surface rounded-4xl border border-surface-border overflow-hidden">
+                            <div className="p-6 border-b border-gray-50 dark:border-slate-800 dark:border-slate-800 flex items-center gap-2">
+                                <Award className="w-5 h-5 text-emerald-500" />
+                                <h2 className="text-lg font-black">Top Performing Students</h2>
+                            </div>
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-50 dark:border-slate-800/80">
+                                        <th className="p-4">Name</th>
+                                        <th className="p-4">Email</th>
+                                        <th className="p-4">Quizzes</th>
+                                        <th className="p-4">Accuracy</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {(!data.topStudents || data.topStudents.length === 0) ? (
+                                        <tr>
+                                            <td colSpan={4} className="p-8 text-center text-gray-400">
+                                                No student attempts recorded yet
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        data.topStudents.map((s) => (
+                                            <tr key={s.userId} className="border-b border-gray-50 dark:border-slate-800/80">
+                                                <td className="p-4 font-bold text-gray-900 dark:text-white">{s.name}</td>
+                                                <td className="p-4 text-gray-500">{s.email}</td>
+                                                <td className="p-4 font-bold text-gray-400">{s.attempts}</td>
+                                                <td className="p-4 font-black text-emerald-500">{s.accuracy}%</td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             )}

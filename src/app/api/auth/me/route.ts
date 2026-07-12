@@ -23,6 +23,7 @@ export async function GET() {
                 role: user.role || "student",
                 subscriptionType: user.subscriptionType || "free",
                 premiumUntil: user.premiumUntil || null,
+                emailVerificationTime: user.emailVerificationTime || null,
             },
         });
     } catch (error) {

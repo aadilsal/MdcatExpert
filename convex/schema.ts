@@ -23,6 +23,9 @@ export default defineSchema({
     createdAt: v.optional(v.number()),
     lastLoginAt: v.optional(v.number()),
     isActive: v.optional(v.boolean()),
+    otpCode: v.optional(v.string()),
+    otpExpiry: v.optional(v.number()),
+    lastClaimedTopperWeek: v.optional(v.string()),
   })
     .index("by_email", ["email"])
     .index("by_role", ["role"]),
