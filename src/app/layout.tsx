@@ -6,6 +6,7 @@ import NavigationProgress from "@/components/navigation-progress";
 import PageViewTracker from "@/components/page-view-tracker";
 import { getSiteUrl } from "@/lib/site-url";
 import { ThemeProvider } from "@/components/theme-provider";
+import ConvexClientProvider from "@/components/convex-client-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -118,11 +119,13 @@ export default async function RootLayout({
           }}
         />
         <ConvexAuthNextjsServerProvider>
-          <ThemeProvider>
-            <NavigationProgress />
-            <PageViewTracker />
-            {children}
-          </ThemeProvider>
+          <ConvexClientProvider>
+            <ThemeProvider>
+              <NavigationProgress />
+              <PageViewTracker />
+              {children}
+            </ThemeProvider>
+          </ConvexClientProvider>
         </ConvexAuthNextjsServerProvider>
       </body>
     </html>
