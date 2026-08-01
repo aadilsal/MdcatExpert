@@ -121,7 +121,7 @@ function SignupPaymentContent() {
 
     if (submitted) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-linear-to-b from-white to-gray-50">
+            <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-linear-to-b from-white to-gray-50 dark:from-slate-950 dark:to-slate-950">
                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -134,9 +134,9 @@ function SignupPaymentContent() {
                     <p className="text-gray-500 dark:text-gray-400 font-bold italic">
                         Your payment screenshot has been received. Our team is verifying your submission.
                     </p>
-                    <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-left">
-                        <p className="text-sm font-semibold text-blue-900 mb-2">What happens next:</p>
-                        <ul className="text-sm text-blue-800 space-y-2">
+                    <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/30 rounded-2xl p-4 text-left">
+                        <p className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">What happens next:</p>
+                        <ul className="text-sm text-blue-800 dark:text-blue-400 space-y-2">
                             <li className="flex items-start gap-2">
                                 <Clock className="w-4 h-4 mt-0.5 shrink-0" />
                                 <span><strong>Within 24 hours:</strong> Admin will verify your payment</span>
@@ -151,7 +151,7 @@ function SignupPaymentContent() {
                             </li>
                         </ul>
                     </div>
-                    <p className="text-xs text-gray-400">You'll receive a notification when your account is approved.</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">You'll receive a notification when your account is approved.</p>
                 </div>
                 <button
                     onClick={() => router.push("/dashboard")}
@@ -164,7 +164,7 @@ function SignupPaymentContent() {
     }
 
     return (
-        <div className="min-h-screen bg-linear-to-b from-white to-gray-50 pb-20 pt-10 px-4">
+        <div className="min-h-screen bg-linear-to-b from-white to-gray-50 dark:from-slate-950 dark:to-slate-950 pb-20 pt-10 px-4">
             <div className="max-w-2xl mx-auto">
                 <Link href="/dashboard" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-100 font-semibold mb-12 transition-colors">
                     <ArrowLeft className="w-5 h-5" />
@@ -186,7 +186,7 @@ function SignupPaymentContent() {
 
                 <div className="bg-surface rounded-[2.5rem] shadow-2xl border border-surface-border p-8 sm:p-12">
                     {error && (
-                        <div className="mb-8 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700">
+                        <div className="mb-8 p-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 text-red-700 dark:text-red-400">
                             <p className="text-sm font-semibold">{error}</p>
                         </div>
                     )}
@@ -205,11 +205,11 @@ function SignupPaymentContent() {
                                 />
                                 <label
                                     htmlFor="screenshot-upload"
-                                    className="cursor-pointer rounded-3xl border border-dashed border-gray-200 bg-gray-50 px-5 py-12 text-center hover:border-primary-600 hover:bg-primary-50 transition-all"
+                                    className="cursor-pointer rounded-3xl border border-dashed border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900/60 px-5 py-12 text-center hover:border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950/20 transition-all"
                                 >
                                     <Upload className="mx-auto mb-4 w-10 h-10 text-primary-600" />
                                     <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Choose a screenshot or PDF</p>
-                                    <p className="text-xs text-gray-400 mt-2">Maximum file size: 5MB</p>
+                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Maximum file size: 5MB</p>
                                 </label>
                             </div>
                         </div>
@@ -221,7 +221,7 @@ function SignupPaymentContent() {
                                     type="text"
                                     value={transactionId}
                                     onChange={(e) => setTransactionId(e.target.value)}
-                                    className="w-full rounded-3xl border border-gray-200 px-4 py-4 text-sm text-gray-900 dark:text-gray-100 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                                    className="w-full rounded-3xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-4 text-sm text-gray-900 dark:text-gray-100 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900/30"
                                 />
                             </div>
                             <div>
@@ -230,7 +230,7 @@ function SignupPaymentContent() {
                                     type="text"
                                     value={parsedTitle}
                                     onChange={(e) => setParsedTitle(e.target.value)}
-                                    className="w-full rounded-3xl border border-gray-200 px-4 py-4 text-sm text-gray-900 dark:text-gray-100 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                                    className="w-full rounded-3xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-4 text-sm text-gray-900 dark:text-gray-100 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900/30"
                                 />
                             </div>
                             <div>
@@ -239,7 +239,7 @@ function SignupPaymentContent() {
                                     type="text"
                                     value={parsedYear}
                                     onChange={(e) => setParsedYear(e.target.value)}
-                                    className="w-full rounded-3xl border border-gray-200 px-4 py-4 text-sm text-gray-900 dark:text-gray-100 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                                    className="w-full rounded-3xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-4 text-sm text-gray-900 dark:text-gray-100 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900/30"
                                 />
                             </div>
                         </div>

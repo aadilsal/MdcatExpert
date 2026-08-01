@@ -81,7 +81,7 @@ export default async function BlogPostPage({ params }: Props) {
 
       <Link
         href="/blog"
-        className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-primary-600 transition-colors"
+        className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 dark:text-slate-500 hover:text-primary-600 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Blog
@@ -109,7 +109,7 @@ export default async function BlogPostPage({ params }: Props) {
               ? new Date(post.publishedAt).toISOString()
               : new Date(post.createdAt).toISOString()
           }
-          className="flex items-center gap-2 text-sm text-gray-400 font-bold"
+          className="flex items-center gap-2 text-sm text-gray-400 dark:text-slate-500 font-bold"
         >
           <Calendar className="w-4 h-4" />
           {formatDate(post.publishedAt ?? post.createdAt)}

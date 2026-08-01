@@ -16,12 +16,12 @@ export default function ContactPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="text-center py-20 space-y-8"
             >
-                <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto shadow-xl shadow-emerald-600/10">
+                <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-3xl flex items-center justify-center mx-auto shadow-xl shadow-emerald-600/10">
                     <CheckCircle className="w-10 h-10" />
                 </div>
                 <div className="space-y-4">
-                    <h1 className="text-4xl font-black text-gray-900 tracking-tight">Message Received.</h1>
-                    <p className="text-xl text-gray-500 font-medium max-w-md mx-auto leading-relaxed">
+                    <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight">Message Received.</h1>
+                    <p className="text-xl text-gray-500 dark:text-slate-400 font-medium max-w-md mx-auto leading-relaxed">
                         Thank you for reaching out! Our team will get back to you within 24 hours.
                     </p>
                 </div>
@@ -38,12 +38,12 @@ export default function ContactPage() {
     return (
         <div className="space-y-16">
             <div className="text-center space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 text-primary-700 text-xs font-black uppercase tracking-widest mb-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-400 text-xs font-black uppercase tracking-widest mb-2">
                     <MessageCircle className="w-4 h-4" />
                     Get in Touch
                 </div>
-                <h1 className="text-4xl sm:text-6xl font-black text-gray-900 tracking-tight">Let&apos;s <span className="text-primary-600">talk.</span></h1>
-                <p className="text-lg text-gray-500 max-w-xl mx-auto font-medium">Have a question or feedback? We&apos;d love to hear from you. Our team typically responds within 24 hours.</p>
+                <h1 className="text-4xl sm:text-6xl font-black text-gray-900 dark:text-white tracking-tight">Let&apos;s <span className="text-primary-600">talk.</span></h1>
+                <p className="text-lg text-gray-500 dark:text-slate-400 max-w-xl mx-auto font-medium">Have a question or feedback? We&apos;d love to hear from you. Our team typically responds within 24 hours.</p>
             </div>
 
             <div className="grid lg:grid-cols-5 gap-12 lg:gap-20">
@@ -54,24 +54,24 @@ export default function ContactPage() {
                 >
                     <div className="space-y-8">
                         <div className="group flex items-start gap-5">
-                            <div className="w-12 h-12 rounded-2xl bg-primary-50 text-primary-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                            <div className="w-12 h-12 rounded-2xl bg-primary-50 dark:bg-primary-950/40 text-primary-600 dark:text-primary-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                                 <Mail className="w-6 h-6" />
                             </div>
                             <div>
-                                <h3 className="font-black text-gray-900 uppercase tracking-widest text-xs mb-2">Email Us</h3>
-                                <p className="text-lg font-bold text-gray-700">support@mdcatxpert.com</p>
-                                <p className="text-sm text-gray-400 font-medium leading-relaxed">For support, feedback, or collaborations.</p>
+                                <h3 className="font-black text-gray-900 dark:text-white uppercase tracking-widest text-xs mb-2">Email Us</h3>
+                                <p className="text-lg font-bold text-gray-700 dark:text-slate-300">support@mdcatxpert.com</p>
+                                <p className="text-sm text-gray-400 dark:text-slate-500 font-medium leading-relaxed">For support, feedback, or collaborations.</p>
                             </div>
                         </div>
 
                         <div className="group flex items-start gap-5">
-                            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                            <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                                 <Globe className="w-6 h-6" />
                             </div>
                             <div>
-                                <h3 className="font-black text-gray-900 uppercase tracking-widest text-xs mb-2">Location</h3>
-                                <p className="text-lg font-bold text-gray-700">Pakistan</p>
-                                <p className="text-sm text-gray-400 font-medium leading-relaxed">Serving MDCAT aspirants nationwide.</p>
+                                <h3 className="font-black text-gray-900 dark:text-white uppercase tracking-widest text-xs mb-2">Location</h3>
+                                <p className="text-lg font-bold text-gray-700 dark:text-slate-300">Pakistan</p>
+                                <p className="text-sm text-gray-400 dark:text-slate-500 font-medium leading-relaxed">Serving MDCAT aspirants nationwide.</p>
                             </div>
                         </div>
                     </div>
@@ -94,10 +94,10 @@ export default function ContactPage() {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="lg:col-span-3 bg-white border border-gray-100 p-8 sm:p-12 rounded-[2.5rem] shadow-xl shadow-gray-200/50"
+                    className="lg:col-span-3 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-8 sm:p-12 rounded-[2.5rem] shadow-xl shadow-gray-200/50 dark:shadow-none"
                 >
                     {state?.error && (
-                        <div className="mb-8 p-4 rounded-2xl bg-red-50 border border-red-100 flex items-center gap-3 text-red-700 text-sm font-bold animate-shake">
+                        <div className="mb-8 p-4 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 flex items-center gap-3 text-red-700 dark:text-red-400 text-sm font-bold animate-shake">
                             <AlertCircle className="w-5 h-5 shrink-0" />
                             {state.error}
                         </div>
@@ -106,34 +106,34 @@ export default function ContactPage() {
                     <form action={action} className="space-y-6">
                         <div className="grid sm:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-gray-900 uppercase tracking-widest ml-1">First Name</label>
-                                <input name="firstName" type="text" placeholder="Ahmad" className={`w-full px-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:ring-4 focus:ring-primary-100 focus:bg-white focus:border-primary-500 transition-all text-sm font-medium ${state?.fieldErrors?.firstName ? "border-red-300 ring-red-50" : ""}`} />
+                                <label className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest ml-1">First Name</label>
+                                <input name="firstName" type="text" placeholder="Ahmad" className={`w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-slate-950/50 border border-gray-100 dark:border-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-500/10 focus:bg-white dark:focus:bg-slate-900 focus:border-primary-500 transition-all text-sm font-medium ${state?.fieldErrors?.firstName ? "border-red-300 ring-red-50" : ""}`} />
                                 {state?.fieldErrors?.firstName && <p className="text-xs font-bold text-red-500 ml-1">{state.fieldErrors.firstName[0]}</p>}
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-gray-900 uppercase tracking-widest ml-1">Last Name</label>
-                                <input name="lastName" type="text" placeholder="Ali" className={`w-full px-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:ring-4 focus:ring-primary-100 focus:bg-white focus:border-primary-500 transition-all text-sm font-medium ${state?.fieldErrors?.lastName ? "border-red-300 ring-red-50" : ""}`} />
+                                <label className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest ml-1">Last Name</label>
+                                <input name="lastName" type="text" placeholder="Ali" className={`w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-slate-950/50 border border-gray-100 dark:border-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-500/10 focus:bg-white dark:focus:bg-slate-900 focus:border-primary-500 transition-all text-sm font-medium ${state?.fieldErrors?.lastName ? "border-red-300 ring-red-50" : ""}`} />
                                 {state?.fieldErrors?.lastName && <p className="text-xs font-bold text-red-500 ml-1">{state.fieldErrors.lastName[0]}</p>}
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-gray-900 uppercase tracking-widest ml-1">Email Address</label>
-                            <input name="email" type="email" placeholder="you@example.com" className={`w-full px-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:ring-4 focus:ring-primary-100 focus:bg-white focus:border-primary-500 transition-all text-sm font-medium ${state?.fieldErrors?.email ? "border-red-300 ring-red-50" : ""}`} />
+                            <label className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest ml-1">Email Address</label>
+                            <input name="email" type="email" placeholder="you@example.com" className={`w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-slate-950/50 border border-gray-100 dark:border-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-500/10 focus:bg-white dark:focus:bg-slate-900 focus:border-primary-500 transition-all text-sm font-medium ${state?.fieldErrors?.email ? "border-red-300 ring-red-50" : ""}`} />
                             {state?.fieldErrors?.email && <p className="text-xs font-bold text-red-500 ml-1">{state.fieldErrors.email[0]}</p>}
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-gray-900 uppercase tracking-widest ml-1">Subject</label>
-                            <select name="subject" className={`w-full px-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:ring-4 focus:ring-primary-100 focus:bg-white focus:border-primary-500 transition-all text-sm font-medium appearance-none ${state?.fieldErrors?.subject ? "border-red-300 ring-red-50" : ""}`}>
-                                <option value="">Select a subject</option>
-                                <option value="General Inquiry">General Inquiry</option>
-                                <option value="Technical Support">Technical Support</option>
-                                <option value="Feedback">Feedback</option>
+                            <label className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest ml-1">Subject</label>
+                            <select name="subject" className={`w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-slate-950/50 border border-gray-100 dark:border-slate-800 text-gray-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-500/10 focus:bg-white dark:focus:bg-slate-900 focus:border-primary-500 transition-all text-sm font-medium appearance-none ${state?.fieldErrors?.subject ? "border-red-300 ring-red-50" : ""}`}>
+                                <option value="" className="bg-white dark:bg-slate-900">Select a subject</option>
+                                <option value="General Inquiry" className="bg-white dark:bg-slate-900">General Inquiry</option>
+                                <option value="Technical Support" className="bg-white dark:bg-slate-900">Technical Support</option>
+                                <option value="Feedback" className="bg-white dark:bg-slate-900">Feedback</option>
                             </select>
                             {state?.fieldErrors?.subject && <p className="text-xs font-bold text-red-500 ml-1">{state.fieldErrors.subject[0]}</p>}
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-gray-900 uppercase tracking-widest ml-1">Message</label>
-                            <textarea name="message" rows={4} placeholder="How can we help?" className={`w-full px-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:ring-4 focus:ring-primary-100 focus:bg-white focus:border-primary-500 transition-all text-sm font-medium resize-none ${state?.fieldErrors?.message ? "border-red-300 ring-red-50" : ""}`}></textarea>
+                            <label className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest ml-1">Message</label>
+                            <textarea name="message" rows={4} placeholder="How can we help?" className={`w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-slate-950/50 border border-gray-100 dark:border-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-500/10 focus:bg-white dark:focus:bg-slate-900 focus:border-primary-500 transition-all text-sm font-medium resize-none ${state?.fieldErrors?.message ? "border-red-300 ring-red-50" : ""}`}></textarea>
                             {state?.fieldErrors?.message && <p className="text-xs font-bold text-red-500 ml-1">{state.fieldErrors.message[0]}</p>}
                         </div>
                         <FormSubmitButton className="w-full flex items-center justify-center gap-3 px-8 py-5 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition-all shadow-xl shadow-primary-600/30 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed">

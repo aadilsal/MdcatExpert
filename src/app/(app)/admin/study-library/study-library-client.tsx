@@ -269,7 +269,7 @@ export default function StudyLibraryClient({
               placeholder="Published title"
               value={summaryTitle}
               onChange={(e) => setSummaryTitle(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm font-medium"
+              className="theme-input w-full px-4 py-3 rounded-xl text-sm font-medium"
             />
           </>
         )}

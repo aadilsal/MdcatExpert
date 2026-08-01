@@ -398,7 +398,7 @@ export default function QuizPage({
                         </button>
                         <button
                             onClick={() => router.push("/quizzes")}
-                            className="px-8 py-4 bg-gray-100 text-gray-900 dark:text-gray-100 font-black rounded-2xl hover:bg-gray-200 transition-all"
+                            className="px-8 py-4 bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100 font-black rounded-2xl hover:bg-gray-200 dark:hover:bg-slate-700 transition-all"
                         >
                             Browse Quizzes
                         </button>

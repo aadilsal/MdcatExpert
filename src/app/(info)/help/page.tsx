@@ -31,12 +31,12 @@ export default function HelpPage() {
     return (
         <div className="space-y-16">
             <div className="text-center space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 text-primary-700 text-xs font-black uppercase tracking-widest mb-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-400 text-xs font-black uppercase tracking-widest mb-2">
                     <HelpCircle className="w-4 h-4" />
                     Support Center
                 </div>
-                <h1 className="text-4xl sm:text-6xl font-black text-gray-900 tracking-tight">How can we <span className="text-primary-600">help?</span></h1>
-                <p className="text-lg text-gray-500 max-w-2xl mx-auto font-medium">Search our knowledge base or browse help topics below.</p>
+                <h1 className="text-4xl sm:text-6xl font-black text-gray-900 dark:text-white tracking-tight">How can we <span className="text-primary-600">help?</span></h1>
+                <p className="text-lg text-gray-500 dark:text-slate-400 max-w-2xl mx-auto font-medium">Search our knowledge base or browse help topics below.</p>
 
                 <div className="max-w-xl mx-auto pt-8">
                     <div className="relative group">
@@ -44,7 +44,7 @@ export default function HelpPage() {
                         <input
                             type="text"
                             placeholder="Search for articles..."
-                            className="w-full pl-12 pr-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:ring-4 focus:ring-primary-100 focus:bg-white focus:border-primary-500 transition-all text-sm font-medium"
+                            className="w-full pl-12 pr-6 py-4 rounded-2xl bg-gray-50 dark:bg-slate-900/60 border border-gray-100 dark:border-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-500/10 focus:bg-white dark:focus:bg-slate-900 focus:border-primary-500 transition-all text-sm font-medium"
                         />
                     </div>
                 </div>
@@ -54,16 +54,16 @@ export default function HelpPage() {
                 {faqs.map((group) => (
                     <div key={group.category} className="space-y-6">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600">
+                            <div className="w-10 h-10 bg-primary-100 dark:bg-primary-950/50 rounded-xl flex items-center justify-center text-primary-600 dark:text-primary-400">
                                 <group.icon className="w-5 h-5" />
                             </div>
-                            <h2 className="text-2xl font-black text-gray-900 leading-none">{group.category}</h2>
+                            <h2 className="text-2xl font-black text-gray-900 dark:text-white leading-none">{group.category}</h2>
                         </div>
                         <div className="grid gap-4">
                             {group.questions.map((faq) => (
-                                <div key={faq.q} className="p-6 rounded-2xl bg-white border border-gray-100 hover:border-primary-100 hover:shadow-xl hover:shadow-primary-600/5 transition-all group">
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">{faq.q}</h3>
-                                    <p className="text-gray-500 font-medium leading-relaxed">{faq.a}</p>
+                                <div key={faq.q} className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 hover:border-primary-100 dark:hover:border-primary-800 hover:shadow-xl hover:shadow-primary-600/5 transition-all group">
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 transition-colors">{faq.q}</h3>
+                                    <p className="text-gray-500 dark:text-slate-400 font-medium leading-relaxed">{faq.a}</p>
                                 </div>
                             ))}
                         </div>

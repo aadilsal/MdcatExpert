@@ -105,13 +105,13 @@ export default function StudentTable({ users }: StudentTableProps) {
                             placeholder="Search students by name or email..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-12 pr-6 py-4 rounded-2xl bg-gray-50 border border-surface-border text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-surface focus:border-primary-500 transition-all font-bold italic"
+                            className="w-full pl-12 pr-6 py-4 rounded-2xl bg-gray-50 dark:bg-slate-950/50 border border-surface-border text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-surface focus:border-primary-500 transition-all font-bold italic"
                         />
                     </div>
                     <select
                         value={filter}
                         onChange={(e) => setFilter(e.target.value)}
-                        className="px-6 py-4 rounded-2xl bg-gray-50 border border-surface-border text-gray-700 dark:text-gray-300 font-bold focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-surface focus:border-primary-500 transition-all appearance-none"
+                        className="px-6 py-4 rounded-2xl bg-gray-50 dark:bg-slate-950/50 border border-surface-border text-gray-700 dark:text-gray-300 font-bold focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-surface focus:border-primary-500 transition-all appearance-none"
                     >
                         <option value="all">All Users</option>
                         <option value="student">Students Only</option>
@@ -127,7 +127,7 @@ export default function StudentTable({ users }: StudentTableProps) {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-gray-50/50 border-b border-surface-border">
+                            <tr className="bg-gray-50/50 dark:bg-slate-900/40 border-b border-surface-border">
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">User Profile</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Joined Date</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Current Role</th>
@@ -218,7 +218,7 @@ export default function StudentTable({ users }: StudentTableProps) {
                                                 <select
                                                     value={user.subscription_type}
                                                     onChange={(e) => handleSubscriptionChange(user.id, e.target.value)}
-                                                    className="px-3 py-2 rounded-lg border border-gray-200 text-xs font-black uppercase tracking-widest"
+                                                    className="px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 text-xs font-black uppercase tracking-widest"
                                                     disabled={updatingUserId === user.id}
                                                 >
                                                     <option value="free">Free</option>
@@ -228,7 +228,7 @@ export default function StudentTable({ users }: StudentTableProps) {
                                                     onClick={() => handleRoleChange(user.id, user.role)}
                                                     disabled={updatingUserId === user.id}
                                                     className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${user.role === "admin"
-                                                            ? "bg-gray-100 text-gray-500 dark:text-gray-400 hover:bg-gray-200"
+                                                            ? "bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700"
                                                             : "bg-primary-600 text-white hover:bg-primary-700 shadow-lg shadow-primary-600/20"
                                                         } disabled:opacity-50`}
                                                 >
@@ -245,7 +245,7 @@ export default function StudentTable({ users }: StudentTableProps) {
                             ) : (
                                 <tr>
                                     <td colSpan={6} className="px-8 py-20 text-center">
-                                        <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 opacity-50">
+                                        <div className="w-16 h-16 bg-gray-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4 opacity-50">
                                             <Users className="w-8 h-8 text-gray-300" />
                                         </div>
                                         <h3 className="font-black text-gray-900 dark:text-gray-100 tracking-tight italic">No users matching search.</h3>

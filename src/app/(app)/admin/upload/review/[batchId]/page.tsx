@@ -240,7 +240,7 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
                                     <textarea
                                         value={editForm.question_text}
                                         onChange={e => setEditForm(prev => ({ ...prev, question_text: e.target.value }))}
-                                        className="w-full p-4 rounded-xl bg-gray-50 border border-gray-200 font-bold focus:outline-none focus:ring-2 ring-primary-500 min-h-[100px]"
+                                        className="theme-input w-full p-4 rounded-xl font-bold focus:outline-none focus:ring-2 ring-primary-500 min-h-[100px]"
                                     />
                                 ) : (
                                     <p className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-relaxed italic">
@@ -340,7 +340,7 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
                                 <img
                                     src={q.image_url}
                                     alt="Question illustration"
-                                    className="max-w-full h-auto max-h-64 rounded-xl border border-gray-200 shadow-lg"
+                                    className="max-w-full h-auto max-h-64 rounded-xl border border-gray-200 dark:border-slate-800 shadow-lg"
                                     onError={(e) => {
                                         console.error("Image failed to load:", q.image_url);
                                         e.currentTarget.style.display = 'none';
@@ -354,13 +354,13 @@ export default function AdminReviewPage({ params }: { params: Promise<{ batchId:
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {(["a", "b", "c", "d"] as const).map(opt => (
-                                <div key={opt} className={`p-4 rounded-2xl border ${q.correct_option === opt.toUpperCase() ? "bg-emerald-50 border-emerald-200 text-emerald-900" : "bg-gray-50 border-surface-border text-gray-600 dark:text-gray-400"}`}>
+                                <div key={opt} className={`p-4 rounded-2xl border ${q.correct_option === opt.toUpperCase() ? "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-300" : "bg-gray-50 dark:bg-slate-900/60 border-surface-border text-gray-600 dark:text-gray-400"}`}>
                                     <p className="text-[9px] font-black uppercase tracking-[0.2em] mb-1 opacity-50">Option {opt.toUpperCase()}</p>
                                     {editingId === q.id ? (
                                         <input
                                             value={editForm[`option_${opt}` as keyof StagingQuestion] as string}
                                             onChange={e => setEditForm(prev => ({ ...prev, [`option_${opt}`]: e.target.value }))}
-                                            className="w-full bg-transparent border-b border-gray-200 focus:border-primary-500 focus:outline-none font-bold"
+                                            className="w-full bg-transparent border-b border-gray-200 dark:border-slate-700 focus:border-primary-500 focus:outline-none font-bold"
                                         />
                                     ) : (
                                         <p className="font-bold">{q[`option_${opt}` as keyof StagingQuestion]}</p>

@@ -319,7 +319,7 @@ export default function AdminReportsPage() {
                                                         question_text: e.target.value,
                                                     }))
                                                 }
-                                                className="w-full p-3 rounded-lg border border-gray-200 text-sm min-h-[80px]"
+                                                className="theme-input w-full p-3 rounded-lg text-sm min-h-[80px]"
                                             />
                                             {(["a", "b", "c", "d"] as const).map((l) => (
                                                 <input
@@ -336,7 +336,7 @@ export default function AdminReportsPage() {
                                                         }))
                                                     }
                                                     placeholder={`Option ${l.toUpperCase()}`}
-                                                    className="w-full p-2 rounded-lg border border-gray-200 text-sm"
+                                                    className="theme-input w-full p-2 rounded-lg text-sm"
                                                 />
                                             ))}
                                             <select
@@ -347,7 +347,7 @@ export default function AdminReportsPage() {
                                                         correct_option: e.target.value,
                                                     }))
                                                 }
-                                                className="w-full p-2 rounded-lg border border-gray-200 text-sm"
+                                                className="theme-input w-full p-2 rounded-lg text-sm"
                                             >
                                                 {["A", "B", "C", "D"].map((o) => (
                                                     <option key={o} value={o}>
@@ -396,7 +396,7 @@ export default function AdminReportsPage() {
                                                 type="button"
                                                 onClick={() => handleReportAction("dismiss")}
                                                 disabled={actionLoading}
-                                                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 text-gray-700 dark:text-gray-300 text-sm font-medium disabled:opacity-50"
+                                                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 text-sm font-medium disabled:opacity-50"
                                             >
                                                 <XCircle className="w-4 h-4" />
                                                 Dismiss

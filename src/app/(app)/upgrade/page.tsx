@@ -324,14 +324,14 @@ function UpgradePageContent() {
                             {!showManualFallback ? null : (
                             <>
                             {/* Payment Instruction */}
-                            <div className="bg-primary-50 border border-primary-100 p-6 rounded-4xl space-y-4">
+                            <div className="bg-primary-50 dark:bg-primary-950/20 border border-primary-100 dark:border-primary-900/30 p-6 rounded-4xl space-y-4">
                                 <div className="flex items-center gap-3">
                                     <CreditCard className="w-5 h-5 text-primary-600" />
                                     <span className="text-[10px] font-black uppercase tracking-widest text-primary-600">Payment Protocol</span>
                                 </div>
                                 <div className="space-y-2">
                                     <p className="text-sm font-bold text-gray-700 dark:text-gray-300 italic">Please send <span className="text-primary-600">Rs. 2500</span> to:</p>
-                                    <div className="p-4 bg-surface rounded-xl border border-primary-200">
+                                    <div className="p-4 bg-surface rounded-xl border border-primary-200 dark:border-primary-900/40">
                                         <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">JazzCash / Nayapay</p>
                                         <p className="text-lg font-black text-gray-900 dark:text-gray-100 tracking-tight">03035116528</p>
                                         <p className="text-[9px] font-bold text-gray-400 mt-1 uppercase">Account Title: Adil Salman Butt</p>
@@ -348,7 +348,7 @@ function UpgradePageContent() {
                                         value={transactionId}
                                         onChange={(e) => setTransactionId(e.target.value)}
                                         placeholder="Enter the 10-12 digit ID"
-                                        className={`w-full px-6 py-4 rounded-2xl bg-gray-50 border placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-surface transition-all font-bold text-gray-900 dark:text-gray-100 italic ${autoTransactionId ? "border-emerald-300 bg-emerald-50/50" : "border-gray-100"}`}
+                                        className={`w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-slate-950/50 border placeholder:text-gray-300 dark:placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-surface transition-all font-bold text-gray-900 dark:text-gray-100 italic ${autoTransactionId ? "border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20" : "border-gray-100 dark:border-slate-800"}`}
                                     />
                                     {autoTransactionId && (
                                         <p className="text-[9px] text-emerald-600 font-bold uppercase tracking-widest">
@@ -361,15 +361,15 @@ function UpgradePageContent() {
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Screenshot Evidence</label>
                                     <div
                                         onClick={() => document.getElementById('screenshot-upload')?.click()}
-                                        className={`border-2 border-dashed rounded-4xl p-10 text-center cursor-pointer transition-all ${screenshot ? "border-emerald-500 bg-emerald-50" : "border-surface-border bg-gray-50 hover:bg-surface hover:border-primary-300"}`}
+                                        className={`border-2 border-dashed rounded-4xl p-10 text-center cursor-pointer transition-all ${screenshot ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20" : "border-surface-border bg-gray-50 dark:bg-slate-900/60 hover:bg-surface hover:border-primary-300"}`}
                                     >
                                         <input type="file" id="screenshot-upload" className="hidden" accept="image/*" onChange={handleFileChange} />
                                         {screenshot ? (
                                             <div className="flex flex-col items-center gap-2">
                                                 <div className="w-12 h-12 bg-emerald-500 text-white rounded-2xl flex items-center justify-center shadow-lg"><Check className="w-6 h-6" /></div>
-                                                <p className="text-xs font-black text-emerald-900 italic truncate w-full px-4">{screenshot.name}</p>
+                                                <p className="text-xs font-black text-emerald-900 dark:text-emerald-300 italic truncate w-full px-4">{screenshot.name}</p>
                                                 {(parsedTitle || parsedYear) && (
-                                                    <div className="text-[9px] text-emerald-700 font-bold uppercase tracking-widest bg-emerald-100 px-2 py-1 rounded-lg">
+                                                    <div className="text-[9px] text-emerald-700 dark:text-emerald-400 font-bold uppercase tracking-widest bg-emerald-100 dark:bg-emerald-950/40 px-2 py-1 rounded-lg">
                                                         {parsedTitle && <span>Title: {parsedTitle}</span>}
                                                         {parsedTitle && parsedYear && <span> • </span>}
                                                         {parsedYear && <span>Year: {parsedYear}</span>}

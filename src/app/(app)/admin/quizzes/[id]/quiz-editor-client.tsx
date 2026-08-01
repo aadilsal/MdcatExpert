@@ -241,7 +241,7 @@ export default function QuizEditorClient({
                                             <button
                                                 type="button"
                                                 onClick={() => startEdit(question)}
-                                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50"
+                                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800"
                                             >
                                                 <Edit3 className="w-3.5 h-3.5" />
                                                 Edit
