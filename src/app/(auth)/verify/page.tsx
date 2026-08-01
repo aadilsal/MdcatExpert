@@ -6,6 +6,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { sendOtpEmailAction } from "../signup/actions";
 import { clearMeClientCache } from "@/lib/me-client-cache";
+import { formatUserError } from "@/lib/format-user-error";
 import { LoadingButton } from "@/components/loading-button";
 import { RefreshCw, Mail } from "lucide-react";
 import Swal from "sweetalert2";
@@ -87,12 +88,12 @@ export default function VerifyPage() {
                 showConfirmButton: false,
             });
             router.replace("/dashboard");
-        } catch (err: any) {
+        } catch (err) {
             console.error(err);
             Swal.fire({
                 icon: "error",
                 title: "Verification failed",
-                text: err?.message || "Incorrect verification code.",
+                text: formatUserError(err, "Incorrect verification code."),
             });
         } finally {
             setVerifying(false);

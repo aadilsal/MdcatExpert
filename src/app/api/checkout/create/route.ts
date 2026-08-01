@@ -41,10 +41,6 @@ export async function POST() {
       mode: "payment",
       currency: "PKR",
       amount: amountInPaisa,
-      metadata: {
-        userId: user._id,
-        product: "elite_season_pass",
-      },
     });
     const trackerToken: string | undefined = session?.data?.tracker?.token;
     if (!trackerToken) {

@@ -62,6 +62,12 @@ const ERROR_MESSAGES: Record<string, string> = {
   // Profile
   "Password change is not available yet. Use password reset from login.":
     "Password change isn't available yet. Use the forgot-password option on the login page.",
+
+  // Email verification (OTP)
+  "Incorrect verification code.": "Incorrect verification code.",
+  "Verification code has expired. Please request a new one.":
+    "This code has expired. Please request a new one.",
+  "No active OTP request found.": "No active verification code found. Please request a new one.",
 };
 
 const MESSAGE_KEYS_BY_LENGTH = Object.keys(ERROR_MESSAGES).sort(
