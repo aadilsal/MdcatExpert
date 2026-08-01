@@ -63,12 +63,10 @@ export default function SignupPage() {
                             formData.set("flow", "signUp");
                             await signIn("password", formData);
 
-                            // Send welcome email in background
-                            try {
-                                await sendWelcomeEmailAction(email, name);
-                            } catch (emailErr) {
+                            // Fire the welcome email without blocking navigation on it.
+                            sendWelcomeEmailAction(email, name).catch((emailErr) => {
                                 console.error("Welcome email failed asynchronously:", emailErr);
-                            }
+                            });
 
                             const trimmedPromo = promoCode.trim();
                             if (trimmedPromo) {
@@ -86,19 +84,21 @@ export default function SignupPage() {
                                             "Invalid promo code.",
                                         ),
                                     );
+                                    setIsPending(false);
                                     return;
                                 }
 
                                 router.push("/dashboard");
-                                router.refresh();
                                 return;
                             }
 
                             router.push(goElite ? "/signup-payment" : "/dashboard");
-                            router.refresh();
+                            // isPending stays true (keeps the button disabled/loading) until
+                            // the navigation unmounts this form. Resetting it here — or calling
+                            // router.refresh() right after push() — used to race the pending
+                            // client-side transition and could leave the user stuck on this page.
                         } catch (err) {
                             setError(formatUserError(err, "Signup failed. Please try again."));
-                        } finally {
                             setIsPending(false);
                         }
                     }}

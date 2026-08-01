@@ -88,7 +88,9 @@ function ResetPasswordForm() {
                             formData.set("flow", "reset-verification");
                             await signIn("password", formData);
                             router.push("/dashboard");
-                            router.refresh();
+                            // isPending stays true until navigation unmounts this form — see
+                            // signup/login pages for why resetting it (or calling
+                            // router.refresh() right after push()) is unsafe here.
                         } catch (err) {
                             setError(
                                 formatUserError(
@@ -96,7 +98,6 @@ function ResetPasswordForm() {
                                     "Could not reset password. Check your code and try again.",
                                 ),
                             );
-                        } finally {
                             setIsPending(false);
                         }
                     }}

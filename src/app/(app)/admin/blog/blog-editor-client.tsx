@@ -123,10 +123,11 @@ export default function BlogEditorClient({ postId, initial }: BlogEditorClientPr
       } else {
         router.push("/admin/blog");
       }
-      router.refresh();
+      // saving stays true until navigation unmounts this form — resetting it here
+      // (or calling router.refresh() right after push()) can race the pending
+      // client-side transition and leave the button re-enabled mid-navigation.
     } catch (e) {
       setError(formatUserError(e, "Failed to save post."));
-    } finally {
       setSaving(false);
     }
   };

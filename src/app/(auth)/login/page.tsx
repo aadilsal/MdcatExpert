@@ -48,10 +48,12 @@ export default function LoginPage() {
                             formData.set("flow", "signIn");
                             await signIn("password", formData);
                             router.push("/dashboard");
-                            router.refresh();
+                            // isPending stays true until navigation unmounts this form — resetting
+                            // it here (or calling router.refresh() right after push()) used to race
+                            // the pending client-side transition and could leave the button
+                            // re-enabled while the page never actually navigated.
                         } catch (err) {
                             setError(formatUserError(err, "Incorrect email or password."));
-                        } finally {
                             setIsPending(false);
                         }
                     }}

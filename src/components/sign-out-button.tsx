@@ -22,7 +22,6 @@ export default function SignOutButton() {
         }
         clearMeClientCache();
         router.push("/login");
-        router.refresh();
     };
     return (
         <LoadingButton
