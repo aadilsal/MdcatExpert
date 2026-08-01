@@ -125,7 +125,7 @@ export default function VerifyPage() {
                             value={otpCode}
                             onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
                             placeholder="000000"
-                            className="w-full text-center tracking-[1.5rem] pl-6 py-5 rounded-2xl bg-gray-50 dark:bg-slate-950 border border-gray-100 dark:border-slate-800 font-black text-2xl placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-white transition-all text-gray-900 dark:text-white"
+                            className="w-full text-center tracking-[1.5rem] pl-6 py-5 rounded-2xl bg-gray-50 dark:bg-slate-950 border border-gray-100 dark:border-slate-800 font-black text-2xl placeholder:text-gray-300 dark:placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:bg-white dark:focus:bg-slate-950 transition-all text-gray-900 dark:text-white"
                         />
                     </div>
 
