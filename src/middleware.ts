@@ -21,9 +21,15 @@ const isPublicPath = createRouteMatcher([
   "/blog(.*)",
 ]);
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
+// Server-to-server callbacks that never carry a user session cookie. These
+// must bypass the auth redirect entirely, or Safepay's webhook (and any
+// future gateway) gets redirected to /login and the payment silently never
+// confirms.
+const isWebhookRoute = createRouteMatcher(["/api/webhooks(.*)"]);
 const isProtectedRoute = (req: NextRequest) =>
   !isPublicPath(req) &&
   !isAuthPage(req) &&
+  !isWebhookRoute(req) &&
   // Let Convex Auth proxy its own endpoint via middleware.
   !(new URL(req.url).pathname.startsWith("/api/auth"));
 

@@ -47,6 +47,46 @@ const adminNav = [
     { href: "/admin/discounts", label: "Discount Codes", icon: Ticket },
 ];
 
+const FRIENDLY_LABELS: Record<string, string> = {
+    dashboard: "Overview",
+    quizzes: "Quizzes",
+    quiz: "Quiz Attempt",
+    copilot: "Study Copilot",
+    flashcards: "Flashcards",
+    analytics: "Analytics",
+    login: "Overview",
+    upgrade: "Upgrade",
+    admin: "Control Center",
+    students: "Students",
+    payments: "Payments",
+    discounts: "Discount Codes",
+    reports: "Question Reports",
+    upload: "Upload Quiz",
+    "study-library": "Study Library",
+    blog: "Blog",
+};
+
+// Convex document IDs are long, mostly-lowercase base32-ish strings (25+ chars,
+// no spaces) — that's distinct enough from any real route segment to detect
+// and avoid ever showing a raw database ID in the breadcrumb.
+function looksLikeDatabaseId(segment: string) {
+    return segment.length >= 20 && /^[a-z0-9]+$/i.test(segment);
+}
+
+function getBreadcrumbLabel(pathname: string) {
+    const segments = pathname.split("/").filter(Boolean);
+    const last = segments[segments.length - 1];
+    if (!last) return "Overview";
+
+    if (looksLikeDatabaseId(last)) {
+        // Prefer the parent segment's friendly label (e.g. /quiz/<id> -> "Quiz Attempt").
+        const parent = segments[segments.length - 2];
+        return FRIENDLY_LABELS[parent] || FRIENDLY_LABELS[last] || "Details";
+    }
+
+    return FRIENDLY_LABELS[last] || last.replace(/-/g, " ");
+}
+
 export default function AppLayout({
     children,
 }: {
@@ -227,7 +267,7 @@ export default function AppLayout({
                             <span className="text-xs font-black text-gray-300 dark:text-slate-600 uppercase tracking-widest">Workspace</span>
                             <ChevronRight className="w-3 h-3 text-gray-300 dark:text-slate-500" />
                             <span className="text-xs font-black text-primary-600 dark:text-primary-400 uppercase tracking-widest">
-                                {pathname === "/dashboard" ? "Overview" : pathname.split("/").pop()?.replace("-", " ")}
+                                {getBreadcrumbLabel(pathname)}
                             </span>
                         </div>
                     </div>

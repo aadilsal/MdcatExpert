@@ -147,15 +147,19 @@ export default function QuizPage({
         currentIndexRef.current = currentIndex;
     }, [currentIndex, questions]);
 
-    const formatTime = (seconds: number) => {
-        const hrs = Math.floor(seconds / 3600);
-        const mins = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
-        if (hrs > 0) {
-            return `${hrs}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-        }
-        return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-    };
+    // Warn before an accidental tab close / navigation mid-quiz — losing 20-200
+    // answered questions to a stray back-button tap was a real risk with no
+    // guard at all before this.
+    useEffect(() => {
+        if (loading || selectedLimit === null || submitting) return;
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (Object.keys(selectedAnswers).length === 0) return;
+            e.preventDefault();
+            e.returnValue = "";
+        };
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    }, [loading, selectedLimit, submitting, selectedAnswers]);
 
     const selectOption = useCallback(
         (questionId: string, optionLabel: string) => {
@@ -166,6 +170,47 @@ export default function QuizPage({
         },
         []
     );
+
+    // Keyboard shortcuts: 1-4 / A-D to select an option, arrow keys to move
+    // between questions. Timed MDCAT practice rewards not reaching for the
+    // mouse for every single answer.
+    useEffect(() => {
+        if (loading || selectedLimit === null || !questions[currentIndex]) return;
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement | null;
+            if (target && ["INPUT", "TEXTAREA"].includes(target.tagName)) return;
+
+            const key = e.key.toUpperCase();
+            const optionMap: Record<string, "A" | "B" | "C" | "D"> = {
+                "1": "A", "2": "B", "3": "C", "4": "D",
+                A: "A", B: "B", C: "C", D: "D",
+            };
+            if (optionMap[key]) {
+                e.preventDefault();
+                selectOption(questions[currentIndex].id, optionMap[key]);
+                return;
+            }
+            if (key === "ARROWRIGHT" || key === "N") {
+                e.preventDefault();
+                setCurrentIndex((i) => Math.min(questions.length - 1, i + 1));
+            } else if (key === "ARROWLEFT" || key === "P") {
+                e.preventDefault();
+                setCurrentIndex((i) => Math.max(0, i - 1));
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [loading, selectedLimit, questions, currentIndex, selectOption]);
+
+    const formatTime = (seconds: number) => {
+        const hrs = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        if (hrs > 0) {
+            return `${hrs}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+        }
+        return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    };
 
     const toggleFlag = (questionId: string) => {
         setFlaggedQuestions(prev => {
@@ -570,6 +615,9 @@ export default function QuizPage({
                                 <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
                                     <div className="w-3 h-3 rounded bg-primary-600" /> Active
                                 </div>
+                                <div className="pt-3 mt-3 border-t border-surface-border dark:border-slate-800 text-[9px] font-bold text-gray-300 dark:text-slate-600 leading-relaxed">
+                                    Shortcuts: <span className="font-mono">1-4</span> select · <span className="font-mono">&larr; &rarr;</span> navigate
+                                </div>
                             </div>
                         </motion.aside>
                     )}
@@ -761,6 +809,23 @@ export default function QuizPage({
                                     <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-amber-500">Flagged</span>
                                     <span className="font-black text-amber-600 italic">{flaggedQuestions.size}</span>
                                 </div>
+                                {answeredCount < questions.length && (
+                                    <button
+                                        onClick={() => {
+                                            const firstUnanswered = questions.findIndex((q) => !selectedAnswers[q.id]);
+                                            if (firstUnanswered !== -1) {
+                                                setCurrentIndex(firstUnanswered);
+                                                setShowConfirm(false);
+                                            }
+                                        }}
+                                        className="w-full bg-red-50 rounded-2xl p-4 flex items-center justify-between text-left hover:bg-red-100 transition-colors"
+                                    >
+                                        <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-red-500">
+                                            {questions.length - answeredCount} Unanswered
+                                        </span>
+                                        <span className="text-[9px] sm:text-[10px] font-black text-red-600 uppercase tracking-widest">Jump to first &rarr;</span>
+                                    </button>
+                                )}
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">

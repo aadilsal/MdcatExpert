@@ -589,62 +589,46 @@ export default function LandingClient({
           
           <div className="text-center mb-20 space-y-3">
             <span className="px-3 py-1 bg-primary-50 dark:bg-primary-950/40 border border-primary-100 dark:border-primary-900/30 rounded-full text-[10px] font-black text-primary-700 dark:text-primary-300 uppercase tracking-widest">
-              Success Stories
+              Built For MDCAT 2027
             </span>
             <h2 className="text-3xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight">
-              Trusted by <span className="text-gradient-primary">Top Medical Aspirants</span>
+              Built for <span className="text-gradient-primary">Self-Studying Aspirants</span>
             </h2>
             <p className="text-gray-500 dark:text-gray-400 font-medium max-w-xl mx-auto text-sm">
-              See how MdcatXpert helped students secure seats in Pakistan&apos;s most competitive medical colleges.
+              No paid actors, no borrowed reviews — just what the platform actually does today.
             </p>
           </div>
 
+          {/* NOTE: this section previously showed fabricated named testimonials with
+              invented scores and college placements. Removed — the platform has no
+              verified student outcomes yet, and publishing fake social proof is both
+              dishonest and a real trust/reputational risk once discovered. Replace
+              this section with real testimonials as they come in. */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                quote: "I secured 191/200 and got admission into King Edward Medical University. The AI Weakness Radar showed me exactly what to study in the last 2 weeks.",
-                author: "Ayesha Khan",
-                city: "Lahore",
-                college: "KEMU '26",
-                score: "191/200"
+                title: "100% Verified Past Papers",
+                desc: "Every question is sourced from real UHS, SZABMU, DUHS and ETEA past papers — cross-checked against official boards, not scraped or AI-generated.",
               },
               {
-                quote: "The Mistake Analyzer was a game-changer. I used to make the same errors in Physics, but MdcatXpert corrected my conceptual gaps. Scored 184/200.",
-                author: "Bilal Ahmed",
-                city: "Karachi",
-                college: "Dow Medical College",
-                score: "184/200"
+                title: "Instant, Honest Explanations",
+                desc: "Every wrong answer gets an AI-written explanation of the underlying misconception, not just the correct option.",
               },
               {
-                quote: "We struggled to find real past papers that weren't full of typos. MdcatXpert's verified archives saved us months of prep time.",
-                author: "Zainab Bilal",
-                city: "Peshawar",
-                college: "Khyber Medical College",
-                score: "182/200"
-              }
+                title: "Free to Start, No Card Needed",
+                desc: "Take real past-paper quizzes on the free tier before deciding whether Elite is worth it for you.",
+              },
             ].map((t) => (
-              <div key={t.author} className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl p-8 shadow-xs flex flex-col justify-between relative overflow-hidden">
+              <div key={t.title} className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl p-8 shadow-xs flex flex-col justify-between relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-5">
                   <Star className="w-24 h-24 text-gray-900 dark:text-white" />
                 </div>
-                
-                <div className="space-y-4">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />)}
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 font-medium leading-relaxed italic relative z-10">
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-                </div>
 
-                <div className="border-t border-gray-50 dark:border-slate-800 pt-5 mt-6 flex items-center justify-between">
-                  <div>
-                    <h5 className="font-black text-sm text-gray-900 dark:text-white">{t.author}</h5>
-                    <p className="text-[10px] text-gray-400 dark:text-gray-400 font-bold uppercase tracking-widest">{t.college}</p>
-                  </div>
-                  <span className="px-2.5 py-1 bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 text-[10px] font-black uppercase rounded-lg border border-primary-100 dark:border-primary-900/30">
-                    {t.score}
-                  </span>
+                <div className="space-y-4">
+                  <h5 className="font-black text-lg text-gray-900 dark:text-white relative z-10">{t.title}</h5>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 font-medium leading-relaxed relative z-10">
+                    {t.desc}
+                  </p>
                 </div>
               </div>
             ))}

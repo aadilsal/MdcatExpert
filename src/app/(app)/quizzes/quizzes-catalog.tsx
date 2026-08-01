@@ -205,14 +205,24 @@ export function QuizzesCatalog({
                                             {quiz.title}
                                         </h3>
                                         <div className="flex items-center gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
-                                            <span className="flex items-center gap-1.5 text-primary-500">
-                                                <Hash className="w-3.5 h-3.5" />
-                                                {quiz.subject}
-                                            </span>
+                                            {/* "General" means this paper spans multiple subjects (a full past
+                                                paper) rather than being a data-entry gap — showing it as a subject
+                                                pill was misleading, since it isn't actually one subject. */}
+                                            {quiz.subject !== "General" && (
+                                                <span className="flex items-center gap-1.5 text-primary-500">
+                                                    <Hash className="w-3.5 h-3.5" />
+                                                    {quiz.subject}
+                                                </span>
+                                            )}
                                             <span className="flex items-center gap-1.5">
                                                 <Hash className="w-3.5 h-3.5" />
                                                 {quiz.totalQuestions} Qs
                                             </span>
+                                            {quiz.subject === "General" && (
+                                                <span className="text-gray-300 dark:text-slate-600 normal-case font-medium tracking-normal">
+                                                    Full mixed-subject paper
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
 
@@ -249,7 +259,7 @@ export function QuizzesCatalog({
                     <div>
                         <h4 className="font-black text-emerald-900 uppercase tracking-widest text-[10px] mb-1">Consistency Edge</h4>
                         <p className="font-bold text-emerald-800 text-sm leading-tight">
-                            Users who practice daily see a 24% score increase.
+                            Daily practice compounds — a short streak beats one long cram session.
                         </p>
                     </div>
                 </div>

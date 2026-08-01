@@ -60,23 +60,27 @@ export default async function StudentDashboardPage() {
         redirect("/login");
     }
 
-    const [attemptsRaw, subjectStats, incorrectQuestions] = await Promise.all([
+    const [attemptsRaw, subjectStats, incorrectQuestions, paymentRequests] = await Promise.all([
         fetchQuery(api.attempts.getUserAttempts, { userId: user._id as Id<"users"> }, { token }),
         fetchQuery(api.attempts.getSubjectPerformance, { userId: user._id as Id<"users"> }, { token }),
         fetchQuery(api.attempts.getIncorrectQuestions, {}, { token }),
+        fetchQuery(api.payments.getUserPaymentRequests, { userId: user._id as Id<"users"> }, { token }),
     ]);
 
     const attempts = (attemptsRaw ?? []) as Attempt[];
     const subjectStatsList = (subjectStats ?? []) as SubjectPerformance[];
     const incorrectCount = (incorrectQuestions ?? []).length;
+    const pendingPayment = (paymentRequests ?? [])
+        .filter((r: { status: string }) => r.status === "pending")
+        .sort((a: { createdAt: number }, b: { createdAt: number }) => b.createdAt - a.createdAt)[0] ?? null;
 
     const userName = user.name || "Student";
     const subscriptionType = user.subscriptionType || "free";
     const topperRank = (user as any).topperRank ?? null;
     const hasClaimedWeeklyReward = (user as any).hasClaimedWeeklyReward ?? false;
-    const premiumUntil = user.premiumUntil ? String(user.premiumUntil) : null;
-    const hasPendingPayment = false;
-    const pendingPaymentId = null;
+    const premiumUntil = user.premiumUntil ?? null;
+    const hasPendingPayment = pendingPayment !== null && pendingPayment !== undefined;
+    const pendingPaymentId = pendingPayment?._id ?? null;
 
     const totalAttempts = attempts.length;
     const avgScore =
@@ -102,6 +106,7 @@ export default async function StudentDashboardPage() {
                 premiumUntil={premiumUntil}
                 hasPendingPayment={hasPendingPayment}
                 paymentRequestId={pendingPaymentId ?? undefined}
+                renewalRemindersEnabled={(user as { renewalRemindersEnabled?: boolean }).renewalRemindersEnabled}
             />
 
             <DailyStreakTracker />

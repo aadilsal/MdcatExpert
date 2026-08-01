@@ -32,6 +32,28 @@ function UpgradePageContent() {
     const [parsedTitle, setParsedTitle] = useState<string>("");
     const [parsedYear, setParsedYear] = useState<string>("");
     const [autoTransactionId, setAutoTransactionId] = useState<string>("");
+    const [showManualFallback, setShowManualFallback] = useState(false);
+    const [checkoutLoading, setCheckoutLoading] = useState(false);
+    const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+    const handleSecureCheckout = async () => {
+        setCheckoutLoading(true);
+        setCheckoutError(null);
+        try {
+            trackEvent(ANALYTICS_EVENTS.PAYMENT_SUBMITTED, { method: "safepay" });
+            const res = await fetch("/api/checkout/create", { method: "POST" });
+            const json = await res.json();
+            if (!res.ok || !json.url) {
+                throw new Error(json?.error || "Unable to start checkout.");
+            }
+            window.location.href = json.url;
+        } catch (error) {
+            setCheckoutError(
+                formatUserError(error, "Secure checkout isn't available right now — try the manual option below.")
+            );
+            setCheckoutLoading(false);
+        }
+    };
 
     useEffect(() => {
         trackEvent(ANALYTICS_EVENTS.UPGRADE_PAGE_VIEW, reason ? { reason } : undefined);
@@ -267,9 +289,40 @@ function UpgradePageContent() {
                             <ChevronRight className="w-3 h-3 rotate-180" /> Back to Plans
                         </button>
 
-                        <h2 className="text-3xl font-black text-gray-900 dark:text-gray-100 italic mb-8 tracking-tighter">Manual Checkout.</h2>
+                        <h2 className="text-3xl font-black text-gray-900 dark:text-gray-100 italic mb-8 tracking-tighter">Checkout.</h2>
 
                         <div className="space-y-8">
+                            {/* Automated checkout — primary path */}
+                            <div className="bg-black text-white p-6 rounded-4xl space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <Shield className="w-5 h-5 text-primary-500" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-primary-400">Secure Instant Checkout</span>
+                                </div>
+                                <p className="text-sm font-bold text-white/70 italic">
+                                    Pay by card, JazzCash, or Easypaisa. Your access activates instantly — no waiting for manual review.
+                                </p>
+                                <LoadingButton
+                                    onClick={handleSecureCheckout}
+                                    loading={checkoutLoading}
+                                    className="w-full py-6 bg-primary-600 text-white font-black rounded-3xl uppercase tracking-widest text-xs hover:bg-primary-500 transition-all shadow-xl shadow-primary-600/30 flex items-center justify-center gap-3"
+                                >
+                                    <CreditCard className="w-4 h-4" />
+                                    Pay Rs. 2500 Securely
+                                </LoadingButton>
+                                {checkoutError && (
+                                    <p className="text-[11px] font-bold text-red-400 text-center">{checkoutError}</p>
+                                )}
+                            </div>
+
+                            <button
+                                onClick={() => setShowManualFallback((v) => !v)}
+                                className="w-full text-center text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                            >
+                                {showManualFallback ? "Hide manual bank transfer option" : "Prefer a manual bank transfer instead?"}
+                            </button>
+
+                            {!showManualFallback ? null : (
+                            <>
                             {/* Payment Instruction */}
                             <div className="bg-primary-50 border border-primary-100 p-6 rounded-4xl space-y-4">
                                 <div className="flex items-center gap-3">
@@ -346,6 +399,8 @@ function UpgradePageContent() {
                                     <Clock className="w-3 h-3" /> Activation in 1-2 Hours
                                 </div>
                             </div>
+                            </>
+                            )}
                         </div>
                     </motion.div>
                 )}

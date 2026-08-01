@@ -24,8 +24,10 @@ import type * as blogData_types from "../blogData/types.js";
 import type * as blogPosts from "../blogPosts.js";
 import type * as copilot from "../copilot.js";
 import type * as copilotAccess from "../copilotAccess.js";
+import type * as crons from "../crons.js";
 import type * as documentChunks from "../documentChunks.js";
 import type * as files from "../files.js";
+import type * as gatewayPayments from "../gatewayPayments.js";
 import type * as http from "../http.js";
 import type * as ingestDocument from "../ingestDocument.js";
 import type * as leaderboard from "../leaderboard.js";
@@ -48,6 +50,7 @@ import type * as seedBlogPostsData from "../seedBlogPostsData.js";
 import type * as seedLibrary from "../seedLibrary.js";
 import type * as staging from "../staging.js";
 import type * as studySources from "../studySources.js";
+import type * as subscriptionReminders from "../subscriptionReminders.js";
 import type * as users from "../users.js";
 
 import type {
@@ -73,8 +76,10 @@ declare const fullApi: ApiFromModules<{
   blogPosts: typeof blogPosts;
   copilot: typeof copilot;
   copilotAccess: typeof copilotAccess;
+  crons: typeof crons;
   documentChunks: typeof documentChunks;
   files: typeof files;
+  gatewayPayments: typeof gatewayPayments;
   http: typeof http;
   ingestDocument: typeof ingestDocument;
   leaderboard: typeof leaderboard;
@@ -97,6 +102,7 @@ declare const fullApi: ApiFromModules<{
   seedLibrary: typeof seedLibrary;
   staging: typeof staging;
   studySources: typeof studySources;
+  subscriptionReminders: typeof subscriptionReminders;
   users: typeof users;
 }>;
 

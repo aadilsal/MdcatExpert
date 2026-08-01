@@ -1,18 +1,60 @@
-import { Clock, CheckCircle, AlertCircle, Sparkles } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { useMutation } from "convex/react";
+import { Clock, CheckCircle, AlertCircle, Sparkles, Bell, BellOff } from "lucide-react";
 import Link from "next/link";
+import { api } from "../../convex/_generated/api";
 
 interface SubscriptionStatusBannerProps {
     subscriptionType: "free" | "premium";
-    premiumUntil?: string | null;
+    /** Epoch milliseconds. Convex stores this as a number — never stringify it before passing it in. */
+    premiumUntil?: number | null;
     hasPendingPayment?: boolean;
     paymentRequestId?: string;
+    /** Defaults to true server-side when unset — reminders are opt-out, not opt-in. */
+    renewalRemindersEnabled?: boolean;
+}
+
+function RenewalReminderToggle({ initialEnabled }: { initialEnabled: boolean }) {
+    const setRenewalRemindersEnabled = useMutation(api.users.setRenewalRemindersEnabled);
+    const [enabled, setEnabled] = useState(initialEnabled);
+    const [saving, setSaving] = useState(false);
+
+    const toggle = async () => {
+        const next = !enabled;
+        setEnabled(next); // optimistic
+        setSaving(true);
+        try {
+            await setRenewalRemindersEnabled({ enabled: next });
+        } catch {
+            setEnabled(!next); // revert on failure
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <button
+            onClick={toggle}
+            disabled={saving}
+            className="mt-3 flex items-center gap-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:text-emerald-900 dark:hover:text-emerald-100 transition-colors disabled:opacity-50"
+            title={enabled ? "You'll get an email before this expires — click to turn off" : "You won't be emailed before this expires — click to turn on"}
+        >
+            {enabled ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
+            <span className="underline decoration-dotted underline-offset-2">
+                Renewal reminder emails: {enabled ? "On" : "Off"}
+            </span>
+        </button>
+    );
 }
 
 export default function SubscriptionStatusBanner({
     subscriptionType,
     premiumUntil,
     hasPendingPayment,
-    paymentRequestId
+    paymentRequestId,
+    renewalRemindersEnabled
 }: SubscriptionStatusBannerProps) {
     if (subscriptionType === "premium" && !hasPendingPayment) {
         return (
@@ -25,11 +67,18 @@ export default function SubscriptionStatusBanner({
                     <p className="text-sm text-emerald-700 dark:text-emerald-300 mt-1">
                         You have full access to all Elite features and AI-powered tools.
                     </p>
-                    {premiumUntil && (
+                    {premiumUntil && !Number.isNaN(new Date(premiumUntil).getTime()) && (
                         <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2 font-semibold">
-                            Access until {new Date(premiumUntil).toLocaleDateString()}
+                            Access until{" "}
+                            {new Date(premiumUntil).toLocaleDateString("en-PK", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                            })}
                         </p>
                     )}
+                    {/* No auto-renewal — this is the actual "cancel anytime" control. */}
+                    <RenewalReminderToggle initialEnabled={renewalRemindersEnabled !== false} />
                 </div>
             </div>
         );

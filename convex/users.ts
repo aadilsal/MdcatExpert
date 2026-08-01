@@ -198,6 +198,24 @@ export const updateProfile = mutation({
   },
 });
 
+// Lets a signed-in user opt in/out of the "your Elite access is expiring /
+// has expired" renewal emails (convex/subscriptionReminders.ts). There's no
+// auto-renewal to "cancel" — this is the actual cancel-anytime control.
+// Identity is derived server-side, never taken as an argument.
+export const setRenewalRemindersEnabled = mutation({
+  args: {
+    enabled: v.boolean(),
+  },
+  handler: async (ctx, { enabled }) => {
+    const me = await getAuthUserId(ctx);
+    if (!me) {
+      throw new Error("Unauthorized");
+    }
+    await ctx.db.patch(me, { renewalRemindersEnabled: enabled });
+    return null;
+  },
+});
+
 export const setSubscription = mutation({
   args: {
     userId: v.id("users"),

@@ -29,8 +29,13 @@ export default function LeaderboardWidget() {
       </div>
 
       {leaderboard.length === 0 ? (
-        <div className="py-8 text-center text-xs text-gray-400 font-bold uppercase">
-          Calculating rank positions...
+        <div className="py-8 text-center">
+          <p className="text-xs text-gray-400 font-bold uppercase">
+            No ranked activity yet this week
+          </p>
+          <p className="text-[11px] text-gray-400 mt-1 normal-case">
+            Solve a quiz today to claim the #1 spot.
+          </p>
         </div>
       ) : (
         <div className="space-y-4">

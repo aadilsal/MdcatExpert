@@ -26,9 +26,18 @@ export default defineSchema({
     otpCode: v.optional(v.string()),
     otpExpiry: v.optional(v.number()),
     lastClaimedTopperWeek: v.optional(v.string()),
+
+    // Subscription renewal reminders (no auto-renewal — one-time Safepay
+    // payments only). Both fields store the `premiumUntil` value the email
+    // was sent for, so a renewal (new premiumUntil) naturally re-arms both
+    // reminders for the next cycle without any extra reset logic.
+    renewalRemindersEnabled: v.optional(v.boolean()),
+    premiumReminderSentForExpiry: v.optional(v.number()),
+    premiumExpiredNoticeSentForExpiry: v.optional(v.number()),
   })
     .index("by_email", ["email"])
-    .index("by_role", ["role"]),
+    .index("by_role", ["role"])
+    .index("by_subscriptionType", ["subscriptionType"]),
 
   quizzes: defineTable({
     title: v.string(),
@@ -150,6 +159,28 @@ export default defineSchema({
   })
     .index("by_userId", ["userId"])
     .index("by_status", ["status"]),
+
+  // Automated Safepay checkout sessions. One row per attempted payment.
+  // Replaces the manual screenshot-review flow (paymentRequests, above,
+  // is kept for the legacy/fallback bank-transfer option and historical
+  // records) with instant, gateway-confirmed activation.
+  gatewayOrders: defineTable({
+    userId: v.id("users"),
+    provider: v.literal("safepay"),
+    trackerToken: v.string(),
+    amount: v.number(),
+    currency: v.string(),
+    status: v.union(
+      v.literal("created"),
+      v.literal("succeeded"),
+      v.literal("failed"),
+    ),
+    premiumDays: v.number(),
+    processedAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_trackerToken", ["trackerToken"]),
 
   notifications: defineTable({
     userId: v.id("users"),
