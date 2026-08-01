@@ -31,15 +31,15 @@ You’ll also see how MdcatXpert’s [performance analytics](https://mdcatxpert.
 
 ## First, a quick MDCAT recap (because it affects merit planning)
 
-MDCAT has generally been structured as a **200 MCQ** exam in recent formats, with historically **+4 for correct and -1 for incorrect** marking. Subject distribution is often discussed as:
+MDCAT 2026 is confirmed by PMDC as a **180 MCQ** exam (180 minutes, no negative marking — correct = +1, wrong or blank = 0). Confirmed subject distribution:
 
-- **Biology ~34%**
-- **Chemistry ~27%**
-- **Physics ~27%**
-- **English ~12%**
-- **Logical Reasoning** (included in the remaining share or in a small portion depending on the blueprint)
+- **Biology — 81 MCQs (45%)**
+- **Chemistry — 45 MCQs (25%)**
+- **Physics — 36 MCQs (20%)**
+- **English — 9 MCQs (5%)**
+- **Logical Reasoning — 9 MCQs (5%)**
 
-This matters because negative marking changes your strategy: you must plan for **accuracy**, not just attempts.
+This matters for merit planning because with no negative marking, every MCQ you attempt is pure upside — so your MDCAT score ceiling is really about how many you can answer correctly in 180 minutes, not about managing risk.
 
 ## What “merit” means in Pakistan medical admissions
 
@@ -99,7 +99,7 @@ Students preparing for KPK pathways often notice a strong culture of speed and n
 ### What students should do differently
 
 - practice with strict timing early, especially for Physics and Chemistry numericals
-- maintain skipping discipline under negative marking
+- since there's no negative marking, train yourself to attempt every question rather than skip
 - track your speed and accuracy using [analytics](https://mdcatxpert.com/analytics)
 
 ## Sindh (DUHS) context: merit lists and documentation mindset
@@ -142,8 +142,8 @@ This method helps you estimate targets and monitor progress, even before the off
 
 Because merit is competitive, the safe strategy is:
 
-- aim to maximize your MDCAT score
-- improve accuracy to reduce negative marking loss
+- aim to maximize your MDCAT score — with no negative marking, every attempted question is upside
+- improve accuracy so more of your attempts convert into correct answers
 - push your strongest subject to perfection while fixing weak subjects steadily
 
 ### How to set a realistic target score
@@ -170,13 +170,13 @@ You should obsess over MDCAT practice, but you must understand how your academic
 
 Only trust official merit lists and admission notifications. Social media “expected closing merit” is often wrong.
 
-### Mistake 3: Ignoring negative marking strategy
+### Mistake 3: Leaving MCQs blank
 
-Under historically **+4/-1**, blind guessing can reduce your score and therefore your aggregate.
+MDCAT has no negative marking, so an unanswered question is a guaranteed zero for no reason. Fill in every bubble, even as a guess.
 
 ### Mistake 4: Not preparing English and Logical Reasoning
 
-Even if English is often cited around **~12%**, it can separate candidates with similar science scores.
+Together they're only 10% of the paper (9 MCQs each), but that's still enough to separate candidates with similar science scores — and both are fast to improve relative to the science subjects.
 
 ## FAQs
 
@@ -192,13 +192,13 @@ No. FSc helps your aggregate, but MDCAT often carries the largest weight and can
 
 Repeaters should focus on improving MDCAT systematically through timed practice, error logs, and analytics. Your academics are fixed, but your MDCAT score is highly improvable.
 
-### How do I avoid losing marks due to negative marking?
+### Does MDCAT still have negative marking?
 
-Practice timed sets, guess only when you can eliminate at least two options, and review mistakes. Track repeated errors using [analytics](https://mdcatxpert.com/analytics).
+No — it's had none since 2020, and PMDC has confirmed this continues for 2026. Practice timed sets, always attempt every question, and review mistakes. Track repeated errors using [analytics](https://mdcatxpert.com/analytics).
 
 ### When are merit lists and admissions typically announced?
 
-Timelines vary, and MDCAT itself is typically **August–October** depending on the year. Always check official portals and your provincial admission authority for exact dates.
+MDCAT 2026 itself is confirmed for **16 August 2026**; merit lists typically follow some weeks after results are announced. Always check official portals and your provincial admission authority for exact dates.
 
 ### How can MdcatXpert help with merit planning?
 

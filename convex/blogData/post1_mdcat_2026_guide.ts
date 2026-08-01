@@ -4,10 +4,10 @@ const post: BlogPostSeed = {
   title: "Complete MDCAT 2026 Preparation Guide (Pakistan): Pattern, Plan, Mistakes",
   slug: "mdcat-2026-preparation-guide-pakistan",
   excerpt:
-    "Preparing for MDCAT 2026 is less about studying more and more about studying correctly: mastering FSc concepts, drilling MCQs under time pressure, and tracking mistakes. This guide covers the PMC-style paper pattern, registration pointers, a practical 6‑month plan, and the most common traps that keep good students from top merit.",
+    "Preparing for MDCAT 2026 is less about studying more and more about studying correctly: mastering FSc concepts, drilling MCQs at speed, and tracking mistakes. This guide covers the confirmed PMDC paper pattern, exam date, a practical study plan, and the most common traps that keep good students from top merit.",
   metaTitle: "MDCAT 2026 Preparation Guide (Pakistan) | MdcatXpert",
   metaDescription:
-    "Complete MDCAT 2026 guide for Pakistan: PMC-style 200 MCQs, historically +4/-1 marking, 6‑month plan, mistakes to avoid, and practice on MdcatXpert.",
+    "Complete MDCAT 2026 guide for Pakistan: 180 MCQs, no negative marking, exam on 16 August 2026, study plan, mistakes to avoid, and practice on MdcatXpert.",
   tags: [
     "MDCAT 2026",
     "PMC",
@@ -24,22 +24,22 @@ This post is your complete MDCAT 2026 preparation guide: paper pattern, marking,
 
 ## MDCAT 2026 exam pattern (Pakistan) in one snapshot
 
-While authorities and notifications have changed over the years (you’ll see both **PMC** and **PMDC** referenced in different eras), the MDCAT pattern in recent years has generally followed a **200 MCQ** paper with negative marking. Historically, the marking scheme has been **+4 for a correct answer and -1 for an incorrect answer**. Always confirm the latest blueprint on the official portal, but plan your preparation assuming:
+PMDC (the current federal authority, after the PMC era) has confirmed MDCAT 2026 follows the same 2025 Uniform Curriculum: **180 MCQs**, **no negative marking**, sat on a paper-based OMR sheet. Plan your preparation around:
 
-- **200 MCQs** (time is usually tight, so speed matters)
-- **Historically +4/-1 marking** (accuracy is as valuable as speed)
-- **Weightage (often approximated as)**:
-  - **Biology ~34%**
-  - **Chemistry ~27%**
-  - **Physics ~27%**
-  - **English ~12%**
-  - **Logical Reasoning** (often tested within the remaining share or as a small standalone portion depending on the blueprint)
+- **180 MCQs in 180 minutes (3 hours)** — roughly a minute a question, so speed still matters
+- **No negative marking** — every correct answer is +1, every wrong or blank answer is 0. This has been the policy since 2020 and continues for 2026, so **there is no penalty for guessing**
+- **Confirmed subject weightage**:
+  - **Biology — 81 MCQs (45%)**
+  - **Chemistry — 45 MCQs (25%)**
+  - **Physics — 36 MCQs (20%)**
+  - **English — 9 MCQs (5%)**
+  - **Logical Reasoning — 9 MCQs (5%)**
 
-Why this matters: a student who improves accuracy by even 5% can gain a double benefit under negative marking: more correct answers and fewer penalties.
+Why this matters: with no negative marking, an unanswered question is a guaranteed zero while a guess is a free chance at a mark — so the single highest-leverage exam-day habit is to **never leave a bubble blank**, even under time pressure at the end.
 
-## Registration and timeline: what to do without guessing dates
+## Exam date and registration: what's confirmed for 2026
 
-MDCAT is **typically held August–October** depending on the year and policy timeline. Do not rely on social media “final dates.” Instead, prepare your workflow so you can register smoothly whenever the portal opens.
+MDCAT 2026 is scheduled for **Sunday, 16 August 2026 at 10:00am**, held nationwide by PMDC. If you're reading this close to that date, your priority shifts from long-range planning to focused final revision — treat every remaining day as exam week. Always double-check your roll number slip and test city on the official PMDC portal, since these are the two most common last-minute panic points.
 
 ### Registration checklist (practical and safe)
 
@@ -141,23 +141,23 @@ Key habit: after every mock, do a **two-pass review**:
 
 If you feel stuck, use the [AI copilot](https://mdcatxpert.com/copilot) to ask concept questions and to generate targeted practice prompts for your weak areas, then verify with PTB text.
 
-## Time management strategy for a 200 MCQ paper
+## Time management strategy for a 180 MCQ paper
 
-In a 200-question exam, time is a resource. Your goal is to reduce time waste on low-probability “hard battles” and collect marks from high-probability questions.
+In a 180-question, 180-minute exam, time is a resource. Your goal is to reduce time waste on low-probability “hard battles” and collect marks from high-probability questions.
 
 ### A simple three-pass attempt strategy
 
 - **Pass 1 (fast marks)**: attempt all easy and medium questions first.
 - **Pass 2 (calculated effort)**: return to questions that need 30–60 seconds.
-- **Pass 3 (final decisions)**: handle the toughest questions and educated guesses.
+- **Pass 3 (final decisions)**: handle the toughest questions — and guess on anything left, since blanks and wrong guesses score identically (zero).
 
-### Negative marking: when to guess and when to skip
+### No negative marking: attempt everything
 
-With historical **+4/-1** marking, blind guessing is expensive. Use this rule:
+MDCAT has had **no negative marking since 2020**, and PMDC has confirmed this continues for 2026 — every correct answer is +1, every wrong or blank answer is 0. That changes the old “guess carefully” advice completely:
 
-- guess only if you can eliminate at least **two options** confidently
-- skip if you are stuck between **three or four options**
-- do not change answers without a clear reason (answer switching often hurts)
+- never leave a question blank; an educated guess and a random guess both beat a blank
+- spend your time on questions you can actually solve, not on deciding whether to risk a guess
+- if you're genuinely out of time near the end, fill in your remaining bubbles with a single best-guess letter rather than leaving them empty
 
 ## Common MDCAT mistakes (and exactly how to fix them)
 
@@ -252,13 +252,13 @@ You don’t need more motivation. You need a system that removes friction.
 
 ## FAQs
 
-### Is MDCAT 2026 definitely 200 MCQs with +4/-1 marking?
+### Is MDCAT 2026 definitely 180 MCQs with no negative marking?
 
-Recent MDCAT formats have commonly used **200 MCQs** with **historical +4/-1** marking, but authorities can update the blueprint. Prepare with this structure and confirm the latest notification on the official portal.
+Yes. PMDC has confirmed MDCAT 2026 follows the 2025 Uniform Curriculum: 180 MCQs in 180 minutes, with no negative marking (correct = +1, wrong or blank = 0). Always double-check your official roll number slip for any last-minute logistics, but the pattern itself is confirmed.
 
-### When will MDCAT 2026 happen in Pakistan?
+### When is MDCAT 2026 in Pakistan?
 
-It is **typically August–October**, but exact dates vary. Avoid rumors and check official announcements from the relevant authority and your provincial admission bodies.
+MDCAT 2026 is confirmed for **Sunday, 16 August 2026 at 10:00am**, held nationwide by PMDC. Check the official PMDC portal for your roll number slip and test city.
 
 ### How many hours per day are enough for merit-level preparation?
 
@@ -268,9 +268,9 @@ Most top scorers succeed with **6–10 high-quality hours** depending on their b
 
 Yes. PTB-aligned conceptual clarity is a strong foundation for MDCAT MCQs across provinces. Pair it with MCQ practice to match the exam style.
 
-### What is the best way to improve accuracy with negative marking?
+### Since there's no negative marking, does accuracy still matter?
 
-Keep an error log, do timed practice, and only guess when you can eliminate at least two options. Review your mistake patterns using tools like MdcatXpert’s [analytics](https://mdcatxpert.com/analytics).
+Yes — accuracy is still what separates a good score from an average one, since a wrong guess and a correct answer aren't equal even though wrong/blank are equal. Keep an error log, do timed practice, and use your remaining time on questions you can actually solve rather than deliberating over guesses. Review your mistake patterns using tools like MdcatXpert’s [analytics](https://mdcatxpert.com/analytics).
 
 ### How early should I start full-length mocks?
 

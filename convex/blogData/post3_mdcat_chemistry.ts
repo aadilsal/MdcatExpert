@@ -5,7 +5,7 @@ const post: BlogPostSeed = {
     "MDCAT Chemistry Preparation (Pakistan): Stoichiometry, Organic Reactions, Daily Drills",
   slug: "mdcat-chemistry-preparation-stoichiometry-organic-daily-drills",
   excerpt:
-    "MDCAT Chemistry becomes scoring when you stop reading passively and start drilling: mole concept, stoichiometry, periodic trends, and a clean set of organic reaction rules. This guide gives a chapter-wise approach plus a daily drill plan to boost speed and accuracy under negative marking.",
+    "MDCAT Chemistry becomes scoring when you stop reading passively and start drilling: mole concept, stoichiometry, periodic trends, and a clean set of organic reaction rules. This guide gives a chapter-wise approach plus a daily drill plan to boost speed and accuracy for the 45-MCQ Chemistry section.",
   metaTitle: "MDCAT Chemistry Prep: Organic + Numericals | MdcatXpert",
   metaDescription:
     "Master MDCAT Chemistry with PTB-based concepts, stoichiometry practice, periodic trends, key organic reactions, and a daily drill plan using MdcatXpert quizzes.",
@@ -19,9 +19,9 @@ const post: BlogPostSeed = {
     "PTB Chemistry",
     "Pakistan",
   ],
-  content: `Chemistry is where many MDCAT students lose marks even after “completing the syllabus.” The reason is simple: Chemistry needs **active practice**, not passive reading. In a 200 MCQ exam with historically **+4/-1** marking, one weak Chemistry section can pull your aggregate down quickly.
+  content: `Chemistry is where many MDCAT students lose marks even after “completing the syllabus.” The reason is simple: Chemistry needs **active practice**, not passive reading. In the 180-MCQ MDCAT 2026 paper, one weak Chemistry section can pull your aggregate down quickly — and with no negative marking, every Chemistry MCQ you get right is a mark you keep, full stop.
 
-In most PMC-style blueprints, Chemistry is often cited around **~27%** of the paper, which is enough to decide merit when everyone is strong in Biology and Physics. This guide shows you how to prepare MDCAT Chemistry with a PTB-first approach, a clean reaction toolkit for organic chemistry, and a daily drill routine. You’ll also see how MdcatXpert’s [practice quizzes](https://mdcatxpert.com/quizzes) and [performance analytics](https://mdcatxpert.com/analytics) can help you fix recurring mistakes instead of repeating them.
+Under PMDC's confirmed MDCAT 2026 weightage, Chemistry is **45 of 180 MCQs (25%)** — the second-largest subject after Biology, and enough to decide merit when everyone is strong in Biology. This guide shows you how to prepare MDCAT Chemistry with a PTB-first approach, a clean reaction toolkit for organic chemistry, and a daily drill routine. You’ll also see how MdcatXpert’s [practice quizzes](https://mdcatxpert.com/quizzes) and [performance analytics](https://mdcatxpert.com/analytics) can help you fix recurring mistakes instead of repeating them.
 
 ## What MDCAT Chemistry MCQs usually test
 
@@ -172,7 +172,7 @@ This routine works for both FSc students and repeaters.
 - 2 days: mixed Chemistry sets (timed)
 - 1 day: revision of the week’s error log
 
-## Timed practice strategy for Chemistry in a 200 MCQ paper
+## Timed practice strategy for Chemistry in a 180 MCQ paper
 
 Time pressure changes Chemistry performance. Many students can solve, but too slowly.
 
@@ -182,13 +182,13 @@ Time pressure changes Chemistry performance. Many students can solve, but too sl
 - then do short timed sets (10–15 minutes)
 - then do longer mixed sets (30–45 minutes)
 
-### When to skip vs guess under negative marking
+### There's no negative marking — never leave a Chemistry MCQ blank
 
-With historical **+4/-1**, avoid blind guessing.
+MDCAT has had no negative marking since 2020 and PMDC has confirmed this for 2026: correct = +1, wrong or blank = 0.
 
-- guess only if you can eliminate at least two options
-- skip if you are unsure among three or four options
-- mark it for review if time remains
+- solve what you can within your time budget
+- if you run out of time on a numerical, take your best guess rather than skipping it
+- mark it for review if time remains, but always fill something in before moving on
 
 ## Province context: how to keep your preparation universal
 
@@ -226,9 +226,9 @@ No. Build a toolkit of the **syllabus-level reactions** and focus on functional 
 
 Aim for **25–60 MCQs/day** depending on your time. The key is reviewing wrong questions and re-testing weak subtopics.
 
-### Is Chemistry weightage really around 27%?
+### What's Chemistry's actual weightage in MDCAT 2026?
 
-Many PMC-style distributions are often quoted around **~27%** for Chemistry (similar to Physics). Confirm the latest blueprint, but treat Chemistry as a major merit contributor.
+Chemistry is 45 of 180 MCQs — 25% of the paper, PMDC-confirmed for 2026. That's bigger than Physics (20%) and English + Logical Reasoning combined (10%), so it's a major merit contributor.
 
 ### How can MdcatXpert help with Chemistry specifically?
 

@@ -11,6 +11,8 @@
     "convex:dev": "npx convex dev",
     "convex:seed-promos": "npx convex run seed:seedTestPromoCodes",
     "convex:seed-blogs": "npx convex run seedBlog:seedBlogPosts",
+    "convex:seed-practice-questions": "npx convex run seedPracticeQuestions:seedPracticeQuestions",
+    "convex:seed-study-notes": "npx convex run seedStudyNotes:seedStudyNotes",
     "convex:seed-library": "node scripts/seed-pctb-library.mjs",
     "convex:seed-library:now": "node scripts/seed-pctb-library.mjs --now",
     "convex:seed-library:local": "node scripts/seed-pctb-library.mjs --local",

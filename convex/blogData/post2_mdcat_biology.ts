@@ -19,7 +19,7 @@ const post: BlogPostSeed = {
     "MDCAT MCQs",
     "Pakistan",
   ],
-  content: `If you want a fast, reliable score boost for MDCAT, **Biology is usually the best place to start**. In most PMC-style blueprints, Biology carries the largest share (often cited around **~34%**), and Biology MCQs are frequently decided by whether you remember **PTB lines, definitions, sequences, and exceptions**.
+  content: `If you want a fast, reliable score boost for MDCAT, **Biology is usually the best place to start**. Under PMDC's confirmed MDCAT 2026 pattern, Biology carries the largest share of any subject — **81 of 180 MCQs (45%)** — and Biology MCQs are frequently decided by whether you remember **PTB lines, definitions, sequences, and exceptions**.
 
 This guide gives you a chapter-wise MDCAT Biology strategy aligned to the **PMC-style syllabus** (as commonly structured) with a focus on high-yield topics: **cell biology, genetics, human physiology, and ecology**. You’ll also see how to practice with MdcatXpert’s [practice quizzes](https://mdcatxpert.com/quizzes) and improve weak areas using [performance analytics](https://mdcatxpert.com/analytics).
 
@@ -33,7 +33,7 @@ Even when authorities or labels shift (you may see **PMC/PMDC** referenced acros
 - **PTB “small lines”** (often the source of tricky options)
 - **Diagram literacy** (labels and functions, not just pictures)
 
-Under historically negative marking (often **+4/-1**), careless Biology errors are expensive because they usually come from haste, not difficulty.
+MDCAT has had no negative marking since 2020, and PMDC has confirmed this continues for 2026 — so a wrong Biology answer costs you nothing beyond the mark you'd have earned. But careless errors still cost you that mark, and haste (not difficulty) is usually the real cause.
 
 ## The Biology study system that actually works
 
@@ -216,15 +216,15 @@ You don’t need 6 hours of Biology daily. You need consistency.
 
 Use [analytics](https://mdcatxpert.com/analytics) weekly to decide what to revise next instead of revising randomly.
 
-## Timed practice for Biology under negative marking
+## Timed practice for Biology at exam speed
 
-Under historically **+4/-1**, Biology becomes dangerous if you rush.
+With 81 Biology MCQs to get through as part of a 180-minute paper, rushing is still where most avoidable mistakes happen.
 
-### A safe attempt strategy
+### A steady attempt strategy
 
 - attempt the questions you can recall confidently first
-- mark uncertain questions for review
-- guess only if you can eliminate at least two options
+- mark uncertain questions for review, then come back
+- never leave a Biology question blank — since there's no negative marking, an educated guess (or even a random one) can only help
 
 ### How to reduce silly mistakes
 
@@ -243,7 +243,7 @@ Under historically **+4/-1**, Biology becomes dangerous if you rush.
 
 ### Is Biology really the highest-weight subject in MDCAT?
 
-In many PMC-style distributions, Biology is often cited around **~34%**, higher than Chemistry and Physics (often around **~27%** each). Always confirm the latest blueprint, but treat Biology as a major score-driver.
+Yes — under PMDC's confirmed MDCAT 2026 pattern, Biology is 81 of 180 MCQs (45%), well ahead of Chemistry (25%) and Physics (20%). It's the single biggest lever on your score.
 
 ### Should I memorize PTB lines or focus on concepts?
 
@@ -257,7 +257,7 @@ Aim for **25–60 MCQs/day** depending on your schedule. The key is reviewing mi
 
 Cell biology basics, genetics and inheritance patterns, and human physiology systems are consistently high-yield. Ecology also shows up through definitions and cycle sequences.
 
-### How do I improve Biology accuracy with negative marking?
+### How do I improve Biology accuracy?
 
 Use timed practice, read questions carefully for keywords, and keep an error log. Track repeat mistakes using tools like MdcatXpert’s [analytics](https://mdcatxpert.com/analytics).
 

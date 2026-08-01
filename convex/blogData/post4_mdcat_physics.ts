@@ -5,7 +5,7 @@ const post: BlogPostSeed = {
     "MDCAT Physics Preparation (Pakistan): Kinematics, Electricity, Modern Physics + Numericals",
   slug: "mdcat-physics-preparation-kinematics-electricity-modern-physics-numericals",
   excerpt:
-    "MDCAT Physics becomes scoring when you treat it as a numerical skill: formula clarity, unit discipline, and fast decision-making under time pressure. This guide covers kinematics, electricity, and modern physics with a daily drill plan and mock strategies for a 200 MCQ paper with negative marking.",
+    "MDCAT Physics becomes scoring when you treat it as a numerical skill: formula clarity, unit discipline, and fast decision-making under time pressure. This guide covers kinematics, electricity, and modern physics with a daily drill plan and mock strategies for the 36-MCQ Physics section of the 180-MCQ MDCAT 2026 paper.",
   metaTitle: "MDCAT Physics Prep: Numericals, Speed & Accuracy | MdcatXpert",
   metaDescription:
     "Ace MDCAT Physics with PTB concepts, kinematics and electricity numericals, modern physics revision, and timed solving strategies with MdcatXpert practice.",
@@ -19,9 +19,9 @@ const post: BlogPostSeed = {
     "PTB Physics",
     "Pakistan",
   ],
-  content: `Physics is the subject most likely to punish you for “knowing the concept” but not being able to apply it fast. In a 200 MCQ MDCAT-style paper with historically **+4/-1** marking, Physics can either become a clean score booster or a time sink that triggers negative-marking losses.
+  content: `Physics is the subject most likely to punish you for “knowing the concept” but not being able to apply it fast. In the 180-MCQ MDCAT 2026 paper, Physics can either become a clean score booster or a time sink — and since there's no negative marking, the only real cost of running out of time is the marks you don't get to, not a penalty.
 
-In many commonly cited PMC-style distributions, Physics is often around **~27%** of the paper. That’s big enough to change your merit position across Punjab (UHS), KPK (ETEA/KMU), Sindh (DUHS), and federal admissions pathways. The key is to build three things:
+Under PMDC's confirmed MDCAT 2026 weightage, Physics is **36 of 180 MCQs (20%)** — smaller than Biology (45%) and Chemistry (25%), but still big enough to change your merit position across Punjab (UHS), KPK (ETEA/KMU), Sindh (DUHS), and federal admissions pathways. The key is to build three things:
 
 - **concept clarity** anchored to FSc **Punjab Textbook Board (PTB)** content
 - **numerical routine** (setup, formula, units, answer)
@@ -227,7 +227,7 @@ This plan works whether you’re in FSc, doing a gap year, or repeating.
 
 Use [analytics](https://mdcatxpert.com/analytics) to confirm your weak chapters before choosing what to drill next.
 
-## Mock strategy for Physics inside a 200 MCQ paper
+## Mock strategy for Physics inside a 180 MCQ paper
 
 Even if the paper is centralized, your admission route may vary across UHS, ETEA/KMU, DUHS, and federal processes. Your Physics attempt strategy should stay universal.
 
@@ -235,14 +235,14 @@ Even if the paper is centralized, your admission route may vary across UHS, ETEA
 
 - pass 1: quick, confident MCQs (collect marks)
 - pass 2: medium questions that need careful substitution
-- pass 3: toughest numericals and educated guesses
+- pass 3: toughest numericals — attempt every one, even as an educated guess
 
-### Negative marking: guess smarter, not harder
+### No negative marking: never leave a Physics MCQ blank
 
-With historical **+4/-1** marking:
+MDCAT has had no negative marking since 2020, confirmed again for 2026 — wrong and blank answers both score zero, so a blank is always the worse choice.
 
-- guess only when you can eliminate at least two options
-- skip if you cannot set it up quickly
+- if you can't set up a numerical quickly, guess and mark it for review rather than skipping
+- spend your saved time re-checking questions you were unsure about, not deliberating over whether to guess
 - do not change answers without a clear error found
 
 ## How MdcatXpert helps your Physics score
@@ -256,9 +256,9 @@ Physics improves fastest when you can see your mistakes clearly.
 
 ## FAQs
 
-### Is Physics weightage really around 27% in MDCAT?
+### What's Physics's actual weightage in MDCAT 2026?
 
-Many commonly referenced PMC-style distributions cite Physics around **~27%**, similar to Chemistry. Always verify the current blueprint, but treat Physics as a major scoring subject.
+Physics is 36 of 180 MCQs — 20% of the paper, PMDC-confirmed for 2026. That's smaller than Chemistry (25%) and well behind Biology (45%), but still a major scoring subject worth mastering.
 
 ### How can I improve speed in Physics numericals?
 
@@ -268,9 +268,9 @@ Practice with short timers, master standard patterns, and follow a fixed setup m
 
 Kinematics, dynamics/work-energy, and electricity/circuits are often high-yield. Modern physics can also be scoring with smart revision.
 
-### How do I avoid negative marking losses in Physics?
+### Should I guess on Physics numericals I can't solve in time?
 
-Don’t blind-guess. Skip questions you cannot set up quickly, return in later passes, and only guess when you can eliminate at least two options.
+Yes, always. MDCAT has no negative marking, so a guess costs you nothing but can only gain you marks. Set up what you can quickly, mark unclear ones for a later pass, and make sure every bubble is filled before time runs out.
 
 ### Should I study from PTB even if I’m not in Punjab?
 

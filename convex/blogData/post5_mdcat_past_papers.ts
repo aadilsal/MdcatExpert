@@ -25,8 +25,8 @@ This post explains a practical past papers strategy for **2008–2025** across m
 
 - repeated high-yield concepts from **FSc PTB**
 - typical “close option” traps
-- time management for a **200 MCQ** paper
-- accuracy habits under historically **+4/-1** marking
+- time management for MDCAT 2026's confirmed **180 MCQ, 180-minute** paper
+- accuracy habits — note that MDCAT has had **no negative marking since 2020**, so older papers/advice built around +4/-1 marking no longer apply to strategy (though the concepts they test still do)
 
 You’ll also see how to combine past-paper learning with MdcatXpert’s [practice quizzes](https://mdcatxpert.com/quizzes) and [performance analytics](https://mdcatxpert.com/analytics) so your practice becomes measurable.
 
@@ -88,7 +88,7 @@ Examples of pattern notes:
 
 ## Step 3: Do past papers in timed blocks (not full papers immediately)
 
-In a 200 MCQ exam, time pressure is real. Build timing gradually.
+In MDCAT 2026's 180 MCQ, 180-minute exam, time pressure is real. Build timing gradually.
 
 ### The best progression
 
@@ -108,18 +108,17 @@ This progression prevents you from training panic.
 
 Adjust times based on your speed, but always keep a timer.
 
-## Step 4: Use a “negative marking” decision rule
+## Step 4: Train the "always fill it in" habit
 
-With historical **+4/-1** marking, careless guessing can erase your hard work.
+MDCAT has had no negative marking since 2020, and PMDC confirms this continues for 2026 — wrong and blank answers both score zero. Older past-paper advice built around +4/-1 marking (skip if unsure, guess only when you can eliminate options) no longer matches how the exam is scored.
 
-Use this rule during timed past-paper blocks:
+Use this rule during timed past-paper blocks instead:
 
 - attempt confidently first
-- if stuck, eliminate options
-- guess only if you can eliminate at least two options
-- otherwise, mark and move on
+- if stuck, eliminate what you can, then guess — don't leave it blank
+- never finish a timed block with unanswered questions if you had time to at least mark something
 
-This trains the exact exam behavior you need.
+This trains the exact exam behavior you need for 2026: solve fast, guess don't skip.
 
 ## Step 5: Build the most important tool: a mistake log
 
@@ -230,9 +229,9 @@ Use all as practice sources, but treat them as a way to master PTB-based concept
 
 A practical target is **30–80 questions/day** depending on your schedule. Review quality matters more than volume.
 
-### How do I use past papers under negative marking?
+### Do old past papers' negative marking advice still apply?
 
-Train skipping discipline. Guess only when you can eliminate at least two options, and always review mistakes to stop repeating them.
+No — MDCAT has had no negative marking since 2020, confirmed again for 2026. Ignore any old "skip if unsure" advice from pre-2020 sources; train yourself to answer every question instead, and always review mistakes to stop repeating them.
 
 ### When should I start full-length mocks?
 
