@@ -48,7 +48,10 @@ export default function VerifyPage() {
         setSending(true);
         try {
             const code = await generateOtp();
-            await sendOtpEmailAction(currentUser.email || "", currentUser.name || "Student", code);
+            const result = await sendOtpEmailAction(currentUser.email || "", currentUser.name || "Student", code);
+            if (!result.success) {
+                throw new Error(result.error || "Failed to send verification code.");
+            }
             setCountdown(60); // 60s cooldown
             Swal.fire({
                 icon: "success",
