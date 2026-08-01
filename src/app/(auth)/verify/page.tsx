@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { sendOtpEmailAction } from "../signup/actions";
@@ -11,8 +11,13 @@ import { LoadingButton } from "@/components/loading-button";
 import { RefreshCw, Mail } from "lucide-react";
 import Swal from "sweetalert2";
 
-export default function VerifyPage() {
+function VerifyPageContent() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const rawNext = searchParams.get("next");
+    // Only ever redirect within our own app — reject protocol-relative ("//evil.com")
+    // or absolute URLs so this query param can't be turned into an open redirect.
+    const next = rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/dashboard";
     const currentUser = useQuery(api.users.getCurrentUserProfile);
     const generateOtp = useMutation(api.users.generateVerificationOtp);
     const verifyOtp = useMutation(api.users.verifyOtp);
@@ -25,9 +30,9 @@ export default function VerifyPage() {
     // If user is already verified, redirect immediately
     useEffect(() => {
         if (currentUser && currentUser.emailVerificationTime) {
-            router.replace("/dashboard");
+            router.replace(next);
         }
-    }, [currentUser, router]);
+    }, [currentUser, router, next]);
 
     // Send code on mount once user profile is loaded
     useEffect(() => {
@@ -83,11 +88,11 @@ export default function VerifyPage() {
             await Swal.fire({
                 icon: "success",
                 title: "Email verified!",
-                text: "Welcome to MDCAT Xpert. Redirecting to your dashboard...",
+                text: "Welcome to MDCAT Xpert. Redirecting...",
                 timer: 2000,
                 showConfirmButton: false,
             });
-            router.replace("/dashboard");
+            router.replace(next);
         } catch (err) {
             console.error(err);
             Swal.fire({
@@ -152,7 +157,7 @@ export default function VerifyPage() {
                         <RefreshCw className={`w-3.5 h-3.5 ${sending ? "animate-spin" : ""}`} />
                         {countdown > 0 ? `Resend Code in ${countdown}s` : "Resend Verification Code"}
                     </button>
-                    
+
                     <button
                         onClick={() => router.replace("/login")}
                         className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors"
@@ -162,5 +167,17 @@ export default function VerifyPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function VerifyPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+                <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        }>
+            <VerifyPageContent />
+        </Suspense>
     );
 }

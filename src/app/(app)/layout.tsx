@@ -106,7 +106,8 @@ export default function AppLayout({
                     return;
                 }
                 if (!row.emailVerificationTime) {
-                    router.replace("/verify");
+                    const next = window.location.pathname + window.location.search;
+                    router.replace(`/verify?next=${encodeURIComponent(next)}`);
                     return;
                 }
                 setUserData(row);

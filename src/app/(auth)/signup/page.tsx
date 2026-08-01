@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { UserPlus, Eye, EyeOff, AlertCircle, Mail, Lock, User, Sparkles, Ticket } from "lucide-react";
 import { useAuthActions } from "@convex-dev/auth/react";
+import Swal from "sweetalert2";
 import { LoadingButton } from "@/components/loading-button";
 import { formatUserError } from "@/lib/format-user-error";
 import { sendWelcomeEmailAction } from "./actions";
@@ -45,7 +46,7 @@ export default function SignupPage() {
                         <Sparkles className="w-5 h-5 shrink-0 mt-0.5" />
                         <div className="text-sm">
                             <p className="font-semibold">Going Elite!</p>
-                            <p className="text-xs mt-1 opacity-90">Create your account first, then upload your payment screenshot.</p>
+                            <p className="text-xs mt-1 opacity-90">Create your account, then you&apos;ll be taken straight to secure checkout.</p>
                         </div>
                     </div>
                 )}
@@ -92,7 +93,36 @@ export default function SignupPage() {
                                 return;
                             }
 
-                            router.push(goElite ? "/signup-payment" : "/dashboard");
+                            if (goElite) {
+                                // Account already exists at this point — a failure here is a
+                                // checkout problem, not a signup problem, so it gets its own
+                                // message and lands the user somewhere they can retry payment,
+                                // instead of the generic "Signup failed" error below.
+                                try {
+                                    const checkoutRes = await fetch("/api/checkout/create", { method: "POST" });
+                                    const checkoutJson = await checkoutRes.json();
+                                    if (!checkoutRes.ok || !checkoutJson.url) {
+                                        throw new Error(checkoutJson?.error || "Unable to start checkout.");
+                                    }
+                                    window.location.href = checkoutJson.url;
+                                    // isPending stays true — the browser is about to leave this page.
+                                    return;
+                                } catch (checkoutErr) {
+                                    console.error("Elite checkout failed after signup:", checkoutErr);
+                                    await Swal.fire({
+                                        icon: "warning",
+                                        title: "Account created",
+                                        text: formatUserError(
+                                            checkoutErr,
+                                            "Your account was created, but we couldn't start checkout. You can pay from the Upgrade page.",
+                                        ),
+                                    });
+                                    router.push("/upgrade");
+                                    return;
+                                }
+                            }
+
+                            router.push("/dashboard");
                             // isPending stays true (keeps the button disabled/loading) until
                             // the navigation unmounts this form. Resetting it here — or calling
                             // router.refresh() right after push() — used to race the pending
