@@ -15,7 +15,11 @@ import {
   FileText,
   Star,
   Box,
-  ChevronDown
+  ChevronDown,
+  Layers,
+  BarChart3,
+  Library,
+  LifeBuoy
 } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
 import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics-events";
@@ -289,6 +293,51 @@ export default function LandingClient({
           </div>
           
           <MiniQuiz dbQuestions={dbQuestions} />
+        </div>
+      </section>
+
+      {/* WHAT WE OFFER - FULL PRODUCT/SERVICE OVERVIEW */}
+      <section id="offerings" className="py-24 bg-white dark:bg-transparent scroll-mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+          <div className="text-center mb-16 space-y-3">
+            <span className="px-3 py-1 bg-primary-50 dark:bg-primary-950/40 border border-primary-100 dark:border-primary-900/30 rounded-full text-[10px] font-black text-primary-700 dark:text-primary-300 uppercase tracking-widest">
+              What We Offer
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight text-balance">
+              Everything You Need, <span className="text-gradient-primary">One Platform</span>
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 font-medium max-w-xl mx-auto text-sm">
+              A quick look at what&apos;s inside MdcatXpert — from your first free quiz to your final week of revision.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: "Quiz Archive", desc: "Real UHS, SZABMU, DUHS & ETEA past-paper MCQs, organized by subject and year.", icon: FileText },
+              { title: "Study Copilot", desc: "Chat with your own notes or the full study library and get grounded, cited answers.", icon: Sparkles },
+              { title: "AI Mistake Analyzer", desc: "Every wrong answer gets a plain-language misconception breakdown, not just the fix.", icon: AlertTriangleIcon },
+              { title: "Weakness Radar", desc: "A live radar of your subject-wise mastery, updated after every attempt.", icon: Target },
+              { title: "Flashcards & Revise Mode", desc: "Turn any chapter into flashcards or a quick-fire revision chat with the Copilot.", icon: Layers },
+              { title: "Analytics Dashboard", desc: "Track score trends, time-per-question, and subject accuracy across your prep.", icon: BarChart3 },
+              { title: "Subject Library", desc: "Biology, Chemistry & Physics reference chapters built right into the Copilot.", icon: Library },
+              { title: "Priority Support", desc: "A direct line to the team for Elite members — real answers, not a ticket queue.", icon: LifeBuoy },
+            ].map((item, idx) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: (idx % 4) * 0.08 }}
+                viewport={{ once: true }}
+                className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 shadow-xs hover:shadow-lg hover:border-primary-100 dark:hover:border-primary-900/40 transition-all group"
+              >
+                <div className="mb-5 w-11 h-11 bg-gray-50 dark:bg-slate-800 rounded-xl flex items-center justify-center group-hover:bg-primary-50 dark:group-hover:bg-primary-950/40 group-hover:text-primary-600 transition-colors">
+                  <item.icon aria-hidden="true" className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400" />
+                </div>
+                <h4 className="text-base font-black text-gray-900 dark:text-white mb-1.5">{item.title}</h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
