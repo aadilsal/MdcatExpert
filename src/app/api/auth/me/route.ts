@@ -24,6 +24,7 @@ export async function GET() {
                 subscriptionType: user.subscriptionType || "free",
                 premiumUntil: user.premiumUntil || null,
                 emailVerificationTime: user.emailVerificationTime || null,
+                onboardingCompleted: user.onboardingCompleted ?? null,
             },
         });
     } catch (error) {

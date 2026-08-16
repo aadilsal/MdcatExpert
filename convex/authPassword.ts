@@ -22,6 +22,9 @@ export default Password<DataModel>({
       subscriptionType: "free" as const,
       createdAt: Date.now(),
       isActive: true,
+      // New signups get the forced feature tour; existing users are
+      // backfilled to true — see convex/onboarding.ts.
+      onboardingCompleted: false,
     };
   },
   validatePasswordRequirements,

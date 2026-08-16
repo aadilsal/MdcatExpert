@@ -1,9 +1,10 @@
-type MeRow = { 
-    name: string; 
-    email: string; 
-    role: string; 
-    emailVerificationTime?: number | null; 
+type MeRow = {
+    name: string;
+    email: string;
+    role: string;
+    emailVerificationTime?: number | null;
     subscriptionType?: string;
+    onboardingCompleted?: boolean | null;
 };
 
 let meCache: { value: MeRow; at: number } | null = null;
@@ -31,6 +32,7 @@ export async function fetchMeCached(): Promise<MeRow | null> {
             role: payload.user.role || "student",
             emailVerificationTime: payload.user.emailVerificationTime || null,
             subscriptionType: payload.user.subscriptionType || "free",
+            onboardingCompleted: payload.user.onboardingCompleted ?? null,
         };
         meCache = { value, at: Date.now() };
         return value;

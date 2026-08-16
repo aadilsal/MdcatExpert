@@ -17,6 +17,10 @@ export default defineSchema({
     role: v.optional(v.union(v.literal("student"), v.literal("admin"))),
     subscriptionType: v.optional(v.union(v.literal("free"), v.literal("premium"))),
     premiumUntil: v.optional(v.number()),
+    // Which one-time pass is currently active (both plans grant the same
+    // entitlements today — see convex/quizAccess.ts isActivePremiumUser —
+    // this is for display/reminder-copy/reporting only, not gating).
+    activePlanId: v.optional(v.union(v.literal("elite_annual"), v.literal("monthly_pass"))),
     emailNotificationsEnabled: v.optional(v.boolean()),
     promoCode: v.optional(v.string()),
     promoSource: v.optional(v.string()),
@@ -26,6 +30,11 @@ export default defineSchema({
     otpCode: v.optional(v.string()),
     otpExpiry: v.optional(v.number()),
     lastClaimedTopperWeek: v.optional(v.string()),
+
+    // Forced first-time feature tour. Undefined/false = show the tour.
+    // Existing users are backfilled to true so only new signups see it —
+    // see convex/onboarding.ts backfillExistingUsers.
+    onboardingCompleted: v.optional(v.boolean()),
 
     // Subscription renewal reminders (no auto-renewal — one-time Safepay
     // payments only). Both fields store the `premiumUntil` value the email
@@ -166,7 +175,10 @@ export default defineSchema({
   // records) with instant, gateway-confirmed activation.
   gatewayOrders: defineTable({
     userId: v.id("users"),
-    provider: v.literal("safepay"),
+    // "payfast" is reserved for when the merchant-review process confirms
+    // a hosted-checkout integration mode — see docs/PAYFAST_INTEGRATION_PLAN.md.
+    // Not live yet; src/app/api/checkout/create/route.ts only creates "safepay" orders today.
+    provider: v.union(v.literal("safepay"), v.literal("payfast")),
     trackerToken: v.string(),
     amount: v.number(),
     currency: v.string(),
@@ -176,6 +188,8 @@ export default defineSchema({
       v.literal("failed"),
     ),
     premiumDays: v.number(),
+    // Optional so existing rows (created before plans existed) stay valid.
+    planId: v.optional(v.union(v.literal("elite_annual"), v.literal("monthly_pass"))),
     processedAt: v.optional(v.number()),
     createdAt: v.number(),
   })
@@ -295,6 +309,7 @@ export default defineSchema({
     topic: v.optional(v.string()),
     sourceKind: v.union(
       v.literal("pctb_textbook"),
+      v.literal("openstax_textbook"),
       v.literal("admin_upload"),
       v.literal("student_upload"),
       v.literal("ai_summary"),

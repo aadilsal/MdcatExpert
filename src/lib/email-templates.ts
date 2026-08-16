@@ -276,6 +276,68 @@ export function getPremiumActivatedEmailHtml(name: string): string {
   });
 }
 
+interface PaymentInvoiceArgs {
+  name: string;
+  planName: string;
+  priceLabel: string;
+  durationLabel: string;
+  paidAt: number;
+  premiumUntil: number;
+  reference: string;
+}
+
+/**
+ * Returns HTML payment invoice/receipt email content, sent automatically
+ * after a Safepay payment is confirmed (see src/app/api/webhooks/safepay/route.ts).
+ */
+export function getPaymentInvoiceEmailHtml({
+  name,
+  planName,
+  priceLabel,
+  durationLabel,
+  paidAt,
+  premiumUntil,
+  reference,
+}: PaymentInvoiceArgs): string {
+  const title = "Payment Receipt";
+  const preheader = `Your receipt for ${planName} — payment confirmed automatically.`;
+  const dateFmt = new Intl.DateTimeFormat("en-PK", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Karachi",
+  });
+  const invoiceRow = (label: string, value: string, emphasize = false) => `
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #e2e8f0;">
+      <span style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#64748b;">${label}</span>
+      <span style="font-size:${emphasize ? "16px" : "14px"}; font-weight:${emphasize ? "800" : "600"}; color:#0f172a;">${value}</span>
+    </div>
+  `;
+
+  const bodyHtml = `
+    <h2>Hello ${name},</h2>
+    <p>Thanks for upgrading — your payment was confirmed automatically and your <strong>${planName}</strong> access is now active. Here's your receipt for your records.</p>
+
+    <div class="bullets-container" style="padding:0 24px;">
+      ${invoiceRow("Plan", planName)}
+      ${invoiceRow("Amount Paid", priceLabel, true)}
+      ${invoiceRow("Access Period", durationLabel)}
+      ${invoiceRow("Payment Date", dateFmt.format(new Date(paidAt)))}
+      ${invoiceRow("Access Valid Until", dateFmt.format(new Date(premiumUntil)))}
+      ${invoiceRow("Reference No.", reference)}
+    </div>
+
+    <p style="font-size:13px; color:#64748b;">This is a one-time payment — MdcatXpert never auto-renews or auto-charges you. We'll email you a reminder a few days before your access expires so you can choose to renew.</p>
+  `;
+
+  return getBaseEmailTemplate({
+    title,
+    preheader,
+    bodyHtml,
+    ctaText: "Go to Dashboard",
+    ctaUrl: "https://mdcatxpert.com/dashboard",
+  });
+}
+
 /**
  * Returns HTML New Quiz Uploaded notification email.
  */

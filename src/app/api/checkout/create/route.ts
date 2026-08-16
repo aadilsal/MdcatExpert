@@ -5,11 +5,9 @@ import { api } from "../../../../../convex/_generated/api";
 import { formatUserError } from "@/lib/format-user-error";
 import { getSiteUrl } from "@/lib/site-url";
 import { getSafepayClient, getSafepayEnvironment, isSafepayConfigured, SAFEPAY_API_KEY } from "@/lib/safepay";
+import { PLANS, isPlanId, type PlanId } from "@/lib/plans";
 
-const ELITE_PRICE_PKR = 2500;
-const ELITE_PREMIUM_DAYS = 365;
-
-export async function POST() {
+export async function POST(request: Request) {
   try {
     if (!isSafepayConfigured()) {
       return NextResponse.json(
@@ -20,6 +18,21 @@ export async function POST() {
         { status: 503 },
       );
     }
+
+    // Default to the flagship annual plan for callers that don't send a body
+    // (e.g. the existing goElite signup flow) — everything else must name a
+    // valid planId. The price/duration are ALWAYS looked up server-side from
+    // this id below; a client can never supply its own amount.
+    let planId: PlanId = "elite_annual";
+    try {
+      const body = await request.json();
+      if (body && isPlanId(body.planId)) {
+        planId = body.planId;
+      }
+    } catch {
+      // No/empty JSON body — fall back to the default plan above.
+    }
+    const plan = PLANS[planId];
 
     const token = await convexAuthNextjsToken();
     if (!token) {
@@ -32,7 +45,7 @@ export async function POST() {
     }
 
     const safepay = getSafepayClient();
-    const amountInPaisa = ELITE_PRICE_PKR * 100; // Safepay amounts are in the lowest denomination.
+    const amountInPaisa = plan.priceKr * 100; // Safepay amounts are in the lowest denomination.
 
     // Step 1: open a payment session ("tracker").
     const session = await safepay.payments.session.setup({
@@ -80,7 +93,8 @@ export async function POST() {
         trackerToken,
         amount: amountInPaisa,
         currency: "PKR",
-        premiumDays: ELITE_PREMIUM_DAYS,
+        premiumDays: plan.days,
+        planId: plan.id,
       },
       { token },
     );

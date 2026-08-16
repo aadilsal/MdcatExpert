@@ -25,6 +25,11 @@ export default function TermsPage() {
                     While we strive for 100% accuracy in our quiz archives and solutions, the materials on MdcatXpert are provided for educational purposes only. We do not guarantee that all information is free from errors or reflects the precise latest syllabus changes of official examination bodies.
                 </p>
 
+                <h2 className="text-2xl font-black text-gray-900 dark:text-white pt-8 border-t border-gray-100 dark:border-slate-800 uppercase tracking-wider text-sm">3a. Payments &amp; Plans</h2>
+                <p>
+                    MdcatXpert offers a free tier and two paid, one-time-payment plans (a 30-day Monthly Pass and a 365-day Elite Annual pass). Neither plan auto-renews or auto-charges you — access simply expires at the end of the paid period unless you choose to purchase again. Payments are processed by a licensed third-party payment gateway; see our <a href="/refund-policy" className="text-primary-600 hover:underline">Refund Policy</a> for details on cancellations and refunds.
+                </p>
+
                 <h2 className="text-2xl font-black text-gray-900 dark:text-white pt-8 border-t border-gray-100 dark:border-slate-800 uppercase tracking-wider text-sm">4. Limitation of Liability</h2>
                 <p>
                     MdcatXpert and its creators shall not be liable for any direct, indirect, incidental, or consequential damages resulting from the use or inability to use the Platform, including but not limited to exam results.

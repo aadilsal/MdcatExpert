@@ -9,6 +9,7 @@ import {
   incrementDailyMessageCount,
   type CopilotMode,
 } from "./copilotAccess";
+import { isActivePremiumUser } from "./quizAccess";
 
 const modeValidator = v.union(
   v.literal("explain"),
@@ -66,6 +67,9 @@ export const createSession = mutation({
 
     await assertChatModeAllowed(ctx, mode as CopilotMode);
 
+    const profile = await ctx.db.get(userId);
+    const isPremium = isActivePremiumUser(profile);
+
     for (const sourceId of sourceIds) {
       const source = await ctx.db.get(sourceId);
       if (!source) throw new Error("Source not found");
@@ -74,6 +78,13 @@ export const createSession = mutation({
       }
       if (source.ownerType === "platform" && !source.isPublished) {
         throw new Error("Source not available");
+      }
+      // Free users get a taste of the library (isPremiumOnly: false sources,
+      // e.g. one intro chapter per subject) but not the full catalog —
+      // this is the one enforcement point; everything else already treats
+      // "premium" as an undifferentiated bucket (see quizAccess.ts).
+      if (source.ownerType === "platform" && source.isPremiumOnly && !isPremium) {
+        throw new Error("Premium required for this source");
       }
     }
 

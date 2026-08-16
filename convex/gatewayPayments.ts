@@ -34,6 +34,7 @@ export const createGatewayOrder = mutation({
     amount: v.number(),
     currency: v.string(),
     premiumDays: v.number(),
+    planId: v.optional(v.union(v.literal("elite_annual"), v.literal("monthly_pass"))),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -47,6 +48,7 @@ export const createGatewayOrder = mutation({
       currency: args.currency,
       status: "created",
       premiumDays: args.premiumDays,
+      planId: args.planId,
       createdAt: Date.now(),
     });
   },
@@ -115,6 +117,7 @@ export const confirmGatewayPayment = mutation({
     await ctx.db.patch(order.userId, {
       subscriptionType: "premium",
       premiumUntil,
+      activePlanId: order.planId,
     });
 
     await ctx.db.patch(order._id, { status: "succeeded", processedAt: now });
@@ -127,6 +130,23 @@ export const confirmGatewayPayment = mutation({
       createdAt: now,
     });
 
-    return { ok: true };
+    // Returned so the webhook route (Next.js/Node runtime) can send an
+    // invoice email — Convex mutations can't call Resend directly.
+    return {
+      ok: true,
+      invoice:
+        user.email && (user.emailNotificationsEnabled ?? true)
+          ? {
+              email: user.email,
+              name: user.name || "Student",
+              planId: order.planId ?? "elite_annual",
+              amount: order.amount,
+              currency: order.currency,
+              paidAt: now,
+              premiumUntil,
+              reference: order.trackerToken,
+            }
+          : null,
+    };
   },
 });

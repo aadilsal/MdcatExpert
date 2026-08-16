@@ -26,13 +26,14 @@ import { fetchMeCached } from "@/lib/me-client-cache";
 import AnalyticsTracker from "@/components/analytics-tracker";
 import MdcatLogo from "@/components/mdcat-logo";
 import ThemeToggle from "@/components/landing/theme-toggle";
+import OnboardingTour from "@/components/onboarding-tour";
 
 const studentNav = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/quizzes", label: "Quizzes", icon: FileText },
-    { href: "/copilot", label: "Study Copilot", icon: BookOpen },
-    { href: "/flashcards", label: "Flashcards", icon: Layers },
-    { href: "/analytics", label: "Analytics", icon: BarChart3 },
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, tourId: "dashboard" },
+    { href: "/quizzes", label: "Quizzes", icon: FileText, tourId: "quizzes" },
+    { href: "/copilot", label: "Study Copilot", icon: BookOpen, tourId: "copilot" },
+    { href: "/flashcards", label: "Flashcards", icon: Layers, tourId: "flashcards" },
+    { href: "/analytics", label: "Analytics", icon: BarChart3, tourId: "analytics" },
 ];
 
 const adminNav = [
@@ -95,7 +96,7 @@ export default function AppLayout({
     const pathname = usePathname();
     const router = useRouter();
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [userData, setUserData] = useState<{ name: string; email: string; role: string; emailVerificationTime?: number | null } | null>(null);
+    const [userData, setUserData] = useState<{ name: string; email: string; role: string; emailVerificationTime?: number | null; onboardingCompleted?: boolean | null } | null>(null);
     const [openReportCount, setOpenReportCount] = useState(0);
 
     useEffect(() => {
@@ -130,6 +131,7 @@ export default function AppLayout({
     return (
         <div className="min-h-screen bg-[#FDFDFF] dark:bg-slate-950 text-gray-900 dark:text-gray-100 transition-colors duration-350">
             <AnalyticsTracker />
+            <OnboardingTour active={userData?.role === "student" && userData?.onboardingCompleted === false} />
             {/* Mobile overlay */}
             <AnimatePresence>
                 {sidebarOpen && (
@@ -173,6 +175,7 @@ export default function AppLayout({
                                     <Link
                                         key={item.href}
                                         href={item.href}
+                                        data-tour-id={item.tourId}
                                         onClick={() => setSidebarOpen(false)}
                                         className={`group flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 ${isActive
                                             ? "bg-primary-600 text-white shadow-lg shadow-primary-600/20 scale-[1.02]"

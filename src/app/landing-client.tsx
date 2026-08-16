@@ -20,6 +20,7 @@ import {
 import { useRef, useEffect, useState } from "react";
 import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics-events";
 import MdcatLogo from "@/components/mdcat-logo";
+import { PLANS } from "@/lib/plans";
 
 // Import new interactive widgets
 import MiniQuiz, { type SampleQuestion } from "@/components/landing/mini-quiz";
@@ -114,11 +115,15 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 export default function LandingClient({
   recentPosts = [],
   dbQuestions = [],
+  stats = { totalQuizzes: 0, totalStudents: 0 },
 }: {
   recentPosts?: RecentBlogPost[];
   dbQuestions?: SampleQuestion[];
+  stats?: { totalQuizzes: number; totalStudents: number };
 }) {
   const containerRef = useRef(null);
+  const totalQuizzesLabel = stats.totalQuizzes > 0 ? `${stats.totalQuizzes}+` : "growing";
+  const totalStudentsLabel = stats.totalStudents > 0 ? `${stats.totalStudents}+` : "our first";
 
   useEffect(() => {
     trackEvent(ANALYTICS_EVENTS.LANDING_VIEW);
@@ -493,7 +498,7 @@ export default function LandingClient({
             </p>
           </div>
 
-          <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
             {/* Free Tier */}
             <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-gray-100 dark:border-slate-800 shadow-sm flex flex-col justify-between">
               <div className="space-y-6">
@@ -519,7 +524,35 @@ export default function LandingClient({
               </Link>
             </div>
 
-            {/* Premium Tier */}
+            {/* Monthly Pass — low-commitment entry tier */}
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border-2 border-primary-200 dark:border-primary-900/50 shadow-sm flex flex-col justify-between">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-wider">Monthly Pass</h3>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1">Try It For 30 Days</p>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-4xl font-black text-gray-900 dark:text-white">{PLANS.monthly_pass.priceLabel}</span>
+                  <span className="text-gray-400 dark:text-gray-500 font-bold text-[10px] uppercase tracking-widest">/ 30 Days</span>
+                </div>
+                <ul className="space-y-3.5 border-t border-gray-50 dark:border-slate-800 pt-6">
+                  {["Everything in Elite for 30 days", "Unlimited Premium Quizzes", "Study Copilot — unlimited uploads", "One-time payment, no auto-renewal"].map(f => (
+                    <li key={f} className="flex items-center gap-3 text-xs font-semibold text-gray-500 dark:text-gray-400">
+                      <CheckCircle className="w-4 h-4 text-primary-400 shrink-0" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <Link
+                href="/signup"
+                className="w-full py-4 text-center text-[10px] font-black uppercase tracking-widest text-primary-700 dark:text-primary-300 border-2 border-primary-200 dark:border-primary-900/50 rounded-xl hover:bg-primary-50 dark:hover:bg-primary-950/40 transition-all mt-8 active:scale-95"
+              >
+                Get Monthly Pass
+              </Link>
+            </div>
+
+            {/* Elite Annual — flagship tier */}
             <div className="relative group flex flex-col">
               <div className="absolute -inset-1.5 bg-linear-to-r from-primary-600 to-purple-600 rounded-4xl blur-md opacity-20 group-hover:opacity-30 transition-opacity" />
               <div className="relative bg-gray-950 dark:bg-slate-900 border border-gray-900 dark:border-slate-800/80 text-white rounded-3xl p-8 flex flex-col justify-between flex-1">
@@ -529,14 +562,14 @@ export default function LandingClient({
                       <h3 className="text-xl font-black uppercase tracking-wider text-primary-400">Elite Access</h3>
                       <p className="text-[9px] text-gray-500 dark:text-gray-400 font-black uppercase tracking-widest mt-1">AI Guided Study</p>
                     </div>
-                    <span className="px-3 py-1 bg-primary-600 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg">Recommended</span>
+                    <span className="px-3 py-1 bg-primary-600 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg">Best Value</span>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-black text-primary-300">Rs. 2500</span>
+                    <span className="text-4xl font-black text-primary-300">{PLANS.elite_annual.priceLabel}</span>
                     <span className="text-gray-500 dark:text-gray-400 font-bold text-[10px] uppercase tracking-widest">/ Full Season Pass</span>
                   </div>
                   <ul className="space-y-3.5 border-t border-white/5 dark:border-slate-800 pt-6">
-                    {["Dynamic AI Weakness Radar", "Instant AI Mistake Analyzer explanations", "Unlimited Study Copilot RAG uploads", "Access to 5,000+ past paper archives", "Instant verification & 24/7 Priority Support"].map(f => (
+                    {["Dynamic AI Weakness Radar", "Instant AI Mistake Analyzer explanations", "Unlimited Study Copilot RAG uploads", `Access to our full ${totalQuizzesLabel} past-paper archive`, "Instant verification & 24/7 Priority Support"].map(f => (
                       <li key={f} className="flex items-center gap-3 text-xs font-semibold text-gray-300">
                         <CheckCircle className="w-4 h-4 text-primary-400 shrink-0" />
                         <span>{f}</span>
@@ -715,7 +748,7 @@ export default function LandingClient({
             />
             <FAQItem
               question="How does the Lifetime Premium Plan work?"
-              answer="You pay a one-time fee of Rs. 2500. There are no monthly subscriptions, no hidden charges, and you get access to all features (including the AI Weakness Radar, Mistake Analyzer, and study library updates) for the entire duration of your MDCAT preparation cycle."
+              answer={`You choose either a Rs. ${PLANS.monthly_pass.priceKr} Monthly Pass (30 days) or a Rs. ${PLANS.elite_annual.priceKr} Elite Annual pass (365 days, best value). Both are single one-time payments — no auto-renewal, no hidden charges, and you get access to all features (including the AI Weakness Radar, Mistake Analyzer, and study library) for the full length of your plan.`}
             />
             <FAQItem
               question="Is my payment proof processed quickly?"
@@ -751,7 +784,7 @@ export default function LandingClient({
               <span className="text-primary-300 font-normal italic">Medical College Seat?</span>
             </h2>
             <p className="text-base text-gray-400 dark:text-gray-400 font-medium mb-10 max-w-lg mx-auto">
-              Join thousands of medical aspirants who are already using MdcatXpert to gain a competitive edge.
+              Join {totalStudentsLabel} students already building their MDCAT 2027 prep with MdcatXpert.
             </p>
             <Link
               href="/signup"
@@ -802,6 +835,7 @@ export default function LandingClient({
                 { name: 'Help Center', href: '/help' },
                 { name: 'Terms', href: '/terms' },
                 { name: 'Privacy', href: '/privacy' },
+                { name: 'Refund Policy', href: '/refund-policy' },
                 { name: 'Contact', href: '/contact' }
               ].map(i => (
                 <li key={i.name}><Link href={i.href} className="text-gray-500 dark:text-gray-400 text-xs font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors">{i.name}</Link></li>

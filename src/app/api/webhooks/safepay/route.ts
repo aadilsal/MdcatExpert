@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { fetchMutation } from "convex/nextjs";
 import { api } from "../../../../../convex/_generated/api";
 import { isSafepayConfigured, verifySafepayWebhookSignature } from "@/lib/safepay";
+import { sendEmailNotification } from "@/lib/resend";
+import { getPaymentInvoiceEmailHtml } from "@/lib/email-templates";
+import { PLANS, isPlanId, type PlanId } from "@/lib/plans";
 
 /**
  * Safepay webhook receiver — the source of truth for activating Elite
@@ -56,11 +59,34 @@ export async function POST(request: Request) {
     }
 
     if (event.type === "payment.succeeded") {
-      await fetchMutation(api.gatewayPayments.confirmGatewayPayment, {
+      const result = await fetchMutation(api.gatewayPayments.confirmGatewayPayment, {
         trackerToken,
         outcome: "succeeded",
         internalSecret: process.env.GATEWAY_WEBHOOK_SHARED_SECRET as string,
       });
+
+      const invoice = result?.invoice;
+      if (invoice) {
+        const planId: PlanId = isPlanId(invoice.planId) ? invoice.planId : "elite_annual";
+        const plan = PLANS[planId];
+        const html = getPaymentInvoiceEmailHtml({
+          name: invoice.name,
+          planName: plan.name,
+          priceLabel: `Rs. ${(invoice.amount / 100).toLocaleString("en-PK")}`,
+          durationLabel: plan.durationLabel,
+          paidAt: invoice.paidAt,
+          premiumUntil: invoice.premiumUntil,
+          reference: invoice.reference,
+        });
+        // Best-effort: a failed invoice email must never fail the webhook —
+        // Safepay only cares that we acknowledged the event (see try/catch below).
+        await sendEmailNotification({
+          to: invoice.email,
+          subject: `Your MdcatXpert receipt — ${plan.name}`,
+          text: `Hi ${invoice.name},\n\nYour payment for ${plan.name} (${plan.durationLabel}) was confirmed automatically.\n\nReference: ${invoice.reference}\n\nThanks for upgrading!`,
+          html,
+        });
+      }
     } else if (event.type === "payment.failed") {
       await fetchMutation(api.gatewayPayments.confirmGatewayPayment, {
         trackerToken,

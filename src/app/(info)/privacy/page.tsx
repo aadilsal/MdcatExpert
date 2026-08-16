@@ -22,17 +22,22 @@ export default function PrivacyPage() {
 
                 <h2 className="text-2xl font-black text-gray-900 dark:text-white pt-8 border-t border-gray-100 dark:border-slate-800 uppercase tracking-wider text-sm">3. Data Sharing</h2>
                 <p>
-                    We do not sell, trade, or otherwise transfer your personally identifiable information to outside parties. Your data is strictly used for the Platform&apos;s educational functionality.
+                    We do not sell, trade, or otherwise transfer your personally identifiable information to outside parties. Your data is strictly used for the Platform&apos;s educational functionality. The only exception is payment processing: when you purchase a plan, your payment details (card, JazzCash, Easypaisa, or bank account information) are collected and processed directly by our licensed payment gateway partner. We never receive or store your full card number, CVV, or bank account credentials on our own servers — we only receive confirmation that a payment succeeded.
                 </p>
 
                 <h2 className="text-2xl font-black text-gray-900 dark:text-white pt-8 border-t border-gray-100 dark:border-slate-800 uppercase tracking-wider text-sm">4. Security</h2>
                 <p>
-                    We implement industry-standard security measures to protect your personal information. All authentication and data storage are handled through Supabase, ensuring enterprise-grade encryption and security.
+                    We implement industry-standard security measures to protect your personal information. Authentication and data storage are handled through Convex, with encryption in transit and at rest.
                 </p>
 
                 <h2 className="text-2xl font-black text-gray-900 dark:text-white pt-8 border-t border-gray-100 dark:border-slate-800 uppercase tracking-wider text-sm">5. Your Rights</h2>
                 <p>
                     You have the right to access, correct, or delete your personal data at any time. If you wish to delete your account, please contact us at support@mdcatxpert.com.
+                </p>
+
+                <h2 className="text-2xl font-black text-gray-900 dark:text-white pt-8 border-t border-gray-100 dark:border-slate-800 uppercase tracking-wider text-sm">6. Contact</h2>
+                <p>
+                    MdcatXpert, Gulberg III, Lahore, Pakistan. Phone: 0303-5116528. Email: support@mdcatxpert.com.
                 </p>
             </section>
         </article>

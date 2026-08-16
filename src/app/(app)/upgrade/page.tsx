@@ -19,12 +19,14 @@ import {
 import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics-events";
 import { LoadingButton } from "@/components/loading-button";
 import ScoreImprovementCalculator from "@/components/score-improvement-calculator";
+import { PLANS, type PlanId } from "@/lib/plans";
 
 function UpgradePageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const reason = searchParams.get("reason");
     const [step, setStep] = useState<"pricing" | "checkout">("pricing");
+    const [selectedPlan, setSelectedPlan] = useState<PlanId>("elite_annual");
     const [uploading, setUploading] = useState(false);
     const [screenshot, setScreenshot] = useState<File | null>(null);
     const [transactionId, setTransactionId] = useState("");
@@ -36,12 +38,24 @@ function UpgradePageContent() {
     const [checkoutLoading, setCheckoutLoading] = useState(false);
     const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
+    const plan = PLANS[selectedPlan];
+
+    const goToCheckout = (planId: PlanId) => {
+        setSelectedPlan(planId);
+        setShowManualFallback(false);
+        setStep("checkout");
+    };
+
     const handleSecureCheckout = async () => {
         setCheckoutLoading(true);
         setCheckoutError(null);
         try {
-            trackEvent(ANALYTICS_EVENTS.PAYMENT_SUBMITTED, { method: "safepay" });
-            const res = await fetch("/api/checkout/create", { method: "POST" });
+            trackEvent(ANALYTICS_EVENTS.PAYMENT_SUBMITTED, { method: "safepay", planId: selectedPlan });
+            const res = await fetch("/api/checkout/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ planId: selectedPlan }),
+            });
             const json = await res.json();
             if (!res.ok || !json.url) {
                 throw new Error(json?.error || "Unable to start checkout.");
@@ -224,13 +238,13 @@ function UpgradePageContent() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className="grid grid-cols-1 lg:grid-cols-2 gap-10"
+                        className="grid grid-cols-1 lg:grid-cols-3 gap-8"
                     >
                         {/* Free Tier */}
-                        <div className="bg-surface rounded-4xl p-10 border border-surface-border shadow-xl opacity-60">
+                        <div className="bg-surface rounded-4xl p-8 border border-surface-border shadow-xl opacity-60 flex flex-col">
                             <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100 italic mb-2">Standard.</h2>
-                            <div className="text-5xl font-black text-gray-900 dark:text-gray-100 mb-8 italic">Free</div>
-                            <ul className="space-y-4 mb-10">
+                            <div className="text-4xl font-black text-gray-900 dark:text-gray-100 mb-8 italic">Free</div>
+                            <ul className="space-y-4 mb-10 grow">
                                 {["5 Practice Quizzes", "Study Copilot (3 uploads, 10 msgs/day)", "Explain mode only", "Basic Analytics"].map(f => (
                                     <li key={f} className="flex items-center gap-3 text-gray-500 dark:text-gray-400 font-bold italic text-sm">
                                         <Check className="w-4 h-4 text-gray-400" /> {f}
@@ -240,19 +254,49 @@ function UpgradePageContent() {
                             <div className="w-full py-4 text-center font-black uppercase tracking-widest text-[10px] text-gray-400">Current Plan</div>
                         </div>
 
-                        {/* Premium Tier */}
+                        {/* Monthly Pass — low-commitment entry tier */}
+                        <div className="bg-surface rounded-4xl p-8 border-2 border-primary-200 dark:border-primary-900/50 shadow-xl flex flex-col">
+                            <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100 italic mb-2">Monthly Pass.</h2>
+                            <div className="flex items-baseline gap-2 mb-1">
+                                <span className="text-4xl font-black italic text-primary-600 dark:text-primary-400">{PLANS.monthly_pass.priceLabel}</span>
+                                <span className="text-gray-400 font-bold uppercase text-[9px] tracking-widest">/ {PLANS.monthly_pass.durationLabel}</span>
+                            </div>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-8">One-time payment. No auto-renewal.</p>
+                            <ul className="space-y-4 mb-10 grow">
+                                {[
+                                    "Everything in Elite for 30 days",
+                                    "Unlimited Premium Quizzes",
+                                    "Study Copilot — unlimited uploads & messages",
+                                    "AI Mistake Analyzer & Weakness Radar",
+                                ].map(f => (
+                                    <li key={f} className="flex items-center gap-3 text-gray-700 dark:text-gray-300 font-bold italic text-sm">
+                                        <Check className="w-4 h-4 text-primary-500" /> {f}
+                                    </li>
+                                ))}
+                            </ul>
+                            <button
+                                onClick={() => goToCheckout("monthly_pass")}
+                                className="w-full py-5 bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-900/50 font-black rounded-3xl uppercase tracking-widest text-xs hover:bg-primary-100 dark:hover:bg-primary-950/70 transition-all flex items-center justify-center gap-3 group"
+                            >
+                                Get Monthly Pass <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </button>
+                        </div>
+
+                        {/* Elite Annual — flagship tier */}
                         <div className="relative group">
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-1.5 bg-primary-500 text-white text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg">Best Value</div>
                             <div className="absolute -inset-1 bg-linear-to-r from-primary-600 to-purple-600 rounded-[2.6rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
-                            <div className="relative bg-black rounded-4xl p-10 text-white shadow-2xl border border-white/10">
+                            <div className="relative bg-black rounded-4xl p-8 text-white shadow-2xl border border-white/10 h-full flex flex-col">
                                 <div className="absolute top-0 right-0 p-8">
                                     <Rocket className="w-12 h-12 text-primary-500/20 rotate-12" />
                                 </div>
                                 <h2 className="text-2xl font-black italic mb-2">Elite.</h2>
-                                <div className="flex items-baseline gap-2 mb-8">
-                                    <span className="text-5xl font-black italic text-primary-500">Rs. 2500</span>
-                                    <span className="text-white/40 font-bold uppercase text-[9px] tracking-widest">/ 1-Year Season Pass</span>
+                                <div className="flex items-baseline gap-2 mb-1">
+                                    <span className="text-4xl font-black italic text-primary-500">{PLANS.elite_annual.priceLabel}</span>
+                                    <span className="text-white/40 font-bold uppercase text-[9px] tracking-widest">/ {PLANS.elite_annual.durationLabel}</span>
                                 </div>
-                                <ul className="space-y-4 mb-10">
+                                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-8">≈ Rs. 208/month. One payment for the whole exam year.</p>
+                                <ul className="space-y-4 mb-10 grow">
                                     {[
                                         "Unlimited Premium Quizzes",
                                         "Study Copilot — unlimited uploads & messages",
@@ -270,7 +314,7 @@ function UpgradePageContent() {
                                     ))}
                                 </ul>
                                 <button
-                                    onClick={() => setStep("checkout")}
+                                    onClick={() => goToCheckout("elite_annual")}
                                     className="w-full py-6 bg-primary-600 text-white font-black rounded-3xl uppercase tracking-widest text-xs hover:bg-primary-500 transition-all shadow-xl shadow-primary-600/30 flex items-center justify-center gap-3 group"
                                 >
                                     Activate Elite Status <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -289,7 +333,8 @@ function UpgradePageContent() {
                             <ChevronRight className="w-3 h-3 rotate-180" /> Back to Plans
                         </button>
 
-                        <h2 className="text-3xl font-black text-gray-900 dark:text-gray-100 italic mb-8 tracking-tighter">Checkout.</h2>
+                        <h2 className="text-3xl font-black text-gray-900 dark:text-gray-100 italic mb-2 tracking-tighter">Checkout.</h2>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-8">{plan.name} — {plan.priceLabel} / {plan.durationLabel}</p>
 
                         <div className="space-y-8">
                             {/* Automated checkout — primary path */}
@@ -307,13 +352,19 @@ function UpgradePageContent() {
                                     className="w-full py-6 bg-primary-600 text-white font-black rounded-3xl uppercase tracking-widest text-xs hover:bg-primary-500 transition-all shadow-xl shadow-primary-600/30 flex items-center justify-center gap-3"
                                 >
                                     <CreditCard className="w-4 h-4" />
-                                    Pay Rs. 2500 Securely
+                                    Pay {plan.priceLabel} Securely
                                 </LoadingButton>
                                 {checkoutError && (
                                     <p className="text-[11px] font-bold text-red-400 text-center">{checkoutError}</p>
                                 )}
                             </div>
 
+                            {selectedPlan !== "elite_annual" ? (
+                                <p className="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                    Manual bank transfer is only available for the Elite Annual plan — the Monthly Pass is instant-checkout only.
+                                </p>
+                            ) : (
+                            <>
                             <button
                                 onClick={() => setShowManualFallback((v) => !v)}
                                 className="w-full text-center text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
@@ -399,6 +450,8 @@ function UpgradePageContent() {
                                     <Clock className="w-3 h-3" /> Activation in 1-2 Hours
                                 </div>
                             </div>
+                            </>
+                            )}
                             </>
                             )}
                         </div>

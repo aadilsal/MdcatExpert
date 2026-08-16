@@ -307,6 +307,7 @@ export default function CopilotClient({
               key={s._id}
               source={s}
               selected={selectedSources.has(s._id)}
+              isLocked={Boolean(s.isPremiumOnly) && !usage.isPremium}
               onToggle={() => toggleSource(s._id)}
             />
           ))}
@@ -383,6 +384,7 @@ function SourceCard({
   onChat,
   isDeleting = false,
   deleteDisabled = false,
+  isLocked = false,
 }: {
   source: StudySource;
   selected: boolean;
@@ -391,24 +393,35 @@ function SourceCard({
   onChat?: () => void;
   isDeleting?: boolean;
   deleteDisabled?: boolean;
+  isLocked?: boolean;
 }) {
+  const router = useRouter();
   return (
     <div
-      className={`p-4 rounded-2xl border transition-colors cursor-pointer ${
-        selected
-          ? "border-primary-400 dark:border-primary-500 bg-primary-50/50 dark:bg-primary-950/20"
-          : "border-surface-border dark:border-slate-800/80 bg-white dark:bg-slate-900"
+      className={`p-4 rounded-2xl border transition-colors ${
+        isLocked
+          ? "border-surface-border dark:border-slate-800/80 bg-gray-50 dark:bg-slate-900/60 cursor-pointer"
+          : selected
+          ? "border-primary-400 dark:border-primary-500 bg-primary-50/50 dark:bg-primary-950/20 cursor-pointer"
+          : "border-surface-border dark:border-slate-800/80 bg-white dark:bg-slate-900 cursor-pointer"
       }`}
-      onClick={onToggle}
+      onClick={isLocked ? () => router.push("/upgrade?reason=premium_content") : onToggle}
     >
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="font-bold text-gray-900 dark:text-white text-sm">{source.title}</p>
+          <p className="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-1.5">
+            {source.title}
+            {isLocked && <Lock className="w-3 h-3 text-gray-400" />}
+          </p>
           <p className="text-xs text-gray-400 dark:text-gray-505 mt-1">
             {source.subject ?? "General"} · {statusLabel(source.status)}
           </p>
         </div>
-        <input type="checkbox" checked={selected} readOnly className="mt-1" />
+        {isLocked ? (
+          <span className="text-[9px] font-black uppercase tracking-widest text-primary-600 dark:text-primary-400 whitespace-nowrap">Elite</span>
+        ) : (
+          <input type="checkbox" checked={selected} readOnly className="mt-1" />
+        )}
       </div>
       {source.status === "ready" && onChat && (
         <button

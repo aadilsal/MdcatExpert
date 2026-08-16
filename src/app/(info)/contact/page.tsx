@@ -69,9 +69,10 @@ export default function ContactPage() {
                                 <Globe className="w-6 h-6" />
                             </div>
                             <div>
-                                <h3 className="font-black text-gray-900 dark:text-white uppercase tracking-widest text-xs mb-2">Location</h3>
-                                <p className="text-lg font-bold text-gray-700 dark:text-slate-300">Pakistan</p>
-                                <p className="text-sm text-gray-400 dark:text-slate-500 font-medium leading-relaxed">Serving MDCAT aspirants nationwide.</p>
+                                <h3 className="font-black text-gray-900 dark:text-white uppercase tracking-widest text-xs mb-2">Office</h3>
+                                <p className="text-lg font-bold text-gray-700 dark:text-slate-300">MdcatXpert</p>
+                                <p className="text-sm text-gray-400 dark:text-slate-500 font-medium leading-relaxed">Gulberg III, Lahore, Pakistan</p>
+                                <p className="text-sm text-gray-400 dark:text-slate-500 font-medium leading-relaxed">0303-5116528</p>
                             </div>
                         </div>
                     </div>

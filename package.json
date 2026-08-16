@@ -16,6 +16,7 @@
     "convex:seed-library": "node scripts/seed-pctb-library.mjs",
     "convex:seed-library:now": "node scripts/seed-pctb-library.mjs --now",
     "convex:seed-library:local": "node scripts/seed-pctb-library.mjs --local",
+    "convex:seed-openstax": "npx convex run seedOpenStax:seedAllOpenStaxChapters",
     "convex:reindex-failed": "node scripts/reindex-failed-library.mjs"
   },
   "dependencies": {

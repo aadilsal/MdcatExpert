@@ -279,6 +279,26 @@ export const getLandingQuestions = query({
   },
 });
 
+/**
+ * Real, safe-to-publish aggregate counts for the public landing page —
+ * unlike adminAnalytics.getAdminDashboard (admin-gated), this returns only
+ * non-sensitive totals so the marketing copy never has to hardcode numbers
+ * that go stale (see src/app/landing-client.tsx).
+ */
+export const getPublicStats = query({
+  args: {},
+  handler: async (ctx) => {
+    const [quizzes, students] = await Promise.all([
+      ctx.db.query("quizzes").collect(),
+      ctx.db.query("users").withIndex("by_role", (q) => q.eq("role", "student")).collect(),
+    ]);
+    return {
+      totalQuizzes: quizzes.length,
+      totalStudents: students.length,
+    };
+  },
+});
+
 export const ensureMistakesQuiz = mutation({
   handler: async (ctx) => {
     const me = await getAuthUserId(ctx);
