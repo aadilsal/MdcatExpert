@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description:
+    "The terms governing use of MdcatXpert's quiz archives, Study Copilot, and paid plans.",
+};
+
 export default function TermsPage() {
     return (
         <article className="prose prose-blue max-w-none">

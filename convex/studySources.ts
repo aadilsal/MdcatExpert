@@ -298,6 +298,7 @@ export const internalPatchSource = internalMutation({
     chunkCount: v.optional(v.number()),
     pageCount: v.optional(v.number()),
     errorMessage: v.optional(v.string()),
+    notifiedAt: v.optional(v.number()),
   },
   handler: async (ctx, { sourceId, ...patch }) => {
     await ctx.db.patch(sourceId, { ...patch, updatedAt: Date.now() });

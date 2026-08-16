@@ -131,7 +131,7 @@ function UpgradePageContent() {
                 body: JSON.stringify({
                     transactionId,
                     screenshotUrl: uploadJson.url,
-                    amount: 2500,
+                    amount: plan.priceKr,
                     archiveTitle: parsedTitle,
                     archiveYear: parsedYear
                 })
@@ -295,7 +295,7 @@ function UpgradePageContent() {
                                     <span className="text-4xl font-black italic text-primary-500">{PLANS.elite_annual.priceLabel}</span>
                                     <span className="text-white/40 font-bold uppercase text-[9px] tracking-widest">/ {PLANS.elite_annual.durationLabel}</span>
                                 </div>
-                                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-8">≈ Rs. 208/month. One payment for the whole exam year.</p>
+                                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-8">≈ Rs. {Math.round(PLANS.elite_annual.priceKr / 12)}/month. One payment for the whole exam year.</p>
                                 <ul className="space-y-4 mb-10 grow">
                                     {[
                                         "Unlimited Premium Quizzes",
@@ -381,7 +381,7 @@ function UpgradePageContent() {
                                     <span className="text-[10px] font-black uppercase tracking-widest text-primary-600">Payment Protocol</span>
                                 </div>
                                 <div className="space-y-2">
-                                    <p className="text-sm font-bold text-gray-700 dark:text-gray-300 italic">Please send <span className="text-primary-600">Rs. 2500</span> to:</p>
+                                    <p className="text-sm font-bold text-gray-700 dark:text-gray-300 italic">Please send <span className="text-primary-600">{plan.priceLabel}</span> to:</p>
                                     <div className="p-4 bg-surface rounded-xl border border-primary-200 dark:border-primary-900/40">
                                         <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">JazzCash / Nayapay</p>
                                         <p className="text-lg font-black text-gray-900 dark:text-gray-100 tracking-tight">03035116528</p>

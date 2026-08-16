@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { LoadingButton } from "@/components/loading-button";
+import { PLANS } from "@/lib/plans";
 
 function SignupPaymentContent() {
     const router = useRouter();
@@ -98,7 +99,7 @@ function SignupPaymentContent() {
                 body: JSON.stringify({
                     transactionId,
                     screenshotUrl: uploadResult.url,
-                    amount: 2500,
+                    amount: PLANS.elite_annual.priceKr,
                     archiveTitle: parsedTitle,
                     archiveYear: parsedYear,
                 }),

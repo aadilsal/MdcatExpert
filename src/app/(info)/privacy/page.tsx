@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "How MdcatXpert collects, uses, and protects your personal data, including quiz activity and payment processing.",
+};
+
 export default function PrivacyPage() {
     return (
         <article className="prose prose-blue max-w-none">

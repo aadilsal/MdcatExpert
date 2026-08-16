@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
   BookOpen,
@@ -40,42 +40,6 @@ export interface RecentBlogPost {
   tags: string[];
   publishedAt?: number;
   createdAt: number;
-}
-
-// Custom Counter Component for Scrolltelling Stats
-function AnimatedCounter({ value, suffix = "", duration = 1.2 }: { value: number; suffix?: string; duration?: number }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
-
-  useEffect(() => {
-    if (isInView) {
-      let start = 0;
-      const end = value;
-      if (start === end) return;
-
-      const totalMiliseconds = duration * 1000;
-      const incrementTime = Math.max(Math.floor(totalMiliseconds / end), 15);
-      
-      const timer = setInterval(() => {
-        start += Math.ceil(end / (totalMiliseconds / incrementTime));
-        if (start >= end) {
-          setCount(end);
-          clearInterval(timer);
-        } else {
-          setCount(start);
-        }
-      }, incrementTime);
-
-      return () => clearInterval(timer);
-    }
-  }, [isInView, value, duration]);
-
-  return (
-    <span ref={ref} className="tabular-nums font-black text-4xl sm:text-5xl text-gray-900 dark:text-white">
-      {count.toLocaleString()}{suffix}
-    </span>
-  );
 }
 
 // Collapsible FAQ Item Component
@@ -143,8 +107,8 @@ export default function LandingClient({
   const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
 
   return (
-    <div ref={containerRef} className="relative min-h-screen bg-transparent">
-      
+    <div ref={containerRef} className="relative min-h-screen bg-transparent pb-20 sm:pb-0">
+
       {/* Navigation */}
       <motion.nav
         initial={{ y: -100 }}
@@ -485,28 +449,6 @@ export default function LandingClient({
               </div>
             </div>
 
-          </div>
-        </div>
-      </section>
-
-      {/* TELEMETRY / SCROLLTELLING COUNTERS */}
-      <section className="py-20 bg-white dark:bg-slate-950/40 border-y border-gray-50 dark:border-slate-800/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          <div className="space-y-2">
-            <AnimatedCounter value={12400} suffix="+" />
-            <p className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Registered Aspirants</p>
-          </div>
-          <div className="space-y-2">
-            <AnimatedCounter value={5500} suffix="+" />
-            <p className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Verified Past Questions</p>
-          </div>
-          <div className="space-y-2">
-            <AnimatedCounter value={94} suffix="%" />
-            <p className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Accuracy Improvement</p>
-          </div>
-          <div className="space-y-2">
-            <AnimatedCounter value={500} suffix="+" />
-            <p className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">KEMU & DMC Admissions</p>
           </div>
         </div>
       </section>
@@ -904,6 +846,17 @@ export default function LandingClient({
           </div>
         </div>
       </footer>
+
+      {/* STICKY MOBILE CTA — thumb-zone signup bar, hidden on desktop where the nav CTA is always visible */}
+      <div className="sm:hidden fixed inset-x-0 bottom-0 z-40 p-3 bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl border-t border-gray-100 dark:border-slate-800">
+        <Link
+          href="/signup"
+          className="flex items-center justify-center gap-2 w-full py-3.5 text-sm font-black text-white bg-primary-600 rounded-2xl active:scale-95 transition-transform shadow-lg shadow-primary-600/25"
+        >
+          Start Free Practice
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
     </div>
   );
 }

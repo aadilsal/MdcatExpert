@@ -1,4 +1,11 @@
-import { Search, MessageCircle, Mail, MapPin, ChevronRight, HelpCircle, BookOpen, Target, BarChart3 } from "lucide-react";
+import type { Metadata } from "next";
+import { Search, MessageCircle, Mail, MapPin, ChevronRight, HelpCircle, BookOpen, Target, BarChart3, CreditCard } from "lucide-react";
+import { PLANS } from "@/lib/plans";
+
+export const metadata: Metadata = {
+  title: "Help Center",
+  description: "Answers to common questions about quizzes, analytics, Study Copilot, and billing on MdcatXpert.",
+};
 
 export default function HelpPage() {
     const faqs = [
@@ -6,8 +13,17 @@ export default function HelpPage() {
             category: "Getting Started",
             icon: BookOpen,
             questions: [
-                { q: "Is MdcatXpert really free?", a: "Yes, MdcatXpert is 100% free for all MDCAT aspirants. We provide access to all quiz archives and analytics without any subscription fees." },
+                { q: "Is MdcatXpert free?", a: `MdcatXpert has a free tier — 5 practice quizzes, basic analytics, and limited Study Copilot access, no card needed. For unlimited quizzes, the full Study Copilot, and the AI Weakness Radar, choose either the ${PLANS.monthly_pass.name} (${PLANS.monthly_pass.priceLabel} for ${PLANS.monthly_pass.durationLabel}) or the ${PLANS.elite_annual.name} (${PLANS.elite_annual.priceLabel} for ${PLANS.elite_annual.durationLabel}) — see our Plans page for details.` },
                 { q: "How do I take a quiz?", a: "Simply log in to your account, navigate to the 'Quizzes' tab, and select any year's quiz to start your timed session." }
+            ]
+        },
+        {
+            category: "Plans & Billing",
+            icon: CreditCard,
+            questions: [
+                { q: "What plans does MdcatXpert offer?", a: `Two paid plans, both one-time payments with no auto-renewal: the ${PLANS.monthly_pass.name} (${PLANS.monthly_pass.priceLabel}, ${PLANS.monthly_pass.durationLabel} of full access) and the ${PLANS.elite_annual.name} (${PLANS.elite_annual.priceLabel}, ${PLANS.elite_annual.durationLabel} of full access) — plus a free tier with limited quizzes and Study Copilot use.` },
+                { q: "Will I be charged again automatically?", a: "No. Neither plan renews automatically. Your access simply ends at the end of the paid period, and you'll only be charged again if you choose to purchase a new plan." },
+                { q: "How do I get a refund?", a: "See our Refund Policy for the full terms — email support@mdcatxpert.com with your payment reference if you were charged in error or never received access." }
             ]
         },
         {

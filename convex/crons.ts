@@ -15,4 +15,22 @@ crons.interval(
   {},
 );
 
+// "What's new this week" recap — new quizzes + new library content. Skips
+// itself entirely if nothing was published that week (see weeklyDigest.ts).
+crons.weekly(
+  "send weekly digest",
+  { dayOfWeek: "monday", hourUTC: 6, minuteUTC: 0 },
+  internal.weeklyDigest.sendWeeklyDigest,
+  {},
+);
+
+// Win-back nudge for users inactive 14+ days, sent at most once per
+// dormancy episode — see dormantReminders.ts.
+crons.interval(
+  "send dormant user reminders",
+  { hours: 24 },
+  internal.dormantReminders.sendDormantReminders,
+  {},
+);
+
 export default crons;

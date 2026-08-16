@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Refund Policy",
+  description:
+    "MdcatXpert's refund policy for the Monthly Pass and Elite Annual plans — digital access, no auto-renewal, and how to request a refund review.",
+};
+
 export default function RefundPolicyPage() {
     return (
         <article className="prose prose-blue max-w-none">

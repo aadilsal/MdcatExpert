@@ -26,6 +26,7 @@ import type * as copilot from "../copilot.js";
 import type * as copilotAccess from "../copilotAccess.js";
 import type * as crons from "../crons.js";
 import type * as documentChunks from "../documentChunks.js";
+import type * as dormantReminders from "../dormantReminders.js";
 import type * as files from "../files.js";
 import type * as gatewayPayments from "../gatewayPayments.js";
 import type * as http from "../http.js";
@@ -33,10 +34,12 @@ import type * as ingestDocument from "../ingestDocument.js";
 import type * as leaderboard from "../leaderboard.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as lib_chunker from "../lib/chunker.js";
+import type * as lib_emailShell from "../lib/emailShell.js";
 import type * as lib_ocrClient from "../lib/ocrClient.js";
 import type * as lib_passwordValidation from "../lib/passwordValidation.js";
 import type * as lib_retrieval from "../lib/retrieval.js";
 import type * as lib_userErrors from "../lib/userErrors.js";
+import type * as libraryNotifications from "../libraryNotifications.js";
 import type * as notifications from "../notifications.js";
 import type * as ocrPageTexts from "../ocrPageTexts.js";
 import type * as onboarding from "../onboarding.js";
@@ -59,6 +62,7 @@ import type * as studyNoteSeeds_notes1 from "../studyNoteSeeds/notes1.js";
 import type * as studySources from "../studySources.js";
 import type * as subscriptionReminders from "../subscriptionReminders.js";
 import type * as users from "../users.js";
+import type * as weeklyDigest from "../weeklyDigest.js";
 
 import type {
   ApiFromModules,
@@ -85,6 +89,7 @@ declare const fullApi: ApiFromModules<{
   copilotAccess: typeof copilotAccess;
   crons: typeof crons;
   documentChunks: typeof documentChunks;
+  dormantReminders: typeof dormantReminders;
   files: typeof files;
   gatewayPayments: typeof gatewayPayments;
   http: typeof http;
@@ -92,10 +97,12 @@ declare const fullApi: ApiFromModules<{
   leaderboard: typeof leaderboard;
   "lib/auth": typeof lib_auth;
   "lib/chunker": typeof lib_chunker;
+  "lib/emailShell": typeof lib_emailShell;
   "lib/ocrClient": typeof lib_ocrClient;
   "lib/passwordValidation": typeof lib_passwordValidation;
   "lib/retrieval": typeof lib_retrieval;
   "lib/userErrors": typeof lib_userErrors;
+  libraryNotifications: typeof libraryNotifications;
   notifications: typeof notifications;
   ocrPageTexts: typeof ocrPageTexts;
   onboarding: typeof onboarding;
@@ -118,6 +125,7 @@ declare const fullApi: ApiFromModules<{
   studySources: typeof studySources;
   subscriptionReminders: typeof subscriptionReminders;
   users: typeof users;
+  weeklyDigest: typeof weeklyDigest;
 }>;
 
 /**

@@ -4,6 +4,7 @@ import "./globals.css";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import NavigationProgress from "@/components/navigation-progress";
 import PageViewTracker from "@/components/page-view-tracker";
+import CookieBanner from "@/components/cookie-banner";
 import { getSiteUrl } from "@/lib/site-url";
 import { ThemeProvider } from "@/components/theme-provider";
 import ConvexClientProvider from "@/components/convex-client-provider";
@@ -129,6 +130,7 @@ export default async function RootLayout({
               <NavigationProgress />
               <PageViewTracker />
               {children}
+              <CookieBanner />
             </ThemeProvider>
           </ConvexClientProvider>
         </ConvexAuthNextjsServerProvider>

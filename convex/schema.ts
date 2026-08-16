@@ -43,6 +43,13 @@ export default defineSchema({
     renewalRemindersEnabled: v.optional(v.boolean()),
     premiumReminderSentForExpiry: v.optional(v.number()),
     premiumExpiredNoticeSentForExpiry: v.optional(v.number()),
+
+    // Engagement emails (weekly digest + dormant win-back). Both store a
+    // timestamp of the last send so a re-run within the same window is a
+    // no-op instead of a duplicate email — same idempotency pattern as the
+    // renewal reminders above.
+    lastWeeklyDigestSentAt: v.optional(v.number()),
+    dormantReminderSentAt: v.optional(v.number()),
   })
     .index("by_email", ["email"])
     .index("by_role", ["role"])
@@ -64,7 +71,8 @@ export default defineSchema({
     createdAt: v.number(),
   })
     .index("by_subject", ["subject"])
-    .index("by_year", ["year"]),
+    .index("by_year", ["year"])
+    .index("by_createdAt", ["createdAt"]),
 
   questions: defineTable({
     quizId: v.id("quizzes"),
@@ -322,6 +330,10 @@ export default defineSchema({
     errorMessage: v.optional(v.string()),
     isPremiumOnly: v.boolean(),
     isPublished: v.boolean(),
+    // Set once we've emailed users that this went live — decoupled from
+    // `status` so a later admin reindex (which also cycles through
+    // "processing" -> "ready") never re-fires the notification.
+    notifiedAt: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -329,7 +341,8 @@ export default defineSchema({
     .index("by_userId", ["userId"])
     .index("by_subject", ["subject"])
     .index("by_status", ["status"])
-    .index("by_sourceKind", ["sourceKind"]),
+    .index("by_sourceKind", ["sourceKind"])
+    .index("by_createdAt", ["createdAt"]),
 
   ocrPageTexts: defineTable({
     sourceId: v.id("studySources"),

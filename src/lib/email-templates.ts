@@ -1,3 +1,5 @@
+import { PLANS } from "@/lib/plans";
+
 /**
  * Centrally managed HTML email template builders for Elite MDCAT SaaS.
  * Designed with a premium, medical-inspired dark slate and emerald/primary color palette.
@@ -217,7 +219,7 @@ export function getWelcomeEmailHtml(name: string): string {
       </div>
     </div>
 
-    <p>Want to upgrade and unlock our full prep library? Upgrade to <strong>Elite Premium</strong> for a one-time 1-Year Full Season Pass payment of just Rs. 2,500.</p>
+    <p>Want to upgrade and unlock our full prep library? Upgrade to <strong>Elite Premium</strong> for a one-time 1-Year Full Season Pass payment of just ${PLANS.elite_annual.priceLabel}.</p>
   `;
 
   return getBaseEmailTemplate({

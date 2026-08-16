@@ -1,0 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Log In",
+  description: "Log in to your MdcatXpert account to continue your MDCAT preparation.",
+};
+
+export default function LoginLayout({ children }: { children: React.ReactNode }) {
+  return children;
+}

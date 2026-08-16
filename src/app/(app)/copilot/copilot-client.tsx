@@ -38,6 +38,14 @@ function statusLabel(status: StudySource["status"]) {
   return "Failed";
 }
 
+// Surfaces freshly-added library content (e.g. a new textbook seed) with a
+// "New" tag for a couple of weeks, then fades back to normal automatically —
+// no manual cleanup needed once the novelty wears off.
+const NEW_SOURCE_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
+function isRecentlyAdded(source: StudySource) {
+  return Date.now() - source.createdAt < NEW_SOURCE_WINDOW_MS;
+}
+
 export default function CopilotClient({
   user,
   myUploads,
@@ -301,21 +309,34 @@ export default function CopilotClient({
       )}
 
       {tab === "library" && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {library.map((s) => (
-            <SourceCard
-              key={s._id}
-              source={s}
-              selected={selectedSources.has(s._id)}
-              isLocked={Boolean(s.isPremiumOnly) && !usage.isPremium}
-              onToggle={() => toggleSource(s._id)}
-            />
-          ))}
-          {library.length === 0 && (
-            <p className="col-span-full text-gray-400 font-medium py-8 text-center">
-              Library is empty. Admins can add textbooks from Study Library.
-            </p>
+        <div className="space-y-4">
+          {library.some(isRecentlyAdded) && (
+            <div className="flex items-start gap-3 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
+              <Sparkles aria-hidden="true" className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+              <p className="text-sm font-bold text-emerald-800 dark:text-emerald-300 leading-relaxed">
+                New in the library: free official Biology, Chemistry &amp; Physics reference chapters. Look for the{" "}
+                <span className="px-1.5 py-0.5 rounded-md bg-emerald-600 text-white text-[9px] font-black uppercase tracking-widest">New</span>{" "}
+                tag below and add one to a chat.
+              </p>
+            </div>
           )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {library.map((s) => (
+              <SourceCard
+                key={s._id}
+                source={s}
+                selected={selectedSources.has(s._id)}
+                isLocked={Boolean(s.isPremiumOnly) && !usage.isPremium}
+                isNew={isRecentlyAdded(s)}
+                onToggle={() => toggleSource(s._id)}
+              />
+            ))}
+            {library.length === 0 && (
+              <p className="col-span-full text-gray-400 font-medium py-8 text-center">
+                Library is empty. Admins can add textbooks from Study Library.
+              </p>
+            )}
+          </div>
         </div>
       )}
 
@@ -385,6 +406,7 @@ function SourceCard({
   isDeleting = false,
   deleteDisabled = false,
   isLocked = false,
+  isNew = false,
 }: {
   source: StudySource;
   selected: boolean;
@@ -394,6 +416,7 @@ function SourceCard({
   isDeleting?: boolean;
   deleteDisabled?: boolean;
   isLocked?: boolean;
+  isNew?: boolean;
 }) {
   const router = useRouter();
   return (
@@ -409,9 +432,14 @@ function SourceCard({
     >
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-1.5">
+          <p className="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-1.5 flex-wrap">
             {source.title}
-            {isLocked && <Lock className="w-3 h-3 text-gray-400" />}
+            {isLocked && <Lock className="w-3 h-3 text-gray-400 shrink-0" />}
+            {isNew && (
+              <span className="px-1.5 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 text-[9px] font-black uppercase tracking-widest shrink-0">
+                New
+              </span>
+            )}
           </p>
           <p className="text-xs text-gray-400 dark:text-gray-505 mt-1">
             {source.subject ?? "General"} · {statusLabel(source.status)}

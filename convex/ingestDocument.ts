@@ -24,7 +24,7 @@ function pdfTextLooksSufficient(text: string, pageCount: number): boolean {
 async function saveChunks(
   ctx: ActionCtx,
   sourceId: Id<"studySources">,
-  source: { subject?: string; ownerType: "platform" | "user" },
+  source: { subject?: string; ownerType: "platform" | "user"; isPublished: boolean; notifiedAt?: number },
   chunks: TextChunk[],
 ) {
   await ctx.runMutation(internal.documentChunks.deleteBySourceId, { sourceId });
@@ -46,12 +46,22 @@ async function saveChunks(
     });
   }
 
+  // Only ever notify once per source — a later admin reindex also cycles
+  // through "processing" -> "ready" and must not re-fire the email blast.
+  const shouldNotify = source.ownerType === "platform" && source.isPublished && !source.notifiedAt;
+  const notifiedAt = shouldNotify ? Date.now() : undefined;
+
   await ctx.runMutation(internal.studySources.internalPatchSource, {
     sourceId,
     status: "ready",
     chunkCount: chunks.length,
     errorMessage: undefined,
+    notifiedAt,
   });
+
+  if (shouldNotify) {
+    await ctx.scheduler.runAfter(0, internal.libraryNotifications.notifyNewLibraryContent, { sourceId });
+  }
 }
 
 async function markFailed(ctx: ActionCtx, sourceId: Id<"studySources">, message: string) {
